@@ -5,6 +5,9 @@
 src/main/resources/*.yml
 config/*.yml
 
+### target ###
+target/
+
 ### Eclipse ###
 .metadata
 bin/
