@@ -1,0 +1,83 @@
+= API Guide
+Bbang ;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+[[overview]]
+= 개요
+
+[[overview-http-verbs]]
+
+== HTTP 상태 코드
+
+[cols="2,6"]
+|===
+| HTTP응답코드 | 설명
+
+| `200`
+| 성공
+
+| `404`
+| 미정의
+|===
+
+
+[[resources]]
+= 리소스
+
+[[resources-common]]
+== 공통 파라메터
+
+
+[[resources-common-header]]
+==== 공통헤더
+include::{snippets}/healthchecktest/healthcheck/request-headers.adoc[]
+
+
+[[resources-api]]
+== API
+
+
+[[resources-health-check]]
+==== healthCheck API
+
+include::{snippets}/healthchecktest/healthcheck/response-fields.adoc[]
+
+include::{snippets}/healthchecktest/healthcheck/http-request.adoc[]
+include::{snippets}/healthchecktest/healthcheck/http-response.adoc[]
+
+include::{snippets}/healthchecktest/healthcheck/curl-request.adoc[]
+
+
+
+[[resources-test-join]]
+==== Join Test API
+
+include::{snippets}/testtest/join/request-fields.adoc[]
+include::{snippets}/testtest/join/response-fields.adoc[]
+
+include::{snippets}/testtest/join/http-request.adoc[]
+include::{snippets}/testtest/join/http-response.adoc[]
+
+include::{snippets}/testtest/join/curl-request.adoc[]
+
+
+
+[[resources-test-login]]
+==== Login Test API
+
+include::{snippets}/testtest/login/request-fields.adoc[]
+include::{snippets}/testtest/login/response-fields.adoc[]
+
+include::{snippets}/testtest/login/http-request.adoc[]
+include::{snippets}/testtest/login/http-response.adoc[]
+
+include::{snippets}/testtest/login/curl-request.adoc[]
+
+

@@ -5,124 +5,117 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
+
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.snippet.Snippet;
-import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.RequestBodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.reactive.function.BodyInserters;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Transactional
+import io.my.bbang.test.repository.TestRepository;
+
 @SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@ExtendWith(RestDocumentationExtension.class)
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class RestDocsBaseWithSpringBoot extends TestBase {
-	
-	@Autowired
-	protected ApplicationContext context;
-	
+
 	protected WebTestClient webTestClient;
-	
-	@BeforeEach
-	public void setUp(WebApplicationContext context, RestDocumentationContextProvider restDocumentation) {
-		this.webTestClient = WebTestClient.bindToApplicationContext(context)
-			.configureClient()
-			.filter(documentationConfiguration(restDocumentation))
-			.build();
-	}
+	protected Snippet defaultRequestHeader;
 	
     @Autowired
     protected ObjectMapper objectMapper;
+    
+    @Autowired
+    protected BCryptPasswordEncoder passwordEncoder;
+    
+    @Autowired
+    protected TestRepository testRepository;
+    
+    
 
-//    protected ErrorResponse errResp =ErrorResponse.builder()
-//			.result()
-//			.build();
-    
-    protected Snippet defaultRequestHeader;
-    
-    @BeforeEach
-    public void setup(WebApplicationContext context, RestDocumentationContextProvider restDocument) {
-    	this.webTestClient= WebTestClient.bindToApplicationContext(context)
-    									.configureClient()
-    									.filter(documentationConfiguration(restDocument))
-										.filter(documentationConfiguration(restDocument).snippets().withEncoding("UTF-8"))
-										.build();
-    	
-    	
+	@BeforeEach
+	void setUp(ApplicationContext applicationContext,
+			RestDocumentationContextProvider restDocumentation) {
+		this.webTestClient = WebTestClient.bindToApplicationContext(applicationContext)
+				.configureClient()
+				.baseUrl("http://125.240.27.115:17500") 
+				.filter(documentationConfiguration(restDocumentation)) 
+				.filter(documentationConfiguration(restDocumentation).snippets().withEncoding("UTF-8"))
+				.build();
+
     	this.defaultRequestHeader = requestHeaders(
 				headerWithName("Authorization")
 					.description("JWT 인증 토큰")
+					.optional()
 	    			.attributes(
 	    					RestDocAttributes.length(""),
 	    					RestDocAttributes.format(""),
 	    					RestDocAttributes.etc("JWT 인증 토큰")
 					)
     			);
-    }
-    
-    public void apiNotDevelopedYet(String uri) {
-    	this.webTestClient.post()
-						.uri(uri)
-//						.accept(MediaType.APPLICATION_JSON)
-						.contentType(MediaType.APPLICATION_JSON)
-						.exchange()
-						.expectStatus()
-						.isOk()
-						.expectBody()
-						.consumeWith(WebTestClientRestDocumentation.document(
-								"{class-name}/{method-name}", 
-								preprocessRequest(prettyPrint()), 
-								preprocessResponse(prettyPrint()), 
-								defaultRequestHeader, 
-								responseFields(
-									fieldWithPath("message")
-									.description("API가 기획단계에 있습니다.")
-									.attributes(RestDocAttributes.length("Integer.MAX_VALUE"))
-								)));
-    }
-    
-    public HttpHeaders getTestHeader() {
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("OS", "android");
-		httpHeaders.add("Authorization", "bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJoZXJpdCIsInN1YiI6ImFjZXRrbiIsImF1ZCI6InRlc3QiLCJ0eXAiOiIyIiwiaWF0IjoxNTkzMTMwODAyLCJleHAiOjE1OTQ5NTgxODl9.4xBUAbzdTlRfBhPtM-3Dl3gdLHFDhVuVh_qf6jqtsTY");
-		return httpHeaders;
 	}
-
-    public ResponseSpec webTestClientPost(String uri, Object request) throws JsonProcessingException, Exception {
-    	return webTestClient.post()
-							.uri(uri)
-//							.accept(MediaType.APPLICATION_JSON)
-							.contentType(MediaType.APPLICATION_JSON)
-							.body(BodyInserters.fromValue(request))
-    						.exchange();
-    }
-    
-    public ResponseSpec webTestClientGet(String uri, Object request) throws JsonProcessingException, Exception {
-    	return ((RequestBodySpec) webTestClient.get()
-							.uri(uri))
-							.contentType(MediaType.APPLICATION_JSON)
-							.body(BodyInserters.fromValue(request))
-    						.exchange();
-    }
+	
+	protected ResponseSpec getWebTestClient(String uri) {
+		return this.webTestClient.get().uri(uri).accept(MediaType.APPLICATION_JSON).exchange();
+	}
+	
+	protected ResponseSpec postWebTestClient(Object body, String uri) {
+		return this.webTestClient.post().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec putWebTestClient(Object body, String uri) {
+		return this.webTestClient.put().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			RequestFieldsSnippet requestFieldsSnippet, 
+			ResponseFieldsSnippet responseFieldsSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				requestFieldsSnippet,
+				responseFieldsSnippet);
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			RequestFieldsSnippet requestFieldsSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				requestFieldsSnippet);
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			ResponseFieldsSnippet responseFieldsSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				responseFieldsSnippet);
+	}
+	
 }
