@@ -7,8 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import io.my.commons.entity.BaseTimeEntity;
-import io.my.commons.security.UserRole;
+import io.my.bbang.commons.entity.BaseTimeEntity;
+import io.my.bbang.commons.security.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

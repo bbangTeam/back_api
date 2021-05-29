@@ -3,13 +3,13 @@ package io.my.bbang.test.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.security.UserRole;
+import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.test.entity.TestEntity;
 import io.my.bbang.test.repository.TestRepository;
 import io.my.bbang.test.vo.response.TestJoinResponse;
 import io.my.bbang.test.vo.response.TestLoginResponse;
-import io.my.commons.exception.BbangException;
-import io.my.commons.security.UserRole;
-import io.my.commons.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,6 @@ public class TestService {
 		TestEntity entity = TestEntity.newInstance(loginId, passwordEncoder.encode(password));
 		entity.setName(name);
 		entity.getRoles().add(UserRole.ROLE_USER);
-		entity.getRoles().add(UserRole.ROLE_ADMIN);
 		
 		TestEntity saveEntity = new TestEntity();
 		Mono<TestEntity> monoEntity = testRepository.save(entity);
