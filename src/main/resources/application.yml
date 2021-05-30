@@ -1,0 +1,7 @@
+jjwt:
+  access-token:
+    expired-time: 1
+    secret-key: access_secret
+  refresh-token:
+    expired-time: 720
+    secret-key: refresh_secret

@@ -2,8 +2,12 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=eclipse,visualstudiocode
 
 ### config file ###
-src/main/resources/*.yml
-config/*.yml
+src/main/resources/application-local.yml
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
+config/application-local.yml
+config/application-dev.yml
+config/application-prod.yml
 
 ### target ###
 target/
