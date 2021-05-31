@@ -38,6 +38,7 @@ public class SecurityConfig {
 					.pathMatchers("/api/healthcheck").permitAll()
 					.pathMatchers("/api/test/join").permitAll()
 					.pathMatchers("/api/test/login").permitAll()
+					.pathMatchers("/**").permitAll()
 					.anyExchange().authenticated()
 					.and()
 					.csrf().disable()
