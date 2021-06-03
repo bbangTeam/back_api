@@ -1,19 +1,13 @@
-package io.my.bbang.breadstore.domain;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package io.my.bbang.breadstore.domain.Vo;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Document(collection = "store")
-@Getter
 @Setter
-public class Store {
+@Getter
+public class StoreVo {
 
-	@Id
 	private String id;
-
     private String entrpNm;
     private String loadAddr;
     private String cityDoCd;
