@@ -11,7 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.my.bbang.commons.utils.JwtUtil;
-import io.my.bbang.test.entity.TestEntity;
+import io.my.bbang.user.domain.User;
+import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +31,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 				return Mono.empty();
 			}
 			String userId = jwtUtil.getUserIdByAccessToken(jwt);
-			Mono<TestEntity> entity = userService.findById(userId);
+			Mono<User> entity = userService.findById(userId);
 			
 			return entity.map(user -> {
 				List<GrantedAuthority> authorities = new ArrayList<>();

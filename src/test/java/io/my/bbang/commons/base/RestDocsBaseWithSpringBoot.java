@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -29,11 +31,12 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.my.bbang.test.repository.TestRepository;
+import io.my.bbang.user.repository.UserRepository;
 
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class RestDocsBaseWithSpringBoot extends TestBase {
+	private String authorization = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiZXhwIjoxNjIyOTA0MDA1LCJ1c2VySWQiOiI2MGI3NzkzNTU4NjdlODExZTdmYWRiZTAifQ.Sb91WW9CaEwc-H5jQYGQAPGvnVQG3UJss6Fi5WGP1Apq6nIpvZDdRxuQs8sQTfp-z1oLFEHPePvnwKOXxHDg2g";
 
 	protected WebTestClient webTestClient;
 	protected Snippet defaultRequestHeader;
@@ -45,16 +48,14 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
     protected BCryptPasswordEncoder passwordEncoder;
     
     @Autowired
-    protected TestRepository testRepository;
+    protected UserRepository testRepository;
     
-    
-
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
 		this.webTestClient = WebTestClient.bindToApplicationContext(applicationContext)
 				.configureClient()
-				.baseUrl("http://125.240.27.115:17500") 
+				.baseUrl("http://125.240.27.115:7000") 
 				.filter(documentationConfiguration(restDocumentation)) 
 				.filter(documentationConfiguration(restDocumentation).snippets().withEncoding("UTF-8"))
 				.build();
@@ -72,14 +73,34 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	}
 	
 	protected ResponseSpec getWebTestClient(String uri) {
-		return this.webTestClient.get().uri(uri).accept(MediaType.APPLICATION_JSON).exchange();
+		return this.webTestClient.get().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).exchange();
+	}
+	
+	protected ResponseSpec getWebTestClient(Object body, String uri) {
+		return this.webTestClient.method(HttpMethod.GET).uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
 	
 	protected ResponseSpec postWebTestClient(Object body, String uri) {
-		return this.webTestClient.post().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+		return this.webTestClient.post().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
 	
 	protected ResponseSpec putWebTestClient(Object body, String uri) {
+		return this.webTestClient.put().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec getWebTestClientNotAuth(String uri) {
+		return this.webTestClient.get().uri(uri).accept(MediaType.APPLICATION_JSON).exchange();
+	}
+	
+	protected ResponseSpec getWebTestClientNotAuth(Object body, String uri) {
+		return this.webTestClient.method(HttpMethod.GET).uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec postWebTestClientNotAuth(Object body, String uri) {
+		return this.webTestClient.post().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec putWebTestClientNotAuth(Object body, String uri) {
 		return this.webTestClient.put().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
 	

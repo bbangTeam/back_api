@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import io.my.bbang.commons.properties.AccessTokenProperties;
 import io.my.bbang.commons.properties.RefreshTokenProperties;
 import io.my.bbang.commons.utils.JwtUtil;
-import io.my.bbang.test.repository.TestRepository;
-import io.my.bbang.test.service.TestService;
+import io.my.bbang.user.repository.UserRepository;
+import io.my.bbang.user.service.UserService;
 
 @SpringBootTest
 public class SpringBootTestBase extends TestBase {
@@ -16,10 +16,10 @@ public class SpringBootTestBase extends TestBase {
 	protected JwtUtil jwtUtil;
 	
 	@Autowired
-	protected TestService testService;
+	protected UserService testService;
 
 	@Autowired
-	protected TestRepository testRepository;
+	protected UserRepository testRepository;
 
 	@Autowired
 	protected AccessTokenProperties accessTokenProperties;
