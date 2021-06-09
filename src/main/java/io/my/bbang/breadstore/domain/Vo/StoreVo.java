@@ -1,12 +1,17 @@
 package io.my.bbang.breadstore.domain.Vo;
 
+import io.my.bbang.breadstore.domain.Store;
 import lombok.Getter;
 import lombok.Setter;
+import reactor.core.publisher.Mono;
 
 @Setter
 @Getter
 public class StoreVo {
 
+	
+	
+	
 	private String id;
     private String entrpNm;
     private String loadAddr;
@@ -23,4 +28,16 @@ public class StoreVo {
     private String naverPlaceUrl;
     private String businessHours;
     private String naverThumbUrl;
+   
+    public StoreVo(Mono<Store> store) {
+    	store.subscribe(s->
+    		this.setEntrpNm(s.getEntrpNm())
+    	);
+    }
+
+	public StoreVo() {
+		// TODO Auto-generated constructor stub
+	}
+    
+
 }

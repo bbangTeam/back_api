@@ -7,6 +7,7 @@ import io.my.bbang.breadstore.domain.Store;
 import io.my.bbang.breadstore.domain.Vo.StoreVo;
 import io.my.bbang.breadstore.repository.StoreRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class StoreService {
@@ -30,6 +31,10 @@ public class StoreService {
 
 	public Flux<Store> storeList(StoreVo storeVo) {
 		return storeRepository.findByXposLoLikeAndYposLaLike(storeVo.getXposLo(),storeVo.getYposLa());
+	}
+
+	public Mono<Store> findOneStore(String id) {
+		return storeRepository.findById(id);
 	}
 
 }
