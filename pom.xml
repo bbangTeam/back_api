@@ -164,6 +164,12 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
+					<!-- 
+					<mainClass>io.my.bbang.BbangApiApplication</mainClass>
+					 -->
 				</configuration>
 			</plugin>
 		</plugins>

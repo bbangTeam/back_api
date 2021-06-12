@@ -71,7 +71,7 @@ public class BreadstagramService {
 		List<BreadstagramImageDto> imageList = new ArrayList<>();
 		
 
-		for (int index=0; index<(int)((Math.random()*10000)%10); index++) {
+		for (int index=0; index<(int)((Math.random()*10000)%10 + 1); index++) {
 			BreadstagramImageDto dto = new BreadstagramImageDto();
 			dto.setId(UUID.randomUUID().toString());
 			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
