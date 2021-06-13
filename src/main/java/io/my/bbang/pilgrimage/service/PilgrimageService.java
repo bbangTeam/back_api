@@ -40,7 +40,7 @@ public class PilgrimageService {
 			if (option.equals("all")) {
 				List<Integer> bakeTimeList = new ArrayList<>();
 				
-				dto.setImageUrl("https://www.google.com/imgres?imgurl=https%3A%2F%2Fcloudfront-ap-northeast-1.images.arcpublishing.com%2Fchosunbiz%2FAVZUDXPTLSFWAD4BKFXAFOW7VQ.jpg&imgrefurl=https%3A%2F%2Fbiz.chosun.com%2Fsite%2Fdata%2Fhtml_dir%2F2019%2F04%2F16%2F2019041602279.html&tbnid=v1IIKf0utHD_JM&vet=12ahUKEwjVk9eKh__wAhVqQfUHHTziAv0QMygCegUIARDNAQ..i&docid=yPgI60UYYlXmXM&w=522&h=261&q=%EB%B9%B5%EC%A7%91&ved=2ahUKEwjVk9eKh__wAhVqQfUHHTziAv0QMygCegUIARDNAQ");
+				dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
 				dto.setOpeningHours("07 ~ 20");
 				dto.setBreadName("소보루");
 				dto.setBakeTimeList(bakeTimeList);
