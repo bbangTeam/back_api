@@ -28,23 +28,19 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")), 
+													RestDocAttributes.format("String")), 
 						fieldWithPath("breadList.[].id").description("빵 카테고리 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")),
+													RestDocAttributes.format("String")),
 						fieldWithPath("breadList.[].name").description("빵 카테고리 이름")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"),
-													RestDocAttributes.etc("")),
+													RestDocAttributes.format("String")),
 						fieldWithPath("breadList.[].imageUrl").description("이미지 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc(""))
+													RestDocAttributes.format("String"))
 				);
 		
 		getWebTestClient("/api/ideal/content").expectStatus()

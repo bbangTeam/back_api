@@ -22,6 +22,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.RequestParametersSnippet;
 import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -66,8 +67,7 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 					.optional()
 	    			.attributes(
 	    					RestDocAttributes.length(""),
-	    					RestDocAttributes.format(""),
-	    					RestDocAttributes.etc("JWT 인증 토큰")
+	    					RestDocAttributes.format("")
 					)
     			);
 	}
@@ -137,6 +137,30 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 				preprocessResponse(prettyPrint()), 
 				defaultRequestHeader, 
 				responseFieldsSnippet);
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			RequestParametersSnippet requestParametersSnippet, 
+			ResponseFieldsSnippet responseFieldsSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				requestParametersSnippet,
+				responseFieldsSnippet);
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			RequestParametersSnippet requestParametersSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				requestParametersSnippet);
 	}
 	
 }

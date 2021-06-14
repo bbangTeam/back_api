@@ -39,18 +39,15 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("name").description("이름")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")), 
+													RestDocAttributes.format("String")), 
 						fieldWithPath("loginId").description("로그인 ID")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")),
+													RestDocAttributes.format("String")),
 						fieldWithPath("password").description("비밀번호")
 											.attributes(
 													RestDocAttributes.length(8, 20), 
-													RestDocAttributes.format("String"),
-													RestDocAttributes.etc(""))
+													RestDocAttributes.format("String"))
 				);
 		
 		
@@ -59,18 +56,15 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("id").description("회원 고유 ID")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")), 
+													RestDocAttributes.format("String")), 
 						fieldWithPath("loginId").description("로그인 ID")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")),
+													RestDocAttributes.format("String")),
 						fieldWithPath("createTime").description("생성 시간")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("DateTime"),
-													RestDocAttributes.etc(""))
+													RestDocAttributes.format("DateTime"))
 				);
 		
 		putWebTestClientNotAuth(requestBody, "/join").expectStatus()
@@ -100,13 +94,11 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("loginId").description("로그인 ID")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")),
+													RestDocAttributes.format("String")),
 						fieldWithPath("password").description("비밀번호")
 											.attributes(
 													RestDocAttributes.length(8, 20), 
-													RestDocAttributes.format("String"),
-													RestDocAttributes.etc(""))
+													RestDocAttributes.format("String"))
 				);
 		
 		
@@ -115,18 +107,15 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("loginId").description("로그인 ID")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("")), 
-						fieldWithPath("accessToken").description("Json Web AccessToken")
+													RestDocAttributes.format("String")), 
+						fieldWithPath("accessToken").description("Json Web AccessToken - 유효기간: 720시간")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"), 
-													RestDocAttributes.etc("유효기간: 1시간")),
-						fieldWithPath("refreshToken").description("Json Web RefreshToken")
+													RestDocAttributes.format("String")),
+						fieldWithPath("refreshToken").description("Json Web RefreshToken - 현재 사용 안함")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"),
-													RestDocAttributes.etc("유효기간: 30일"))
+													RestDocAttributes.format("String"))
 				);
 		
 		postWebTestClientNotAuth(requestBody, "/login").expectStatus()

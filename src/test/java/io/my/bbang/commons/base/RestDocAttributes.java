@@ -27,16 +27,4 @@ public class RestDocAttributes {
 	public static Attributes.Attribute format(String format) {
 		return key("format").value(format);
 	}
-	
-	public static Attributes.Attribute etc(String etc) {
-		
-		if(null == etc || "".equals(etc.trim())) {
-			return key("etc").value(etc);
-		} else {
-			StringBuilder sb = new StringBuilder();
-			sb.append("(").append(" ").append(etc).append(" ").append(")");
-			return key("etc").value(sb.toString());
-
-		}
-	}
 }

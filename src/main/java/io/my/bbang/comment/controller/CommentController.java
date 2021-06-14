@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.my.bbang.comment.payload.request.CommentListRequest;
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
 import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
@@ -23,11 +23,11 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping("/list")
-	public Mono<CommentListResponse> list(@RequestBody CommentListRequest requestBody) {
-		String id = requestBody.getId();
-		int pageSize = requestBody.getPageSize();
-		int pageNum = requestBody.getPageNum();
-		
+	public Mono<CommentListResponse> list(
+			@RequestParam String id, 
+			@RequestParam String type,
+			@RequestParam(defaultValue = "1", required = false) int pageNum,
+			@RequestParam int pageSize) {
 		return commentService.list(id, pageSize, pageNum);
 	}
 	

@@ -17,7 +17,7 @@ class HealthCheckTest extends RestDocsBaseWithSpringBoot {
 				responseFields(
 						fieldWithPath("message")
 							.description("응답 메시지")
-							.attributes(RestDocAttributes.length(Integer.MAX_VALUE), RestDocAttributes.format(""), RestDocAttributes.etc("")));
+							.attributes(RestDocAttributes.length(Integer.MAX_VALUE), RestDocAttributes.format("")));
 		
 		getWebTestClientNotAuth("/api/healthcheck").expectStatus()
 						.isOk()
