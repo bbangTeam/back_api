@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,15 +24,20 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
+import org.springframework.restdocs.request.RequestPartsSnippet;
 import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.BodyInserters.MultipartInserter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.my.bbang.image.service.ImageService;
 import io.my.bbang.user.repository.UserRepository;
 
 @SpringBootTest
@@ -50,6 +56,9 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
     
     @Autowired
     protected UserRepository testRepository;
+    
+    @MockBean
+    protected ImageService imageService;
     
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
@@ -84,8 +93,16 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 		return this.webTestClient.post().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
 	
+	protected ResponseSpec postWebTestClient(MultipartInserter multipartInserter, String uri) {
+		return this.webTestClient.post().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).body(multipartInserter).exchange();
+	}
+	
 	protected ResponseSpec putWebTestClient(Object body, String uri) {
 		return this.webTestClient.put().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec deleteWebTestClient(String uri) {
+		return this.webTestClient.delete().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).exchange();
 	}
 	
 	protected ResponseSpec getWebTestClientNotAuth(String uri) {
@@ -161,6 +178,19 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 				preprocessResponse(prettyPrint()), 
 				defaultRequestHeader, 
 				requestParametersSnippet);
+	}
+	
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumer(
+			String fileName, 
+			RequestPartsSnippet requestPartsSnippet, 
+			ResponseFieldsSnippet responseSnippet) {
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				requestPartsSnippet, 
+				responseSnippet);
 	}
 	
 }

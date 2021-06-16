@@ -37,7 +37,6 @@ public class BreadstagramController {
 		return breadstagramService.view(id);
 	}
 	
-	
 	@PutMapping("/write")
 	public Mono<BreadstagramWriteResponse> write(@RequestBody BreadstagramWriteRequest requestBody) {
 		log.info("/api/breadstagram/write 요청전문: {}", requestBody);
