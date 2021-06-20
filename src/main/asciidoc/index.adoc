@@ -212,6 +212,19 @@ NOTE: API 추가 예정
 ==== 이미지 업로드 API
 
 include::{snippets}/imagetest/upload/request-headers.adoc[]
+
+.RequestParameters
+[cols="2,1,1,1,4"]
+|===
+|Name|Length|Format|Optional|Description
+
+|file
+|0
+|file
+|
+|업로드할 파일
+
+|===
 include::{snippets}/imagetest/upload/response-fields.adoc[]
 include::{snippets}/imagetest/upload/http-request.adoc[]
 include::{snippets}/imagetest/upload/http-response.adoc[]
