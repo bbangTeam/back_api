@@ -59,11 +59,9 @@ public class UserService {
 			}
 			
 			String accessToken = jwtUtil.createAccessToken(user.getId());
-			String refreshToken = jwtUtil.createRefreshToken(user.getId());
 			
 			responseBody.setLoginId(loginId);
 			responseBody.setAccessToken(accessToken);
-			responseBody.setRefreshToken(refreshToken);
 			
 			return responseBody;
 		});

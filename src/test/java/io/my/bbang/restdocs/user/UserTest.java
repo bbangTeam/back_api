@@ -111,10 +111,6 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("accessToken").description("Json Web AccessToken - 유효기간: 720시간")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")),
-						fieldWithPath("refreshToken").description("Json Web RefreshToken - 현재 사용 안함")
-											.attributes(
-													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
 				);
 		
