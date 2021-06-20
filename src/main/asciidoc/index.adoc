@@ -200,4 +200,20 @@ NOTE: API 추가 예정
 [[resources-image-upload]]
 ==== 이미지 업로드 API
 
-NOTE: API 추가 예정
+include::{snippets}/imagetest/upload/request-headers.adoc[]
+include::{snippets}/imagetest/upload/response-fields.adoc[]
+include::{snippets}/imagetest/upload/http-request.adoc[]
+include::{snippets}/imagetest/upload/http-response.adoc[]
+include::{snippets}/imagetest/upload/curl-request.adoc[]
+
+
+
+[[resources-image-delete]]
+==== 이미지 삭제 API
+
+include::{snippets}/imagetest/delete/request-headers.adoc[]
+include::{snippets}/imagetest/delete/request-parameters.adoc[]
+include::{snippets}/imagetest/delete/response-fields.adoc[]
+include::{snippets}/imagetest/delete/http-request.adoc[]
+include::{snippets}/imagetest/delete/http-response.adoc[]
+include::{snippets}/imagetest/delete/curl-request.adoc[]

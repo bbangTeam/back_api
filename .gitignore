@@ -85,6 +85,7 @@ local.properties
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+.vscode/
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
@@ -92,3 +93,6 @@ local.properties
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,visualstudiocode
+
+# mac
+.DS_Store

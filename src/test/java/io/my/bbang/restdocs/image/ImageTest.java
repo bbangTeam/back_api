@@ -2,11 +2,11 @@ package io.my.bbang.restdocs.image;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 
 import java.util.UUID;
 
@@ -65,13 +65,13 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 		
 		MultipartInserter multipartInserter = BodyInserters.fromMultipartData(multipartData);
 		
-		RequestPartsSnippet requestSnippet = 
-				requestParts(
-						partWithName("file").description("파일")
-								.attributes(
-										RestDocAttributes.length(0), 
-										RestDocAttributes.format("multipart/form-data"))
-				);
+		// RequestPartFieldsSnippet requestSnippet = 
+		// 		requestPartFields(
+		// 				fieldWithPath("file").description("파일")
+		// 						.attributes(
+		// 								RestDocAttributes.length(0), 
+		// 								RestDocAttributes.format("multipart/form-data"))
+		// 		);
 
 		
 		ResponseFieldsSnippet responseSnippet = 
@@ -93,7 +93,7 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 		postWebTestClient(multipartInserter, "/api/image/upload").expectStatus()
 						.isOk()
 						.expectBody()
-						.consumeWith(createConsumer("/upload", requestSnippet, responseSnippet));
+						.consumeWith(createConsumer("/upload", responseSnippet));
 	}
 	
 	@Test
