@@ -30,6 +30,17 @@ include::{snippets}/healthchecktest/healthcheck/http-response.adoc[]
 include::{snippets}/healthchecktest/healthcheck/curl-request.adoc[]
 
 
+[[resources-jwt-issued]]
+==== 인증토큰 발급 API
+
+include::{snippets}/jwttest/jwt/issued/request-headers.adoc[]
+include::{snippets}/jwttest/jwt/issued/response-headers.adoc[]
+include::{snippets}/jwttest/jwt/issued/response-fields.adoc[]
+include::{snippets}/jwttest/jwt/issued/http-request.adoc[]
+include::{snippets}/jwttest/jwt/issued/http-response.adoc[]
+include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
+
+
 
 [[resources-user-api]]
 === 사용자 정보

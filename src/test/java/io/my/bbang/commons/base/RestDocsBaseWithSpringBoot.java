@@ -2,6 +2,7 @@ package io.my.bbang.commons.base;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -37,13 +38,14 @@ import org.springframework.web.reactive.function.BodyInserters.MultipartInserter
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.image.service.ImageService;
 import io.my.bbang.user.repository.UserRepository;
 
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class RestDocsBaseWithSpringBoot extends TestBase {
-	private String authorization = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiZXhwIjoxNjIyOTA0MDA1LCJ1c2VySWQiOiI2MGI3NzkzNTU4NjdlODExZTdmYWRiZTAifQ.Sb91WW9CaEwc-H5jQYGQAPGvnVQG3UJss6Fi5WGP1Apq6nIpvZDdRxuQs8sQTfp-z1oLFEHPePvnwKOXxHDg2g";
+	private String authorization;
 
 	protected WebTestClient webTestClient;
 	protected Snippet defaultRequestHeader;
@@ -56,6 +58,9 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
     
     @Autowired
     protected UserRepository testRepository;
+
+	@Autowired
+	protected JwtUtil jwtUtil;
     
     @MockBean
     protected ImageService imageService;
@@ -63,6 +68,8 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
+				
+		authorization = "bearer " + jwtUtil.createAccessToken("userId");
 		this.webTestClient = WebTestClient.bindToApplicationContext(applicationContext)
 				.configureClient()
 				.baseUrl("http://125.240.27.115:7000") 
@@ -192,5 +199,29 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 				requestPartsSnippet, 
 				responseSnippet);
 	}
+
+	protected Consumer<EntityExchangeResult<byte[]>> createConsumerAuthorization(
+			String fileName, 
+			ResponseFieldsSnippet responseSnippet) {
+
+		Snippet responseHeader = responseHeaders(
+			headerWithName("Authorization")
+				.description("갱신된 JWT 인증 토큰")
+				.optional()
+				.attributes(
+						RestDocAttributes.length(""),
+						RestDocAttributes.format("")
+			)
+		);
+			
+		return document(
+				this.getClass().getSimpleName().toLowerCase() + fileName, 
+				preprocessRequest(prettyPrint()), 
+				preprocessResponse(prettyPrint()), 
+				defaultRequestHeader, 
+				responseHeader,
+				responseSnippet);
+	}
+
 	
 }
