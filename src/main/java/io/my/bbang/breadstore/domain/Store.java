@@ -29,4 +29,8 @@ public class Store {
     private String naverPlaceUrl;
     private String businessHours;
     private String naverThumbUrl;
+    
+    private String storeId;
+    
+    private StoreMenu storeMenu;
 }

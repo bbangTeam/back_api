@@ -1,3 +1,8 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://csj2702:tjdwns2702@cluster0.8vlwn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+      database: breadstore
 jjwt:
   access-token:
     expired-time: 720

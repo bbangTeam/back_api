@@ -1,10 +1,13 @@
 package io.my.bbang.breadstore.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.breadstore.domain.Store;
-import io.my.bbang.breadstore.domain.Vo.StoreVo;
+import io.my.bbang.breadstore.domain.StoreMenu;
+import io.my.bbang.breadstore.dto.StoreDTO;
+import io.my.bbang.breadstore.repository.StoreMenuRepository;
 import io.my.bbang.breadstore.repository.StoreRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,6 +17,9 @@ public class StoreService {
 	
 	@Autowired
 	private StoreRepository storeRepository;
+	
+	@Autowired
+	private StoreMenuRepository storeMenuRepository;
 
 	
 
@@ -23,18 +29,26 @@ public class StoreService {
 
 
 
-	public Flux<Store> storeList() {
-		return storeRepository.findAll();
+	public Flux<Store> storeList(Pageable pageable, StoreDTO storeVo) {
+		return storeRepository.findAllByXposLoLikeAndYposLaLike(pageable,storeVo.getXposLo(),storeVo.getYposLa());
 	}
 
 
 
-	public Flux<Store> storeList(StoreVo storeVo) {
+	public Flux<Store> storeList(StoreDTO storeVo) {
 		return storeRepository.findByXposLoLikeAndYposLaLike(storeVo.getXposLo(),storeVo.getYposLa());
 	}
 
 	public Mono<Store> findOneStore(String id) {
 		return storeRepository.findById(id);
+	}
+
+
+
+
+
+	public Flux<StoreMenu> findOneStoreMenu(String storeId) {
+		return storeMenuRepository.findByStoreId(storeId);
 	}
 
 }
