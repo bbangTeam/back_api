@@ -299,8 +299,8 @@ include::{snippets}/imagetest/delete/curl-request.adoc[]
 [[resources-map-area-list]]
 ==== 지역 선택 API
 
-include::{snippets}/maptest/arealist/request-headers.adoc[]
-include::{snippets}/maptest/arealist/response-fields.adoc[]
-include::{snippets}/maptest/arealist/http-request.adoc[]
-include::{snippets}/maptest/arealist/http-response.adoc[]
-include::{snippets}/maptest/arealist/curl-request.adoc[]
+include::{snippets}/areatest/list/request-headers.adoc[]
+include::{snippets}/areatest/list/response-fields.adoc[]
+include::{snippets}/areatest/list/http-request.adoc[]
+include::{snippets}/areatest/list/http-response.adoc[]
+include::{snippets}/areatest/list/curl-request.adoc[]

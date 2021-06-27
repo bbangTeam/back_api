@@ -140,10 +140,6 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),
-						fieldWithPath("tagList.[]").description("태그")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
 						fieldWithPath("imageList.[].id").description("사진 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -176,11 +172,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 		requestBody.setContent("피자빵!!!");
 		
 
-		List<String> tagList = new ArrayList<>();
 		List<BreadstagramImageDto> imageList = new ArrayList<>();
-
-		tagList.add("피지빵");
-		tagList.add("서울빵집");
 
 		for (int index=0; index<(int)((Math.random()*10000)%10)+1; index++) {
 			BreadstagramImageDto dto = new BreadstagramImageDto();
@@ -189,7 +181,6 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 			imageList.add(dto);
 		}
 		
-		requestBody.setTagList(tagList);
 		requestBody.setImageList(imageList);
 		
 		
@@ -215,10 +206,6 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-						fieldWithPath("tagList.[]").description("태그")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
 						fieldWithPath("imageList.[].id").description("사진 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 

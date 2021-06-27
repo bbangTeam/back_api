@@ -13,6 +13,5 @@ public class BreadstagramViewResponse {
 	private String breadName;
 	private String nickname;
 	private Integer like;
-	private List<String> tagList;
 	private List<BreadstagramImageDto> imageList;
 }

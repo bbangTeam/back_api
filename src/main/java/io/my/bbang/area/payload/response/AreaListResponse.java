@@ -1,9 +1,9 @@
-package io.my.bbang.map.payload.response;
+package io.my.bbang.area.payload.response;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.my.bbang.map.dto.AreaListDto;
+import io.my.bbang.area.dto.AreaListDto;
 import lombok.Data;
 
 @Data

@@ -13,7 +13,6 @@ import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.service.BreadstagramService;
-import io.my.bbang.commons.payloads.BbangRequest;
 import io.my.bbang.commons.payloads.BbangResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

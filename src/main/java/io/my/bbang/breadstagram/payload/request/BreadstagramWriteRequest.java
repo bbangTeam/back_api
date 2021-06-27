@@ -12,7 +12,6 @@ public class BreadstagramWriteRequest {
 	private String storeName;
 	private String breadName;
 	private String content;
-	private List<String> tagList;
 	private List<BreadstagramImageDto> imageList;
 
 }

@@ -37,15 +37,6 @@ public class BreadstagramService {
 			dto.setImageUrlList(imageUrlList);
 			dto.setLike((int)((Math.random()*100000)));
 			
-			List<String> tagList = new ArrayList<>();
-			
-			if (i%2==0) {
-				tagList.add("빵터짐");
-				tagList.add("빵스타그램");
-			} else {
-				tagList.add("BbangTeam");
-				tagList.add("BbangTag");
-			}
 			
 			dto.setId("bread-stagram-id" + i);
 			responseBody.getBreadstagramList().add(dto);
@@ -65,10 +56,6 @@ public class BreadstagramService {
 		responseBody.setStoreName("빵터짐 1호점");
 		responseBody.setLike((int)((Math.random()*100000)));
 		
-		List<String> tagList = new ArrayList<>();
-		tagList.add("빵터짐 본점");
-		tagList.add("소보루");
-		
 		List<BreadstagramImageDto> imageList = new ArrayList<>();
 		
 
@@ -80,7 +67,6 @@ public class BreadstagramService {
 			imageList.add(dto);
 		}
 		
-		responseBody.setTagList(tagList);
 		responseBody.setImageList(imageList);
 		
 		return Mono.just(responseBody);

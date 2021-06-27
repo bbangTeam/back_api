@@ -1,4 +1,4 @@
-package io.my.bbang.restdocs.map;
+package io.my.bbang.restdocs.area;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -10,11 +10,11 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 
-class MapTest extends RestDocsBaseWithSpringBoot {
+class AreaTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 지역 선택 API")
-	void areaList() {
+	void list() {
 		
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
@@ -32,10 +32,10 @@ class MapTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("String"))
 				);
 		
-		getWebTestClient("/api/map/area/list").expectStatus()
+		getWebTestClient("/api/area/list").expectStatus()
 						.isOk()
 						.expectBody()
-						.consumeWith(createConsumer("/arealist", responseSnippet));
+						.consumeWith(createConsumer("/list", responseSnippet));
 	}
     
 }

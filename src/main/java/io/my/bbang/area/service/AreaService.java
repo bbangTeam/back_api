@@ -1,9 +1,9 @@
-package io.my.bbang.map.service;
+package io.my.bbang.area.service;
 
 import org.springframework.stereotype.Service;
 
-import io.my.bbang.map.dto.AreaListDto;
-import io.my.bbang.map.payload.response.AreaListResponse;
+import io.my.bbang.area.dto.AreaListDto;
+import io.my.bbang.area.payload.response.AreaListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MapService {
+public class AreaService {
 
     public Mono<AreaListResponse> areaList() {
         AreaListResponse responseBody = new AreaListResponse();

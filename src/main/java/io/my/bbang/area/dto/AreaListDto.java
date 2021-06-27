@@ -1,4 +1,4 @@
-package io.my.bbang.map.dto;
+package io.my.bbang.area.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
