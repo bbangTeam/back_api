@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.comment.dto.CommentListDto;
+import io.my.bbang.comment.payload.response.CommentCountResponse;
 import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,14 @@ public class CommentService {
 		responseBody.setResult("Success");
 		responseBody.setId(UUID.randomUUID().toString());
 		
+		return Mono.just(responseBody);
+	}
+
+	public Mono<CommentCountResponse> count(String id) {
+		CommentCountResponse responseBody = new CommentCountResponse();
+		responseBody.setCount(5);
+		responseBody.setResult("Success");
+
 		return Mono.just(responseBody);
 	}
 	

@@ -7,11 +7,11 @@ import io.my.bbang.ideal.dto.IdealContentDto;
 import lombok.Data;
 
 @Data
-public class IdealContentResponse {
+public class IdealResponse {
 	private String result;
 	private List<IdealContentDto> breadList;
 	
-	public IdealContentResponse() {
+	public IdealResponse() {
 		breadList = new ArrayList<>();
 	}
 

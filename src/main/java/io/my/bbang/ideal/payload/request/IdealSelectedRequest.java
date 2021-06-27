@@ -3,6 +3,6 @@ package io.my.bbang.ideal.payload.request;
 import lombok.Data;
 
 @Data
-public class IdealContentRequest {
-
+public class IdealSelectedRequest {
+    private String id;
 }

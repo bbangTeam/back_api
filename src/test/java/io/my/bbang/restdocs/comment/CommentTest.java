@@ -49,7 +49,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		
 		RequestParametersSnippet requestSnippet = 
 				requestParameters(
-						parameterWithName("id").description("도시 고유번호")
+						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
@@ -100,7 +100,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		
 		RequestFieldsSnippet requestSnippet = 
 				requestFields(
-						fieldWithPath("id").description("게시글 번호")
+						fieldWithPath("id").description("게시글(혹은 상위 댓글) 고유 번호")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
@@ -131,6 +131,43 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
+	}
+
+	@Test
+	@DisplayName("REST Docs 댓글 갯수")
+	void count() throws JsonProcessingException {
+		StringBuilder params = new StringBuilder();
+		params.append("?")
+				.append("id")
+				.append("=")
+				.append("comment-id-01")
+		;
+		
+		RequestParametersSnippet requestSnippet = 
+				requestParameters(
+						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String"))
+				);
+		
+		
+		ResponseFieldsSnippet responseSnippet = 
+				responseFields(
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+						fieldWithPath("count").description("댓글 갯수")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("Integer"))
+				);
+		
+		getWebTestClient("/api/comment/count" + params).expectStatus()
+						.isOk()
+						.expectBody()
+						.consumeWith(createConsumer("/count", requestSnippet, responseSnippet));
 	}
 
 }

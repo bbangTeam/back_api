@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
+import io.my.bbang.comment.payload.response.CommentCountResponse;
 import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.comment.service.CommentService;
@@ -38,4 +39,10 @@ public class CommentController {
 		
 		return commentService.write(id, content);
 	}
+
+	@GetMapping(value="/count")
+	public Mono<CommentCountResponse> count(@RequestParam String id) {
+		return commentService.count(id);
+	}
+	
 }

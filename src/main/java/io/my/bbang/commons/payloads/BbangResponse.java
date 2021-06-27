@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class BbangResponse {
-	private String message;
+	private String result;
 }

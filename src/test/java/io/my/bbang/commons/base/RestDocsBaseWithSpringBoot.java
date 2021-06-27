@@ -11,6 +11,8 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +34,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.BodyInserters.MultipartInserter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.my.bbang.commons.utils.JwtUtil;
+import io.my.bbang.ideal.service.IdealService;
 import io.my.bbang.image.service.ImageService;
 import io.my.bbang.user.repository.UserRepository;
 
@@ -64,6 +63,9 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
     
     @MockBean
     protected ImageService imageService;
+
+	@MockBean
+	protected IdealService idealService;
     
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
@@ -104,6 +106,10 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 		return this.webTestClient.post().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).body(multipartInserter).exchange();
 	}
 	
+	protected ResponseSpec postWebTestClient(String uri) {
+		return this.webTestClient.post().uri(uri).accept(MediaType.APPLICATION_JSON).exchange();
+	}
+	
 	protected ResponseSpec putWebTestClient(Object body, String uri) {
 		return this.webTestClient.put().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
@@ -123,7 +129,7 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	protected ResponseSpec postWebTestClientNotAuth(Object body, String uri) {
 		return this.webTestClient.post().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}
-	
+
 	protected ResponseSpec putWebTestClientNotAuth(Object body, String uri) {
 		return this.webTestClient.put().uri(uri).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
 	}

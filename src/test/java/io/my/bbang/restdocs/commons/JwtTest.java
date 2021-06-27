@@ -16,8 +16,8 @@ class JwtTest extends RestDocsBaseWithSpringBoot {
 
         ResponseFieldsSnippet responseSnippet = 
         responseFields(
-                fieldWithPath("message")
-                    .description("응답 메시지")
+                fieldWithPath("result")
+                    .description("결과")
                     .attributes(RestDocAttributes.length(Integer.MAX_VALUE), RestDocAttributes.format("")));
 
         getWebTestClient("/api/jwt/issued").expectStatus()

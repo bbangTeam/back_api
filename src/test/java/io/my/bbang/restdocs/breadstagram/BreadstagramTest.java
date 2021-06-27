@@ -63,6 +63,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("breadstagramList.[].id").description("게시글 고유 번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
 						fieldWithPath("breadstagramList.[].cityName").description("도시명")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -79,10 +83,6 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),
-						fieldWithPath("breadstagramList.[].tagList.[]").description("태그")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
 						fieldWithPath("breadstagramList.[].imageUrlList.[]").description("사진 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -247,4 +247,38 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
 	}
+
+	@Test
+	@DisplayName("REST Docs 빵스타그램 좋아요")
+	void like() {
+		StringBuilder params = new StringBuilder();
+		params.append("?")
+				.append("like")
+				.append("=")
+				.append("true")
+		;
+		
+		RequestParametersSnippet requestSnippet = 
+				requestParameters(
+						parameterWithName("like").description("좋아요")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("Boolean"))
+				);
+		
+		
+		ResponseFieldsSnippet responseSnippet = 
+				responseFields(
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String"))
+				);
+		
+		postWebTestClient("/api/breadstagram/like" + params).expectStatus()
+						.isOk()
+						.expectBody()
+						.consumeWith(createConsumer("/like", requestSnippet, responseSnippet));
+	}
+	
 }

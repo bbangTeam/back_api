@@ -9,10 +9,10 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BreadstagramListDto {
+	private String id;
 	private String cityName;
 	private String breadStoreName;
 	private String breadName;
 	private Integer like;
-	private List<String> tagList;
 	private List<String> imageUrlList;
 }

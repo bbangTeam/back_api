@@ -12,6 +12,7 @@ import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
 import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
+import io.my.bbang.commons.payloads.BbangResponse;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -46,7 +47,7 @@ public class BreadstagramService {
 				tagList.add("BbangTag");
 			}
 			
-			dto.setTagList(tagList);
+			dto.setId("bread-stagram-id" + i);
 			responseBody.getBreadstagramList().add(dto);
 		}
 		
@@ -91,6 +92,11 @@ public class BreadstagramService {
 		responseBody.setId(UUID.randomUUID().toString());
 		responseBody.setResult("Success");
 		
+		return Mono.just(responseBody);
+	}
+
+	public Mono<BbangResponse> like(Boolean like) {
+		BbangResponse responseBody = new BbangResponse("Success");
 		return Mono.just(responseBody);
 	}
 		

@@ -85,6 +85,29 @@ include::{snippets}/idealtest/content/curl-request.adoc[]
 
 
 
+[[resources-ideal-rank]]
+==== 빵드컵 순위 확인 API
+
+include::{snippets}/idealtest/rank/request-headers.adoc[]
+include::{snippets}/idealtest/rank/response-fields.adoc[]
+include::{snippets}/idealtest/rank/http-request.adoc[]
+include::{snippets}/idealtest/rank/http-response.adoc[]
+include::{snippets}/idealtest/rank/curl-request.adoc[]
+
+
+
+[[resources-ideal-selected]]
+==== 빵드컵 1위 선택 API
+
+include::{snippets}/idealtest/selected/request-headers.adoc[]
+include::{snippets}/idealtest/selected/request-fields.adoc[]
+include::{snippets}/idealtest/selected/response-fields.adoc[]
+include::{snippets}/idealtest/selected/http-request.adoc[]
+include::{snippets}/idealtest/selected/http-response.adoc[]
+include::{snippets}/idealtest/selected/curl-request.adoc[]
+
+
+
 [[resources-pilgrimage-api]]
 === 빵지순례
 
@@ -143,6 +166,18 @@ include::{snippets}/breadstagramtest/write/curl-request.adoc[]
 
 
 
+[[resources-breadstagram-like]]
+==== 빵스타그램 좋아요 API
+
+include::{snippets}/breadstagramtest/write/request-headers.adoc[]
+include::{snippets}/breadstagramtest/write/request-parameters.adoc[]
+include::{snippets}/breadstagramtest/write/response-fields.adoc[]
+include::{snippets}/breadstagramtest/write/http-request.adoc[]
+include::{snippets}/breadstagramtest/write/http-response.adoc[]
+include::{snippets}/breadstagramtest/write/curl-request.adoc[]
+
+
+
 [[resources-breadstore-api]]
 === 주변 빵집 검색
 
@@ -188,6 +223,18 @@ include::{snippets}/commenttest/write/response-fields.adoc[]
 include::{snippets}/commenttest/write/http-request.adoc[]
 include::{snippets}/commenttest/write/http-response.adoc[]
 include::{snippets}/commenttest/write/curl-request.adoc[]
+
+
+
+[[resources-comment-count]]
+==== 댓글 갯수 확인 API
+
+include::{snippets}/commenttest/count/request-headers.adoc[]
+include::{snippets}/commenttest/count/request-parameters.adoc[]
+include::{snippets}/commenttest/count/response-fields.adoc[]
+include::{snippets}/commenttest/count/http-request.adoc[]
+include::{snippets}/commenttest/count/http-response.adoc[]
+include::{snippets}/commenttest/count/curl-request.adoc[]
 
 
 
@@ -241,3 +288,19 @@ include::{snippets}/imagetest/delete/response-fields.adoc[]
 include::{snippets}/imagetest/delete/http-request.adoc[]
 include::{snippets}/imagetest/delete/http-response.adoc[]
 include::{snippets}/imagetest/delete/curl-request.adoc[]
+
+
+
+[[resources-set-api]]
+=== 지역
+
+
+
+[[resources-map-area-list]]
+==== 지역 선택 API
+
+include::{snippets}/maptest/arealist/request-headers.adoc[]
+include::{snippets}/maptest/arealist/response-fields.adoc[]
+include::{snippets}/maptest/arealist/http-request.adoc[]
+include::{snippets}/maptest/arealist/http-response.adoc[]
+include::{snippets}/maptest/arealist/curl-request.adoc[]

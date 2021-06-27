@@ -1,6 +1,7 @@
 package io.my.bbang.breadstagram.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,8 @@ import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.service.BreadstagramService;
+import io.my.bbang.commons.payloads.BbangRequest;
+import io.my.bbang.commons.payloads.BbangResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -41,6 +44,11 @@ public class BreadstagramController {
 	public Mono<BreadstagramWriteResponse> write(@RequestBody BreadstagramWriteRequest requestBody) {
 		log.info("/api/breadstagram/write 요청전문: {}", requestBody);
 		return breadstagramService.write(requestBody);
+	}
+
+	@PostMapping("/like")
+	public Mono<BbangResponse> like(@RequestParam Boolean like) {
+		return breadstagramService.like(like);
 	}
 	
 	
