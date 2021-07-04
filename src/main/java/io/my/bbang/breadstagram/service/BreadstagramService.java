@@ -19,11 +19,15 @@ import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.breadstore.service.StoreService;
+import io.my.bbang.comment.domain.Comment;
+import io.my.bbang.comment.dto.CommentType;
+import io.my.bbang.comment.service.CommentService;
 import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.UserHeart;
+import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -31,9 +35,8 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class BreadstagramService {
-	private final String STORE = "store";
-
 	private final BreadstagramRepository breadstagramRepository;
+	private final CommentService commentService;
 	private final StoreService storeService;
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
@@ -90,29 +93,35 @@ public class BreadstagramService {
 	public Mono<BreadstagramWriteResponse> write(BreadstagramWriteRequest requestBody) {
 
 		String storeId = requestBody.getId();
-		String storeName = requestBody.getStoreName();
 		String breadName = requestBody.getBreadName();
 		String cityName = requestBody.getCityName();
-
-		// 댓글에 들어가야함
 		String content = requestBody.getContent();
 		
-		// 이미지에 들어가야함
-		List<BreadstagramImageDto> imageList = requestBody.getImageList();
+		List<BreadstagramImageDto> imageDtoList = requestBody.getImageList();
 
 		Breadstagram entity = new Breadstagram();
 		entity.setBreadName(breadName);
 		entity.setStoreId(storeId);
 		entity.setCityName(cityName);
-		entity.setImageList(imageList);
+		entity.setImageList(imageDtoList);
 		entity.setCreateDate(LocalDateTime.now());
 
-		return breadstagramRepository.save(entity).map(breadstagram -> {
-			BreadstagramWriteResponse responseBody = new BreadstagramWriteResponse();
-
-			responseBody.setId(breadstagram.getId());
-			responseBody.setResult("Success");
-			return responseBody;
+		return breadstagramRepository.save(entity)
+				.flatMap(breadstagram -> {
+					entity.setId(breadstagram.getId());
+					return ReactiveJwtContextHolder.getContext();
+				})
+				.flatMap(context -> context.getJwt())
+				.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
+				.flatMap(userId -> userService.findById(userId))
+				.flatMap(user -> 
+					commentService.save(
+						Comment.build(entity.getId(), user.getId(), user.getLoginId(), content, CommentType.STORE)))
+				.map(comment -> {
+					BreadstagramWriteResponse responseBody = new BreadstagramWriteResponse();
+					responseBody.setId(entity.getId());
+					responseBody.setResult("Success");
+					return responseBody;
 		}).switchIfEmpty(Mono.error(new BbangException("Exception")));
 	}
 
@@ -135,7 +144,7 @@ public class BreadstagramService {
 			.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
 			.map(userId -> {
 				String storeId = store.getId();
-				UserHeart userHeart = UserHeart.build(userId, storeId, STORE);
+				UserHeart userHeart = UserHeart.build(userId, storeId, UserHeartType.STORE);
 
 				if (like) userService.saveUserHeart(userHeart).subscribe();
 				else userService.deleteUserHeart(userHeart).subscribe();

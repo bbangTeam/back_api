@@ -36,7 +36,7 @@ public class UserService {
 		Mono<User> monoEntity = userRepository.save(user);
 		
 		monoEntity.subscribe(e -> {
-			saveUser.setCreatedTime(e.getCreatedTime());
+			saveUser.setCreateDate(e.getCreateDate());
 			saveUser.setLoginId(e.getLoginId());
 			saveUser.setId(e.getId());
 		});
@@ -44,7 +44,7 @@ public class UserService {
 		UserJoinResponse responseBody = new UserJoinResponse();
 		responseBody.setId(saveUser.getId());
 		responseBody.setLoginId(loginId);
-		responseBody.setCreateTime(saveUser.getCreatedTime());
+		responseBody.setCreateTime(saveUser.getCreateDate());
 		
 		return Mono.just(responseBody);
 	}

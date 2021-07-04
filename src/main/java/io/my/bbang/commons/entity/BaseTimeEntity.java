@@ -13,17 +13,17 @@ import lombok.Setter;
 @Setter
 public abstract class BaseTimeEntity {
 
-	@Field("createdTime")
+	@Field("createDate")
 	@CreatedDate
-	private LocalDateTime createdTime;
+	private LocalDateTime createDate;
 
-	@Field("updatedTime")
+	@Field("modifyDate")
 	@LastModifiedDate
-	private LocalDateTime updatedTime;
+	private LocalDateTime modifyDate;
 	
 	protected BaseTimeEntity() {
-    	this.setCreatedTime(LocalDateTime.now());
-    	this.setUpdatedTime(LocalDateTime.now());
+		this.createDate = LocalDateTime.now();
+		modifyDate = createDate;
 	}
 
 }

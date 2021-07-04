@@ -45,7 +45,7 @@ public class CommentService {
 						.flatMap(jwtContext -> jwtContext.getJwt())
 						.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
 						.flatMap(userId -> userService.findById(userId))
-						.map(user -> Comment.build(id, user.getName(), content, type))
+						.map(user -> Comment.build(id, user.getId(), user.getName(), content, type))
 						.flatMap(comment -> commentRepository.save(comment))
 						.map(comment -> {
 							CommentWriteResponse responseBody = new CommentWriteResponse();
@@ -62,6 +62,10 @@ public class CommentService {
 			responseBody.setResult("Success");
 			return responseBody;
 		});
+	}
+
+	public Mono<Comment> save(Comment entity) {
+		return commentRepository.save(entity);
 	}
 	
 

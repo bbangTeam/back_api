@@ -291,7 +291,7 @@ include::{snippets}/imagetest/delete/curl-request.adoc[]
 
 
 [[resources-map-area-list]]
-==== 지역 선택 API
+==== 지역 목록 API
 
 include::{snippets}/areatest/list/request-headers.adoc[]
 include::{snippets}/areatest/list/response-fields.adoc[]

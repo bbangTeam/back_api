@@ -30,8 +30,10 @@ public class ImageController {
 	}
 	
 	@DeleteMapping("/delete")
-	public Mono<BbangResponse> fileDelete(@RequestParam String fileName) {
-		return imageService.fileDelete(fileName);
+	public Mono<BbangResponse> fileDelete(
+		@RequestParam String id, 
+		@RequestParam String fileName) {
+		return imageService.fileDelete(id, fileName);
 	}
 
 }

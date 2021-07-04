@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class UploadResponse {
 	private String result;
+	private String id;
 	private String fileName;
 	private String imageUrl;
 }

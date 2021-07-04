@@ -37,9 +37,11 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 	@DisplayName("이미지 업로드")
 	void upload() {
 		String fileName = UUID.randomUUID() + "image.jpg";
-		
+		String id = UUID.randomUUID().toString();
+
 		UploadResponse responseBody = new UploadResponse();
 		responseBody.setFileName(fileName);
+		responseBody.setId(id);
 		responseBody.setImageUrl("http://localhost:8080/" + UUID.randomUUID() + fileName);
 		responseBody.setResult("Success");
 		
@@ -71,7 +73,11 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 		
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
-						fieldWithPath("fileName").description("업로드 된 파일 ID")
+						fieldWithPath("id").description("업로드 된 파일 고유번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+						fieldWithPath("fileName").description("업로드 된 파일명")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
@@ -95,11 +101,12 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 	@DisplayName("이미지 삭제")
 	void delete() {
 		String fileName = UUID.randomUUID() + "image.jpg";
+		String id = UUID.randomUUID().toString();
 		
 		String message = fileName + " delete success!";
 		BbangResponse responseBody = new BbangResponse(message);
 		
-		Mockito.when(imageService.fileDelete(Mockito.any()))
+		Mockito.when(imageService.fileDelete(Mockito.any(), Mockito.any()))
 				.thenReturn(Mono.just(responseBody));
 		
 		StringBuilder params = new StringBuilder();
@@ -108,11 +115,19 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 				.append("fileName")
 				.append("=")
 				.append(fileName)
+				.append("&")
+				.append("id")
+				.append("=")
+				.append(id)
 		;
 
 		RequestParametersSnippet requestSnippet = 
 				requestParameters(
-						parameterWithName("fileName").description("삭제할 파일 ID")
+						parameterWithName("id").description("삭제할 파일 고유번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+						parameterWithName("fileName").description("삭제할 파일명")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
