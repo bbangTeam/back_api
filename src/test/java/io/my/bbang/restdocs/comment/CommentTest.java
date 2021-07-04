@@ -6,18 +6,26 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.my.bbang.comment.dto.CommentListDto;
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
+import io.my.bbang.comment.payload.response.CommentCountResponse;
+import io.my.bbang.comment.payload.response.CommentListResponse;
+import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
+import reactor.core.publisher.Mono;
 
 class CommentTest extends RestDocsBaseWithSpringBoot {
 
@@ -28,23 +36,39 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 댓글 목록")
 	void list() throws JsonProcessingException {
+
+		int pageSize = 10;
+		int pageNum = 0;
+
+		CommentListResponse responseBody = new CommentListResponse();
+		
+		responseBody.setResult("Success");
+		
+		for (int index=0; index<pageSize; index++) {
+			CommentListDto dto = new CommentListDto();
+			dto.setNickname("빵터짐" + index);
+			dto.setContent("맛있어보여요." + index);
+			
+			responseBody.getCommentList().add(dto);
+		}
+
+		Mockito.when(commentService.list(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
+
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("id")
 				.append("=")
 				.append("seoul001")
 				.append("&")
-				.append("type")
-				.append("=")
-				.append("breadstagram")
 				.append("&")
 				.append("pageNum")
 				.append("=")
-				.append("1")
+				.append(pageNum)
 				.append("&")
 				.append("pageSize")
 				.append("=")
-				.append("3")
+				.append(pageSize)
 		;
 		
 		RequestParametersSnippet requestSnippet = 
@@ -53,10 +77,6 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						parameterWithName("type").description("게시글 종류 (ex.빵스타그램)")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")),
 						parameterWithName("pageSize").description("페이지당 댓글 개수")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -97,6 +117,12 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		requestBody.setId("seoul001");
 		requestBody.setType("breadstagram");
 		requestBody.setContent("맛있어보여요");
+
+		CommentWriteResponse responseBody = new CommentWriteResponse();
+		responseBody.setResult("Success");
+		responseBody.setId(UUID.randomUUID().toString());
+
+		Mockito.when(commentService.write(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
 		
 		RequestFieldsSnippet requestSnippet = 
 				requestFields(
@@ -136,6 +162,13 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 댓글 갯수")
 	void count() throws JsonProcessingException {
+
+		CommentCountResponse responseBody = new CommentCountResponse();
+		responseBody.setCount(5);
+		responseBody.setResult("Success");
+
+		Mockito.when(commentService.count(Mockito.any())).thenReturn(Mono.just(responseBody));
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("id")

@@ -33,6 +33,12 @@ public class BreadstagramController {
 		return breadstagramService.list(pageNum, pageSize);
 	}
 	
+	/**
+	 * 삭제된 API
+	 * @param id
+	 * @return
+	 */
+	@Deprecated
 	@GetMapping("/view")
 	public Mono<BreadstagramViewResponse> view(
 			@RequestParam String id) {
@@ -46,8 +52,10 @@ public class BreadstagramController {
 	}
 
 	@PostMapping("/like")
-	public Mono<BbangResponse> like(@RequestParam Boolean like) {
-		return breadstagramService.like(like);
+	public Mono<BbangResponse> like(
+		@RequestParam String id, 
+		@RequestParam Boolean like) throws InterruptedException {
+		return breadstagramService.like(id, like);
 	}
 	
 	

@@ -31,6 +31,7 @@ public class Store {
     private String naverThumbUrl;
     
     private String storeId;
+    private Integer like;
     
     private StoreMenu storeMenu;
 }

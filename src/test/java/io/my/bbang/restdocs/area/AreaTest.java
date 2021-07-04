@@ -13,7 +13,7 @@ import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 class AreaTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
-	@DisplayName("REST Docs 지역 선택 API")
+	@DisplayName("REST Docs 지역 목록 API")
 	void list() {
 		
 		ResponseFieldsSnippet responseSnippet = 
@@ -22,11 +22,11 @@ class AreaTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						fieldWithPath("areaList.[].id").description("빵집 고유번호")
+						fieldWithPath("areaList.[].id").description("지역 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-						fieldWithPath("areaList.[].name").description("빵집 이름")
+						fieldWithPath("areaList.[].name").description("지역명")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))

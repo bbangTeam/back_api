@@ -12,10 +12,8 @@ import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.properties.ImageProperties;
 import io.my.bbang.image.payload.UploadResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageService {

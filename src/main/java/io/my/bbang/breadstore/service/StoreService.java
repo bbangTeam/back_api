@@ -43,6 +43,10 @@ public class StoreService {
 		return storeRepository.findById(id);
 	}
 
+	public Mono<Store> save(Store store) {
+		return storeRepository.save(store);
+	}
+
 
 
 

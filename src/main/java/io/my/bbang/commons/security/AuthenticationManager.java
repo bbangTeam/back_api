@@ -1,15 +1,13 @@
 package io.my.bbang.commons.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import io.my.bbang.commons.context.ReactiveJwtContextHolder;
+import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.User;
 import io.my.bbang.user.service.UserService;
@@ -26,26 +24,25 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 	public Mono<Authentication> authenticate(Authentication authentication) {
 		String jwt = authentication.getCredentials().toString();
 		
-		try {
-			if ( !jwtUtil.verifyAccessToken(jwt) ) {
-				return Mono.empty();
-			}
-			String userId = jwtUtil.getUserIdByAccessToken(jwt);
-			Mono<User> entity = userService.findById(userId);
-			
-			return entity.map(user -> {
-				List<GrantedAuthority> authorities = new ArrayList<>();
-				user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
-				
-				return new UsernamePasswordAuthenticationToken(
-								user.getLoginId(), 
-								user.getPassword(), 
-								authorities);
-			});
-			
-		} catch (Exception e) {
+		if ( !jwtUtil.verifyAccessToken(jwt) ) {
 			return Mono.empty();
 		}
+		String userId = jwtUtil.getUserIdByAccessToken(jwt);
+		Mono<User> entity = userService.findById(userId);
+
+		entity.subscribe();
+
+		return entity.map(user -> {
+			ReactiveJwtContextHolder.getContext().map(context -> {
+				context.setUser(user);
+				return context;
+			});
+
+			return (Authentication) new UsernamePasswordAuthenticationToken(
+							user.getUsername(), 
+							user.getPassword(), 
+							user.getAuthorities());
+		}).switchIfEmpty(Mono.error(new BbangException("authenticate exception!")));
 	}
 
 }

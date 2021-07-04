@@ -13,10 +13,8 @@ import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/comment")
@@ -26,8 +24,7 @@ public class CommentController {
 	@GetMapping("/list")
 	public Mono<CommentListResponse> list(
 			@RequestParam String id, 
-			@RequestParam String type,
-			@RequestParam(defaultValue = "1", required = false) int pageNum,
+			@RequestParam(defaultValue = "0", required = false) int pageNum,
 			@RequestParam int pageSize) {
 		return commentService.list(id, pageSize, pageNum);
 	}
@@ -36,8 +33,9 @@ public class CommentController {
 	public Mono<CommentWriteResponse> write(@RequestBody CommentWriteRequest requestBody) {
 		String id = requestBody.getId();
 		String content = requestBody.getContent();
+		String type = requestBody.getType();
 		
-		return commentService.write(id, content);
+		return commentService.write(id, content, type);
 	}
 
 	@GetMapping(value="/count")

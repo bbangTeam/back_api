@@ -145,13 +145,7 @@ include::{snippets}/breadstagramtest/list/curl-request.adoc[]
 [[resources-breadstagram-view]]
 ==== 빵스타그램 상세 조회 API
 
-include::{snippets}/breadstagramtest/view/request-headers.adoc[]
-include::{snippets}/breadstagramtest/view/request-parameters.adoc[]
-include::{snippets}/breadstagramtest/view/response-fields.adoc[]
-include::{snippets}/breadstagramtest/view/http-request.adoc[]
-include::{snippets}/breadstagramtest/view/http-response.adoc[]
-include::{snippets}/breadstagramtest/view/curl-request.adoc[]
-
+NOTE: 06.27일자로 삭제된 API 입니다.
 
 
 [[resources-breadstagram-write]]

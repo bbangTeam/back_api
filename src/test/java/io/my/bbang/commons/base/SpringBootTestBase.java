@@ -3,6 +3,7 @@ package io.my.bbang.commons.base;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.commons.properties.AccessTokenProperties;
 import io.my.bbang.commons.properties.RefreshTokenProperties;
 import io.my.bbang.commons.utils.JwtUtil;
@@ -27,4 +28,6 @@ public class SpringBootTestBase extends TestBase {
 	@Autowired
 	protected RefreshTokenProperties refreshTokenProperties;
 	
+	@Autowired
+	protected BreadstagramRepository breadstagramRepository;
 }

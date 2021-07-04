@@ -1,10 +1,14 @@
 package io.my.bbang.user.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import io.my.bbang.commons.entity.BaseTimeEntity;
 import io.my.bbang.commons.security.UserRole;
@@ -15,8 +19,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-@Document(collection = "user")
-public class User extends BaseTimeEntity {
+@Document("user")
+public class User extends BaseTimeEntity implements UserDetails {
 	
 	@Id
 	private String id;
@@ -35,6 +39,38 @@ public class User extends BaseTimeEntity {
 	
 	public static User newInstance(String loginId, String password) {
 		return new User(loginId, password);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
+		return authorities;
+	}
+
+	@Override
+	public String getUsername() {
+		return id;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
 	}
 
 }

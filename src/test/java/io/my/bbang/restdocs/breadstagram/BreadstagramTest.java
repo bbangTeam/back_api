@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
@@ -20,9 +22,15 @@ import org.springframework.restdocs.request.RequestParametersSnippet;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.my.bbang.breadstagram.dto.BreadstagramImageDto;
+import io.my.bbang.breadstagram.dto.BreadstagramListDto;
 import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
+import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
+import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
+import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
+import io.my.bbang.commons.payloads.BbangResponse;
+import reactor.core.publisher.Mono;
 
 class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 	
@@ -33,6 +41,37 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 빵스타그램 목록")
 	void list() throws JsonProcessingException {
+		int pageSize = 10;
+
+		BreadstagramListResponse responseBody = new BreadstagramListResponse();
+		responseBody.setResult("Success");
+
+		for (int i=0; i<pageSize; i++) {
+			BreadstagramListDto dto = new BreadstagramListDto();
+			
+			List<BreadstagramImageDto> imageList = new ArrayList<>();
+			
+			for (int index=0; index< pageSize - 5; index++) {
+				BreadstagramImageDto image = new BreadstagramImageDto();
+				
+				image.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
+				image.setId(UUID.randomUUID().toString());
+				image.setNum(index);
+				imageList.add(image);
+			}
+			
+			dto.setBreadName("bread" + i);
+			dto.setBreadStoreName("breadStore" + i);
+			dto.setCityName("Seoul");
+			dto.setImageList(imageList);
+			dto.setLike((int)((Math.random()*100000)));
+			
+			dto.setId("bread-stagram-id" + i);
+			responseBody.getBreadstagramList().add(dto);
+		}
+
+		Mockito.when(breadstagramService.list(Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("pageNum")
@@ -83,7 +122,16 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),
-						fieldWithPath("breadstagramList.[].imageUrlList.[]").description("사진 경로")
+						fieldWithPath("breadstagramList.[].imageList.[].id").description("사진 id")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+						fieldWithPath("breadstagramList.[].imageList.[].imageUrl").description("사진 경로")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+
+						fieldWithPath("breadstagramList.[].imageList.[].num").description("사진 순서")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
@@ -96,8 +144,34 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 	}
 	
 	@Test
+	@Disabled("삭제된 API")
 	@DisplayName("REST Docs 빵스타그램 상세화면")
 	void view() throws JsonProcessingException {
+
+		BreadstagramViewResponse responseBody = new BreadstagramViewResponse();
+		
+		responseBody.setResult("Success");
+		responseBody.setBreadName("소보루");
+		responseBody.setCityName("서울");
+		responseBody.setNickname("빵터짐");
+		responseBody.setStoreName("빵터짐 1호점");
+		responseBody.setLike((int)((Math.random()*100000)));
+		
+		List<BreadstagramImageDto> imageList = new ArrayList<>();
+		
+
+		for (int index=0; index<(int)((Math.random()*10000)%10 + 1); index++) {
+			BreadstagramImageDto dto = new BreadstagramImageDto();
+			dto.setId(UUID.randomUUID().toString());
+			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
+			dto.setNum(index);
+			imageList.add(dto);
+		}
+		
+		responseBody.setImageList(imageList);
+
+		Mockito.when(breadstagramService.view(Mockito.any())).thenReturn(Mono.just(responseBody));
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("id")
@@ -164,6 +238,13 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 빵스타그램 글쓰기")
 	void write() throws JsonProcessingException {
+		BreadstagramWriteResponse responseBody = new BreadstagramWriteResponse();
+		
+		responseBody.setId(UUID.randomUUID().toString());
+		responseBody.setResult("Success");
+		
+		Mockito.when(breadstagramService.write(Mockito.any())).thenReturn(Mono.just(responseBody));
+
 		BreadstagramWriteRequest requestBody = new BreadstagramWriteRequest();
 		requestBody.setId("id");
 		requestBody.setCityName("서울");
@@ -237,12 +318,20 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like() {
+	void like() throws InterruptedException {
+		BbangResponse responseBody = new BbangResponse("Success");
+
+		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("like")
 				.append("=")
 				.append("true")
+				.append("&")
+				.append("id")
+				.append("=")
+				.append("storeId")
 		;
 		
 		RequestParametersSnippet requestSnippet = 
@@ -250,7 +339,11 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						parameterWithName("like").description("좋아요")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Boolean"))
+													RestDocAttributes.format("Boolean")),
+						parameterWithName("id").description("store 고유 번호")
+						.attributes(
+								RestDocAttributes.length(0), 
+								RestDocAttributes.format("String"))
 				);
 		
 		

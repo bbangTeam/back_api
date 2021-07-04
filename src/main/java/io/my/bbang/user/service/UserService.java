@@ -7,8 +7,10 @@ import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.security.UserRole;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.User;
+import io.my.bbang.user.domain.UserHeart;
 import io.my.bbang.user.payload.response.UserJoinResponse;
 import io.my.bbang.user.payload.response.UserLoginResponse;
+import io.my.bbang.user.repository.UserHeartRepository;
 import io.my.bbang.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import reactor.core.publisher.Mono;
 public class UserService {
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
+	private final UserHeartRepository userHeartRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
 
 	public Mono<UserJoinResponse> join(String name, String loginId, String password) {
@@ -74,6 +77,21 @@ public class UserService {
 	 */
 	public Mono<User> findById(String id) {
 		return userRepository.findById(id);
+	}
+
+	public Mono<UserHeart> saveUserHeart(UserHeart entity) {
+		return userHeartRepository.save(entity);
+	}
+
+	public Mono<Void> deleteUserHeart(UserHeart entity) {
+		return userHeartRepository.deleteAllByUserIdAndHeartIdAndType(
+			entity.getUserId(),
+			entity.getHeartId(), 
+			entity.getType());
+	}
+
+	public Mono<UserHeart> findUserLike(UserHeart entity) {
+		return userHeartRepository.findByUserIdAndHeartIdAndType(entity);
 	}
 	
 }

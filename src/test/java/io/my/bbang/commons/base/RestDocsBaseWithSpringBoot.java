@@ -36,6 +36,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.web.reactive.function.BodyInserters.MultipartInserter;
 
+import io.my.bbang.breadstagram.service.BreadstagramService;
+import io.my.bbang.comment.service.CommentService;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.ideal.service.IdealService;
 import io.my.bbang.image.service.ImageService;
@@ -67,6 +69,12 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	@MockBean
 	protected IdealService idealService;
     
+	@MockBean
+	protected BreadstagramService breadstagramService;
+
+	@MockBean
+	protected CommentService commentService;
+	
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
