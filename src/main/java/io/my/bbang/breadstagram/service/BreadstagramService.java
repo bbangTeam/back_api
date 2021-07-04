@@ -135,6 +135,7 @@ public class BreadstagramService {
 	public Mono<BbangResponse> like(String id, Boolean like) throws InterruptedException {
 		return storeService.findOneStore(id)
 		.flatMap(store -> {
+			if (store.getLike() == null) store.setLike(0);
 			store.setLike(like ? store.getLike() + 1 : store.getLike() - 1);
 			return storeService.save(store);
 		})

@@ -164,7 +164,7 @@ include::{snippets}/breadstagramtest/write/curl-request.adoc[]
 ==== 빵스타그램 좋아요 API
 
 include::{snippets}/breadstagramtest/write/request-headers.adoc[]
-include::{snippets}/breadstagramtest/write/request-parameters.adoc[]
+include::{snippets}/breadstagramtest/write/request-fields.adoc[]
 include::{snippets}/breadstagramtest/write/response-fields.adoc[]
 include::{snippets}/breadstagramtest/write/http-request.adoc[]
 include::{snippets}/breadstagramtest/write/http-response.adoc[]
