@@ -163,12 +163,12 @@ include::{snippets}/breadstagramtest/write/curl-request.adoc[]
 [[resources-breadstagram-like]]
 ==== 빵스타그램 좋아요 API
 
-include::{snippets}/breadstagramtest/write/request-headers.adoc[]
-include::{snippets}/breadstagramtest/write/request-fields.adoc[]
-include::{snippets}/breadstagramtest/write/response-fields.adoc[]
-include::{snippets}/breadstagramtest/write/http-request.adoc[]
-include::{snippets}/breadstagramtest/write/http-response.adoc[]
-include::{snippets}/breadstagramtest/write/curl-request.adoc[]
+include::{snippets}/breadstagramtest/like/request-headers.adoc[]
+include::{snippets}/breadstagramtest/like/request-parameters.adoc[]
+include::{snippets}/breadstagramtest/like/response-fields.adoc[]
+include::{snippets}/breadstagramtest/like/http-request.adoc[]
+include::{snippets}/breadstagramtest/like/http-response.adoc[]
+include::{snippets}/breadstagramtest/like/curl-request.adoc[]
 
 
 

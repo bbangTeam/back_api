@@ -1,80 +1,85 @@
 package io.my.bbang.pilgrimage.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import io.my.bbang.breadstore.service.StoreService;
+import io.my.bbang.commons.utils.JwtUtil;
+import io.my.bbang.pilgrimage.domain.PilgrimageAddress;
 import io.my.bbang.pilgrimage.dto.PilgrimageListDto;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
+import io.my.bbang.pilgrimage.repository.PilgrimageAddressRepository;
 import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
+import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PilgrimageService {
-	private final ModelMapper modelMapper;
+	private final JwtUtil jwtUtil;
+
 	private final PilgrimageRepository pilgrimageRepository;
+	private final PilgrimageAddressRepository pilgrimageAddressRepository;
+	
+	private final StoreService storeService;
+	private final UserService userService;
 
 	public Mono<PilgrimageListResponse> list(String id, String option) {
 		PilgrimageListResponse responseBody = new PilgrimageListResponse();
 
-		log.info("call pilgrimage list service!!!");
-
-		responseBody.setResult("Success");
-		responseBody.setCityName("서울");
-		
-		for (int i=0; i<15; i++) {
+		return jwtUtil.getMonoUserId()
+		.map(userId -> {
+			responseBody.setUserId(userId);
+			return pilgrimageRepository.findAllByPilgrimageAddressId(id);
+		})
+		.map(flux -> {
 			PilgrimageListDto dto = new PilgrimageListDto();
-			dto.setStoreName("bakery" + i);
-			dto.setId(UUID.randomUUID().toString());
-			dto.setIsClear(i%2==0);
-			dto.setLatitude(37.555107 + (i / 1000d));
-			dto.setLongitude(126.970691 + (i / 1000d));
-			
-			if (option.equals("all")) {
-				List<Integer> bakeTimeList = new ArrayList<>();
-				
-				dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
-				dto.setOpeningHours("07 ~ 20");
-				dto.setBreadName("소보루");
-				dto.setBakeTimeList(bakeTimeList);
-				
-				for (int j=8; j<20; j+=2) {
-					bakeTimeList.add(j);
+			return flux.flatMap(entity -> {
+
+				if (option.equals("all")) {
+					dto.setBreadName(entity.getBreadName());
 				}
-			}
-			
-			responseBody.getStoreList().add(dto);
-		}
-		
-		return Mono.just(responseBody);
-		
-		
-//		Mono<Pilgrimage> pilgrimageDocument = pilgrimageRepository.findById(id);
-//
-//		pilgrimageDocument.hasElement().subscribe(hasElement -> responseBody.setResult("Success"));
-//
-//		pilgrimageDocument.subscribe(document -> {
-//			responseBody.setCityName(document.getName());
-//
-//			document.getBreadStoreList().forEach(vo -> {
-//				PilgrimageListDto dto = null;
-//				
-//				if (options.equals("all")) {
-//					dto = modelMapper.map(vo, PilgrimageListDto.class);
-//				} else if (options.equals("none")) {
-//					
-//				}
-//				responseBody.getBakeryList().add(dto);
-//			});
-//		});
-//
-//		return Mono.just(responseBody);
+
+				dto.setPilgrimageId(entity.getId());
+				return storeService.findOneStore(entity.getStoreId());
+			})
+			.flatMap(entity -> {
+				dto.setId(entity.getId());
+				dto.setStoreName(entity.getEntrpNm());
+				dto.setLatitude(entity.getXposLo());
+				dto.setLongitude(entity.getYposLa());
+				
+				if (option.equals("all")) {
+					dto.setImageUrl(entity.getNaverThumbUrl());
+					dto.setOpeningHours(entity.getBusinessHours());
+				}
+
+				return userService.findByUserPilgrimageId(dto.getPilgrimageId());
+			}).map(entity -> {
+				if (entity == null) {
+					dto.setIsClear(Boolean.FALSE);
+				} else {
+					dto.setIsClear(Boolean.TRUE);
+				}
+				// 응답 값으로 불필요하므로, null 처리
+				dto.setPilgrimageId(null);
+				return dto;
+			}).collectList().map(list -> {
+
+				// 응답 값으로 불필요하므로, null 처리
+				responseBody.setUserId(null);
+				responseBody.setStoreList(list);
+				responseBody.setResult("Success");
+				return responseBody;
+			})
+			;
+		}).flatMap(map -> map);
+	}
+
+	public Flux<PilgrimageAddress> findAllPilgrimageAddress() {
+		return pilgrimageAddressRepository.findAll();
 	}
 }

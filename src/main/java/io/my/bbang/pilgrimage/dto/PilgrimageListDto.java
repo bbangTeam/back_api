@@ -21,5 +21,8 @@ public class PilgrimageListDto {
 	private String openingHours;
 	private String breadName;
 	private List<Integer> bakeTimeList;
+
+	// 서비스에서 함수 안에 접근하기 위한 값으로, 응답값으로 불필요함
+	private String pilgrimageId;
 	
 }

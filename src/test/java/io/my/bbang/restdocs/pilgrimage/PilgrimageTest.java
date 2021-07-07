@@ -5,26 +5,61 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.restdocs.payload.ResponseFieldsSnippet;
-import org.springframework.restdocs.request.RequestParametersSnippet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.RequestParametersSnippet;
+
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
+import io.my.bbang.pilgrimage.dto.PilgrimageListDto;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
+import reactor.core.publisher.Mono;
 
 class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 	
-	@BeforeEach
-	void setUp() {
-	}
-
 	@Test
 	@DisplayName("REST Docs 빵지순례 빵집 목록")
 	void list() throws JsonProcessingException {
+		String option = "all";
+
+		PilgrimageListResponse responseBody = new PilgrimageListResponse();
+
+		responseBody.setResult("Success");
+		
+		for (int i=0; i<15; i++) {
+			PilgrimageListDto dto = new PilgrimageListDto();
+			dto.setStoreName("bakery" + i);
+			dto.setId(UUID.randomUUID().toString());
+			dto.setIsClear(i%2==0);
+			dto.setLatitude(37.555107 + (i / 1000d));
+			dto.setLongitude(126.970691 + (i / 1000d));
+			
+			if (option.equals("all")) {
+				List<Integer> bakeTimeList = new ArrayList<>();
+				
+				dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
+				dto.setOpeningHours("07 ~ 20");
+				dto.setBreadName("소보루");
+				dto.setBakeTimeList(bakeTimeList);
+				
+				for (int j=8; j<20; j+=2) {
+					bakeTimeList.add(j);
+				}
+			}
+			
+			responseBody.getStoreList().add(dto);
+		}
+
+		Mockito.when(pilgrimageService.list(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
+
 		StringBuilder params = new StringBuilder();
 		params.append("?")
 				.append("id")
@@ -55,10 +90,6 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						fieldWithPath("cityName").description("도시명")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")),
 						fieldWithPath("storeList.[].id").description("빵집 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 

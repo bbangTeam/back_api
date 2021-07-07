@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
 import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
-import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.service.BreadstagramService;
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -31,18 +30,6 @@ public class BreadstagramController {
 			@RequestParam int pageSize) {
 		
 		return breadstagramService.list(pageNum, pageSize);
-	}
-	
-	/**
-	 * 삭제된 API
-	 * @param id
-	 * @return
-	 */
-	@Deprecated
-	@GetMapping("/view")
-	public Mono<BreadstagramViewResponse> view(
-			@RequestParam String id) {
-		return breadstagramService.view(id);
 	}
 	
 	@PutMapping("/write")

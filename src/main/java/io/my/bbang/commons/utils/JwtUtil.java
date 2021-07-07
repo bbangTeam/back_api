@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.properties.AccessTokenProperties;
 import io.my.bbang.commons.properties.RefreshTokenProperties;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -96,6 +98,15 @@ public class JwtUtil {
 	private Key getKey(String secretKey) {
 		byte[] secretBytes = Base64.getEncoder().encode(secretKey.getBytes());
 		return new SecretKeySpec(secretBytes, SignatureAlgorithm.HS512.getJcaName());
+	}
+
+	/**
+	 * ReactiveJwtContextHolder에서 jwt 정보를 가져와서 userId 반환.
+	 */
+	public Mono<String> getMonoUserId() {
+		return ReactiveJwtContextHolder.getContext()
+		.flatMap(token -> token.getJwt())
+		.map(jwt -> getUserIdByAccessToken(jwt));
 	}
 
 }

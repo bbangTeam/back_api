@@ -22,7 +22,6 @@ import io.my.bbang.breadstore.service.StoreService;
 import io.my.bbang.comment.domain.Comment;
 import io.my.bbang.comment.dto.CommentType;
 import io.my.bbang.comment.service.CommentService;
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
@@ -66,30 +65,6 @@ public class BreadstagramService {
 	
 	}
 	
-	/**
-	 * 삭제된 API
-	 * @param id
-	 * @return
-	 */
-	@Deprecated
-	public Mono<BreadstagramViewResponse> view(String id) {
-		BreadstagramViewResponse responseBody = new BreadstagramViewResponse();
-
-		responseBody.setResult("Success");
-		responseBody.setBreadName("소보루");
-		responseBody.setCityName("서울");
-		responseBody.setNickname("빵터짐");
-		responseBody.setStoreName("빵터짐 1호점");
-		responseBody.setLike((int)((Math.random()*100000)));
-
-		return breadstagramRepository.findById(id).map(entity -> {
-			BreadstagramListDto dto = new BreadstagramListDto();
-			responseBody.setBreadName(entity.getBreadName());
-			responseBody.setCityName(entity.getCityName());
-			return responseBody;
-		});
-	}
-	
 	public Mono<BreadstagramWriteResponse> write(BreadstagramWriteRequest requestBody) {
 
 		String storeId = requestBody.getId();
@@ -109,10 +84,8 @@ public class BreadstagramService {
 		return breadstagramRepository.save(entity)
 				.flatMap(breadstagram -> {
 					entity.setId(breadstagram.getId());
-					return ReactiveJwtContextHolder.getContext();
+					return jwtUtil.getMonoUserId();
 				})
-				.flatMap(context -> context.getJwt())
-				.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
 				.flatMap(userId -> userService.findById(userId))
 				.flatMap(user -> 
 					commentService.save(
@@ -140,9 +113,7 @@ public class BreadstagramService {
 			return storeService.save(store);
 		})
 		.flatMap(store -> {
-			return ReactiveJwtContextHolder.getContext()
-			.flatMap(token -> token.getJwt())
-			.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
+			return jwtUtil.getMonoUserId()
 			.map(userId -> {
 				String storeId = store.getId();
 				UserHeart userHeart = UserHeart.build(userId, storeId, UserHeartType.STORE);
