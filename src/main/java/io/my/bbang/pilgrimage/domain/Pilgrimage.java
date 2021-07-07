@@ -14,6 +14,8 @@ public class Pilgrimage {
     private String id;
     private String storeId;
     private String breadName;
+
+    // common_code의 parent_code = 001 인 항목 참고
     private String pilgrimageAddressId;
     private String detailAddress;
 

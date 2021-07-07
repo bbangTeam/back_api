@@ -125,6 +125,17 @@ include::{snippets}/pilgrimagetest/list/curl-request.adoc[]
 
 
 
+[[resources-pilgrimage-arealist]]
+==== 빵지순례 지역 목록 API
+
+include::{snippets}/pilgrimagetest/arealist/request-headers.adoc[]
+include::{snippets}/pilgrimagetest/arealist/response-fields.adoc[]
+include::{snippets}/pilgrimagetest/arealist/http-request.adoc[]
+include::{snippets}/pilgrimagetest/arealist/http-response.adoc[]
+include::{snippets}/pilgrimagetest/arealist/curl-request.adoc[]
+
+
+
 [[resources-breadstagram-api]]
 === 빵스타그램
 
@@ -282,19 +293,3 @@ include::{snippets}/imagetest/delete/response-fields.adoc[]
 include::{snippets}/imagetest/delete/http-request.adoc[]
 include::{snippets}/imagetest/delete/http-response.adoc[]
 include::{snippets}/imagetest/delete/curl-request.adoc[]
-
-
-
-[[resources-set-api]]
-=== 지역
-
-
-
-[[resources-map-area-list]]
-==== 지역 목록 API
-
-include::{snippets}/areatest/list/request-headers.adoc[]
-include::{snippets}/areatest/list/response-fields.adoc[]
-include::{snippets}/areatest/list/http-request.adoc[]
-include::{snippets}/areatest/list/http-response.adoc[]
-include::{snippets}/areatest/list/curl-request.adoc[]

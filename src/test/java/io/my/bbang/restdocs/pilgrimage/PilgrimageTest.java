@@ -19,7 +19,9 @@ import org.springframework.restdocs.request.RequestParametersSnippet;
 
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
+import io.my.bbang.pilgrimage.dto.PilgrimageAreaListDto;
 import io.my.bbang.pilgrimage.dto.PilgrimageListDto;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageAreaListResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
 import reactor.core.publisher.Mono;
 
@@ -136,5 +138,45 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 						.expectBody()
 						.consumeWith(createConsumer("/list", requestSnippet, responseSnippet));
 	}
+
+
+	@Test
+	@DisplayName("REST Docs 빵지순례 지역 목록 API")
+	void areaList() {
+
+		PilgrimageAreaListResponse responseBody = new PilgrimageAreaListResponse();
+		responseBody.setResult("Success");
+		
+		for (int i=0; i<7; i++) {
+			PilgrimageAreaListDto dto = new PilgrimageAreaListDto();
+			dto.setId(UUID.randomUUID().toString());
+			dto.setName("area" + i);
+			responseBody.getAreaList().add(dto);
+		}
+
+		Mockito.when(pilgrimageService.areaList()).thenReturn(Mono.just(responseBody));
+		
+		ResponseFieldsSnippet responseSnippet = 
+				responseFields(
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+						fieldWithPath("areaList.[].id").description("지역 고유번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+						fieldWithPath("areaList.[].name").description("지역명")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String"))
+				);
+		
+		getWebTestClient("/api/pilgrimage/area/list").expectStatus()
+						.isOk()
+						.expectBody()
+						.consumeWith(createConsumer("/arealist", responseSnippet));
+	}
+    
 	
 }

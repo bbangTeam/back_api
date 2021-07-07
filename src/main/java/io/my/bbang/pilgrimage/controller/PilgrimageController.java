@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.my.bbang.pilgrimage.payload.response.PilgrimageAreaListResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
 import io.my.bbang.pilgrimage.service.PilgrimageService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,11 @@ public class PilgrimageController {
 		log.info("call pilgrimage list!!!");
 		
 		return pilgrimageService.list(id, option);
+	}
+
+	@GetMapping("/area/list")
+	public Mono<PilgrimageAreaListResponse> areaList() {
+		return pilgrimageService.areaList();
 	}
 	
 
