@@ -84,7 +84,8 @@ public class PilgrimageService {
 
 	public Mono<PilgrimageAreaListResponse> areaList() {
 		return codeService.findAllByParentCode(ParentCode.PILGRIMAGE_ADDRESS_CODE.getCode())
-		.collectList().map(codeList -> {
+		.collectList()
+		.map(codeList -> {
 			PilgrimageAreaListResponse responseBody = new PilgrimageAreaListResponse();
 
 			codeList.forEach(code -> {
