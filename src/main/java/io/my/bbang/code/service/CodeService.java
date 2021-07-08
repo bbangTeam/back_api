@@ -13,7 +13,7 @@ public class CodeService {
     private final CodeRepository codeRepository;
 
     public Flux<Code> findAllByParentCode(String parentCode) {
-        return codeRepository.findAllByParentCode(parentCode);
+        return codeRepository.findAllByCodes(parentCode);
     }
     
 }

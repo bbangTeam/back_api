@@ -8,5 +8,5 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface CodeRepository extends ReactiveCrudRepository<Code, String> {
-    Flux<Code> findAllByParentCode(String parentCode);
+    Flux<Code> findAllByCodes(String codes);
 }

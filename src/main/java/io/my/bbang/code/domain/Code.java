@@ -12,7 +12,7 @@ public class Code {
     @Id
     private String id;
     private String code;
-    private String parentCode;
+    private String codes;
     private String content;
     private String description;
 }
