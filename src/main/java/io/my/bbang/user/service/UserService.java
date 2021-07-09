@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.security.UserRole;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.User;
@@ -62,7 +63,7 @@ public class UserService {
 
 		return testUser.map(user -> {
 			if (! passwordEncoder.matches(password, user.getPassword())) {
-				throw new BbangException("password is wrong!");
+				throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
 			}
 			
 			String accessToken = jwtUtil.createAccessToken(user.getId());

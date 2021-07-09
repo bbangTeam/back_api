@@ -9,6 +9,8 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +35,10 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 			return authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(jwt, jwt))
 					.map(SecurityContextImpl::new);
+		} else {
+			// throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
+			return Mono.empty();
 		}
-		
-		return Mono.empty();
 	}
 	
 

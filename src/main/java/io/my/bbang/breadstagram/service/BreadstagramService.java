@@ -23,6 +23,7 @@ import io.my.bbang.comment.domain.Comment;
 import io.my.bbang.comment.dto.CommentType;
 import io.my.bbang.comment.service.CommentService;
 import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.UserHeart;
@@ -61,7 +62,7 @@ public class BreadstagramService {
 			responseBody.setResult("Success");
 			responseBody.setBreadstagramList(list);
 			return responseBody;
-		}).switchIfEmpty(Mono.error(new BbangException("Exception")));
+		}).switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.EMPTY_EXCEPTION)));
 	
 	}
 	
@@ -95,7 +96,7 @@ public class BreadstagramService {
 					responseBody.setId(entity.getId());
 					responseBody.setResult("Success");
 					return responseBody;
-		}).switchIfEmpty(Mono.error(new BbangException("Exception")));
+		}).switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.EMPTY_EXCEPTION)));
 	}
 
 	/**
