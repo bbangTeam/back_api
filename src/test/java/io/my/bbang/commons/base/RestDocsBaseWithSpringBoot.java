@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,6 +40,7 @@ import org.springframework.web.reactive.function.BodyInserters.MultipartInserter
 import io.my.bbang.breadstagram.service.BreadstagramService;
 import io.my.bbang.breadstore.service.StoreService;
 import io.my.bbang.comment.service.CommentService;
+import io.my.bbang.commons.security.AuthenticationManager;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.ideal.service.IdealService;
 import io.my.bbang.image.service.ImageService;
@@ -83,10 +85,15 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 
 	@MockBean
 	protected PilgrimageService pilgrimageService;
+
+	@MockBean
+	protected AuthenticationManager authenticationManager;
 	
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
+				
+		// Mockito.when(authenticationManager.authenticate(Mockito.any())).thenReturn(Mockito.any());
 				
 		authorization = "bearer " + jwtUtil.createAccessToken("userId");
 		this.webTestClient = WebTestClient.bindToApplicationContext(applicationContext)

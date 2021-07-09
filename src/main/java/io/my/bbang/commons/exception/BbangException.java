@@ -1,13 +1,14 @@
 package io.my.bbang.commons.exception;
 
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import lombok.Getter;
 
 @Getter
 public class BbangException extends RuntimeException {
 	private static final long serialVersionUID = 8888926686884785342L;
-	private String message;
+	private ExceptionTypes type;
 	
-	public BbangException(String message) {
-		this.message = message;
+	public BbangException(ExceptionTypes type) {
+		this.type = type;
 	}
 }
