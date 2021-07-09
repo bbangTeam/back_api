@@ -13,11 +13,7 @@ public class Pilgrimage {
     @Id
     private String id;
     private String storeId;
-    private String breadName;
-    private String pilgrimageAddressId;
-    private String detailAddress;
 
-    private String fileName;
-    private String imageUrl;
-    
+    // common_code의 parent_code = 001 인 항목 참고
+    private String pilgrimageAreaId;
 }

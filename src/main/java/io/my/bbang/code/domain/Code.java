@@ -1,4 +1,4 @@
-package io.my.bbang.pilgrimage.domain;
+package io.my.bbang.code.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -6,12 +6,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Getter;
 import lombok.Setter;
 
+@Document("code")
 @Getter @Setter
-@Document("pilgrimage_address")
-public class PilgrimageAddress {
-
+public class Code {
     @Id
     private String id;
-    private String cityName;
-    
+    private String code;
+    private String codes;
+    private String content;
+    private String description;
 }
