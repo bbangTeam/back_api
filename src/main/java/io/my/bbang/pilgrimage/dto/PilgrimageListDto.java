@@ -12,7 +12,7 @@ import lombok.Data;
 public class PilgrimageListDto {
 	private String id;
 	private String storeName;
-	private Boolean isClear;
+	private boolean clear;
 	private Double latitude;
 	private Double longitude;
 	

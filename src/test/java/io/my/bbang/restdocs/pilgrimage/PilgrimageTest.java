@@ -40,7 +40,7 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 			PilgrimageListDto dto = new PilgrimageListDto();
 			dto.setStoreName("bakery" + i);
 			dto.setId(UUID.randomUUID().toString());
-			dto.setIsClear(i%2==0);
+			dto.setClear(i%2==0);
 			dto.setLatitude(37.555107 + (i / 1000d));
 			dto.setLongitude(126.970691 + (i / 1000d));
 			
@@ -100,7 +100,7 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						fieldWithPath("storeList.[].isClear").description("방문 경험")
+						fieldWithPath("storeList.[].clear").description("방문 경험")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Boolean")), 

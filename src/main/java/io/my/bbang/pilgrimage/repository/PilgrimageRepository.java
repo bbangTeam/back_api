@@ -8,5 +8,5 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface PilgrimageRepository extends ReactiveCrudRepository<Pilgrimage, String>{
-    Flux<Pilgrimage> findAllByPilgrimageAddressId(String pilgrimageAddressId);
+    Flux<Pilgrimage> findAllByPilgrimageAreaId(String pilgrimageAreaId);
 }

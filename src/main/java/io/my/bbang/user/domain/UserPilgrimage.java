@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Document("user_pilgrimage")
+@Document("userPilgrimage")
 public class UserPilgrimage {
 
     @Id
