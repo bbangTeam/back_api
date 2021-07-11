@@ -1,5 +1,7 @@
 package io.my.bbang.comment.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,7 +14,6 @@ import io.my.bbang.comment.payload.response.CommentCountResponse;
 import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.comment.repository.CommentRepository;
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,32 +28,38 @@ public class CommentService {
 	
 	public Mono<CommentListResponse> list(String id, int pageSize, int pageNum) {
 		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Direction.DESC, "createDate"));
-		return commentRepository.findByParentId(id, pageable).map(entity -> {
-			CommentListDto dto = new CommentListDto();
-			dto.setContent(entity.getContent());
-			dto.setNickname(entity.getNickname());
-			return dto;
-		}).collectList().map(list -> {
-			CommentListResponse responseBody = new CommentListResponse();
-			responseBody.setCommentList(list);
-			responseBody.setResult("Success");
-			return responseBody;
-		});
+		
+		return commentRepository.findByParentId(id, pageable)
+		.map(this::returnDto).collectList()
+		.map(this::returnResponse);
+	}
+
+	private CommentListDto returnDto(Comment entity) {
+		CommentListDto dto = new CommentListDto();
+		dto.setContent(entity.getContent());
+		dto.setNickname(entity.getNickname());
+		return dto;
+	}
+
+	private CommentListResponse returnResponse(List<CommentListDto> list) {
+		CommentListResponse responseBody = new CommentListResponse();
+		responseBody.setCommentList(list);
+		responseBody.setResult("Success");
+		return responseBody;
 	}
 	
 	public Mono<CommentWriteResponse> write(String id, String content, String type) {
-		return ReactiveJwtContextHolder.getContext()
-						.flatMap(jwtContext -> jwtContext.getJwt())
-						.map(jwt -> jwtUtil.getUserIdByAccessToken(jwt))
-						.flatMap(userId -> userService.findById(userId))
+		return jwtUtil.getMonoUserId().flatMap(userId -> userService.findById(userId))
 						.map(user -> Comment.build(id, user.getId(), user.getName(), content, type))
-						.flatMap(comment -> commentRepository.save(comment))
-						.map(comment -> {
-							CommentWriteResponse responseBody = new CommentWriteResponse();
-							responseBody.setId(comment.getId());
-							responseBody.setResult("Success");
-							return responseBody;
-		});
+						.flatMap(commentRepository::save)
+						.map(this::returnResponse);
+	}
+
+	private CommentWriteResponse returnResponse(Comment entity) {
+		CommentWriteResponse responseBody = new CommentWriteResponse();
+		responseBody.setId(entity.getId());
+		responseBody.setResult("Success");
+		return responseBody;
 	}
 
 	public Mono<CommentCountResponse> count(String id) {
