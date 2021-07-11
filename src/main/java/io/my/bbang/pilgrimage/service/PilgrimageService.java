@@ -1,7 +1,6 @@
 package io.my.bbang.pilgrimage.service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -79,8 +78,8 @@ public class PilgrimageService {
 		PilgrimageListDto dto = dtoMap.get(entity.getId());
 		dto.setId(entity.getId());
 		dto.setStoreName(entity.getEntrpNm());
-		dto.setLatitude(entity.getXposLo());
-		dto.setLongitude(entity.getYposLa());
+		dto.setLatitude(entity.getYposLa());
+		dto.setLongitude(entity.getXposLo());
 		dto.setImageUrl(entity.getNaverThumbUrl());
 		dto.setBreadName(entity.getReprsntMenuNm());
 
