@@ -17,14 +17,10 @@ import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.breadstore.service.StoreService;
-import io.my.bbang.comment.domain.Comment;
-import io.my.bbang.comment.dto.CommentType;
-import io.my.bbang.comment.service.CommentService;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
-import io.my.bbang.user.domain.User;
 import io.my.bbang.user.domain.UserHeart;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.service.UserService;
@@ -35,7 +31,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BreadstagramService {
 	private final BreadstagramRepository breadstagramRepository;
-	private final CommentService commentService;
 	private final StoreService storeService;
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
@@ -54,6 +49,7 @@ public class BreadstagramService {
 
 	private BreadstagramListDto entityToDto(Breadstagram entity) {
 		BreadstagramListDto dto = new BreadstagramListDto();
+		dto.setContent(entity.getContent());
 		dto.setBreadName(entity.getBreadName());
 		dto.setId(entity.getId());
 		dto.setCityName(entity.getCityName());
@@ -79,39 +75,28 @@ public class BreadstagramService {
 	
 	public Mono<BreadstagramWriteResponse> write(BreadstagramWriteRequest requestBody) {
 
-		String content = requestBody.getContent();
-		
-		Breadstagram entity = requestToEntity(requestBody);
-
-		return breadstagramRepository.save(entity)
-				.flatMap(breadstagram -> {
-					entity.setId(breadstagram.getId());
-					return jwtUtil.getMonoUserId();
-				})
-				.flatMap(userId -> userService.findById(userId))
-				.flatMap(user -> saveComment(entity, user, content))
-				.map(comment -> returnResponse(entity))
+		return jwtUtil.getMonoUserId().map(userId -> requestToEntity(requestBody, userId))
+				.flatMap(breadstagramRepository::save)
+				.map(this::returnResponse)
 				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
 	}
 
-	private Breadstagram requestToEntity(BreadstagramWriteRequest requestBody) {
+	private Breadstagram requestToEntity(BreadstagramWriteRequest requestBody, String userId) {
 		String storeId = requestBody.getId();
 		String breadName = requestBody.getBreadName();
 		String cityName = requestBody.getCityName();
+		String content = requestBody.getContent();
 
 		Breadstagram entity = new Breadstagram();
 
+		entity.setUserId(userId);
 		entity.setBreadName(breadName);
 		entity.setStoreId(storeId);
 		entity.setCityName(cityName);
+		entity.setContent(content);
 		entity.setImageList(requestBody.getImageList());
 		entity.setCreateDate(LocalDateTime.now());
 		return entity;
-	}
-
-	private Mono<Comment> saveComment(Breadstagram entity, User user, String content) {
-		return commentService.save(
-			Comment.build(entity.getId(), user.getId(), user.getLoginId(), content, CommentType.STORE));
 	}
 
 	private BreadstagramWriteResponse returnResponse(Breadstagram entity) {
