@@ -22,7 +22,7 @@ public class JwtController {
         log.info("call access token issued api!");
         String accessToken = request.getHeaders().get("Authorization").get(0).substring(7);
 
-        String id = jwtUtil.parseAccessToken(accessToken).getId();
+        String id = jwtUtil.parseAccessToken(accessToken).get("userId").toString();
         
         String responseAccessToken = jwtUtil.createAccessToken(id);
         response.getHeaders().add("Authorization", responseAccessToken);
