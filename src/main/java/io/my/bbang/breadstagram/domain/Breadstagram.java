@@ -19,9 +19,11 @@ public class Breadstagram extends BaseTimeEntity {
     private String id;
 
     private String storeId;
+    private String userId;
     private String cityName;
     private String breadName;
     private String storeName;
+    private String content;
     private List<BreadstagramImageDto> imageList;
 
 }

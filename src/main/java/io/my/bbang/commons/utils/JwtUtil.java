@@ -105,8 +105,14 @@ public class JwtUtil {
 	 */
 	public Mono<String> getMonoUserId() {
 		return ReactiveJwtContextHolder.getContext()
-		.flatMap(token -> token.getJwt())
-		.map(jwt -> getUserIdByAccessToken(jwt));
+		.flatMap(context -> {
+			String userId = context.getUserId();
+			if (userId == null) {
+				return context.getJwt().map(jwt -> getUserIdByAccessToken(jwt));
+			} else {
+				return Mono.just(userId);
+			}
+		});
 	}
 
 }

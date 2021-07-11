@@ -6,34 +6,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.server.EntityResponse;
 
 import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.payloads.BbangResponse;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 	
     @ExceptionHandler(BbangException.class)
     protected Mono<EntityResponse<BbangResponse>> handleHttpRequestMethodNotSupportedException(BbangException e) {
-        
-        log.info("====================================");
-        log.info("exception advice!!!");
-        log.info("====================================");
-        
+        ExceptionTypes exceptionType = e.getType();
+
         return EntityResponse.fromObject(
-            new BbangResponse("BbangException")).status(HttpStatus.BAD_REQUEST).build();
+            new BbangResponse(e.getMessage())).status(exceptionType.getStatus()).build();
     }
 
 
     @ExceptionHandler(Exception.class)
     protected Mono<EntityResponse<BbangResponse>> exceptionAdvice(Exception e) {
-        
-        log.info("====================================");
-        log.info("exception advice!!!");
-        log.info("====================================");
-        
-        return EntityResponse.fromObject(new BbangResponse("Exception")).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        e.printStackTrace();
+        return EntityResponse.fromObject(
+            new BbangResponse("서버 에러")).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 	
 }

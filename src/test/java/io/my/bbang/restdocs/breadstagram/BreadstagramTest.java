@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,13 +20,10 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.my.bbang.breadstagram.dto.BreadstagramImageDto;
 import io.my.bbang.breadstagram.dto.BreadstagramListDto;
 import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
 import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
-import io.my.bbang.breadstagram.payload.response.BreadstagramViewResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
@@ -62,6 +60,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 			
 			dto.setBreadName("bread" + i);
 			dto.setBreadStoreName("breadStore" + i);
+			dto.setContent("content" + UUID.randomUUID());
 			dto.setCityName("Seoul");
 			dto.setImageList(imageList);
 			dto.setLike((int)((Math.random()*100000)));
@@ -118,6 +117,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
+						fieldWithPath("breadstagramList.[].content").description("본문")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
 						fieldWithPath("breadstagramList.[].like").description("좋아요")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -166,6 +169,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 		for (int index=0; index<(int)((Math.random()*10000)%10)+1; index++) {
 			BreadstagramImageDto dto = new BreadstagramImageDto();
+			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
 			dto.setId(UUID.randomUUID().toString());
 			dto.setNum(index);
 			imageList.add(dto);
@@ -197,6 +201,11 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
 						fieldWithPath("imageList.[].id").description("사진 고유번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+
+						fieldWithPath("imageList.[].imageUrl").description("사진 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 

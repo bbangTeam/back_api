@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum ExceptionTypes {
     AUTH_EXCEPTION(HttpStatus.UNAUTHORIZED, 1, "인증 에러"), 
-    EMPTY_EXCEPTION(HttpStatus.BAD_REQUEST, 2, "DB 에러"),
+    DATABASE_EXCEPTION(HttpStatus.BAD_REQUEST, 2, "DB 에러"),
     ;
 
     HttpStatus status;
@@ -15,7 +15,9 @@ public enum ExceptionTypes {
     int returnCode;
 
     ExceptionTypes(HttpStatus status, int returnCode, String message){
-        
+        this.status = status;
+        this.returnCode = returnCode;
+        this.message = message;
     }
     
 }

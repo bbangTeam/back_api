@@ -4,6 +4,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 
 import io.my.bbang.commons.base.RestDocAttributes;
@@ -13,6 +14,7 @@ class JwtTest extends RestDocsBaseWithSpringBoot {
 
     @Test
     void accessTokenIssued() {
+        Mockito.when(jwtService.accessTokenIssued(Mockito.any())).thenReturn(jwtUtil.createAccessToken("userId"));
 
         ResponseFieldsSnippet responseSnippet = 
         responseFields(

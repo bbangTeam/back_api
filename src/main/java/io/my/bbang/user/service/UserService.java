@@ -3,7 +3,6 @@ package io.my.bbang.user.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.security.UserRole;
@@ -37,42 +36,40 @@ public class UserService {
 		user.setName(name);
 		user.getRoles().add(UserRole.ROLE_USER);
 		
-		User saveUser = new User();
-		Mono<User> monoEntity = userRepository.save(user);
-		
-		monoEntity.subscribe(e -> {
-			saveUser.setCreateDate(e.getCreateDate());
-			saveUser.setLoginId(e.getLoginId());
-			saveUser.setId(e.getId());
-		});
-		
+		return userRepository.save(user).map(this::returnJoinResponse);
+	}
+
+	private UserJoinResponse returnJoinResponse(User entity) {
 		UserJoinResponse responseBody = new UserJoinResponse();
-		responseBody.setId(saveUser.getId());
-		responseBody.setLoginId(loginId);
-		responseBody.setCreateTime(saveUser.getCreateDate());
-		
-		return Mono.just(responseBody);
+		responseBody.setId(entity.getId());
+		responseBody.setLoginId(entity.getLoginId());
+		responseBody.setCreateTime(entity.getCreateDate());
+		return responseBody;
 	}
 	
 	public Mono<UserLoginResponse> login(String loginId, String password) {
 		log.info("login service");
 		
-		UserLoginResponse responseBody = new UserLoginResponse();
-			
-		Mono<User> testUser = userRepository.findByLoginId(loginId);
+		return userRepository.findByLoginId(loginId)
+		.map(entity -> checkPassword(entity, password))
+		.map(this::returnLoginResponse);
+	}
 
-		return testUser.map(user -> {
-			if (! passwordEncoder.matches(password, user.getPassword())) {
-				throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
-			}
-			
-			String accessToken = jwtUtil.createAccessToken(user.getId());
-			
-			responseBody.setLoginId(loginId);
-			responseBody.setAccessToken(accessToken);
-			
-			return responseBody;
-		});
+	private User checkPassword(User entity, String password) {
+		if (! passwordEncoder.matches(password, entity.getPassword())) {
+			throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
+		}
+		return entity;
+	}
+
+	private UserLoginResponse returnLoginResponse(User entity) {
+		UserLoginResponse responseBody = new UserLoginResponse();
+		String accessToken = jwtUtil.createAccessToken(entity.getId());
+		
+		responseBody.setLoginId(entity.getLoginId());
+		responseBody.setAccessToken(accessToken);
+		
+		return responseBody;
 	}
 	
 	/**

@@ -46,14 +46,17 @@ public class ImageService {
 					Image image = Image.build(imageUrl, fileName);
 					return imageRepository.save(image);
 				})
-				.map(image -> {
-					UploadResponse responseBody = new UploadResponse();
-					responseBody.setId(image.getId());
-					responseBody.setImageUrl(image.getUrl());
-					responseBody.setFileName(image.getFileName());
-					responseBody.setResult("Success");
-					return responseBody;
-				});
+				.map(this::returnResponse);
+	}
+
+	private UploadResponse returnResponse(Image image) {
+		UploadResponse responseBody = new UploadResponse();
+		responseBody.setId(image.getId());
+		responseBody.setImageUrl(image.getUrl());
+		responseBody.setFileName(image.getFileName());
+		responseBody.setResult("Success");
+		return responseBody;
+
 	}
 	
 	public Mono<BbangResponse> fileDelete(String id, String fileName) {
