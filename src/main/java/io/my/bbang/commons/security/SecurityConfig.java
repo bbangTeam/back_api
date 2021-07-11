@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-	private final AuthenticationManager authenticationManager;
 	private final SecurityContextRepository securityContextRepository;
 	
 	@Bean
@@ -30,17 +29,15 @@ public class SecurityConfig {
 					.and()
 					.formLogin().disable()
 					.httpBasic().disable()
-					.authenticationManager(authenticationManager)
 					.securityContextRepository(securityContextRepository)
 					.authorizeExchange()
 					.pathMatchers(HttpMethod.OPTIONS).permitAll()
 					.pathMatchers("/api/specification/**").permitAll()
 					.pathMatchers("/api/healthcheck").permitAll()
-					.pathMatchers("/**").permitAll()
 					.pathMatchers("/api/**").authenticated()
+					.pathMatchers("/**").permitAll()
 					.and()
 					.csrf().disable()
-//					.addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
 					.build();
 	}
 	

@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 final public class JwtContext implements Serializable {
    private final Mono<String> jwt;
    private User user;
+   private String userId;
 
    public JwtContext(final ServerWebExchange exchange) {
        jwt = Mono.just(exchange)
@@ -28,5 +29,13 @@ final public class JwtContext implements Serializable {
 
    public User getUser() {
        return user;
+   }
+
+   public void setUserId(String userId) {
+       this.userId = userId;
+   }
+
+   public String getUserId() {
+       return userId;
    }
 }

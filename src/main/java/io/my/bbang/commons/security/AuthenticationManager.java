@@ -24,7 +24,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 		String jwt = authentication.getCredentials().toString();
 		
 		if ( jwt == null || !jwtUtil.verifyAccessToken(jwt) ) {
-			// throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
+			return Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION));
 		}
 
 		String userId = jwtUtil.getUserIdByAccessToken(jwt);
@@ -40,7 +40,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 							user.getPassword(), 
 							user.getAuthorities());
 		})
-		// .switchIfEmpty(Mono.error(new BbangException("authenticate exception!")))
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION)))
 		;
 	}
 

@@ -35,10 +35,9 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 			return authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(jwt, jwt))
 					.map(SecurityContextImpl::new);
-		} else {
-			// throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
-			return Mono.empty();
 		}
+		
+		return Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION));
 	}
 	
 

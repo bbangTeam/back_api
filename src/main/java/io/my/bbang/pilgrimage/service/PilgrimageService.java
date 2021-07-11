@@ -19,10 +19,8 @@ import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
 import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
 import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PilgrimageService {

@@ -3,7 +3,6 @@ package io.my.bbang.user.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.security.UserRole;

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.my.bbang.commons.payloads.BbangResponse;
-import io.my.bbang.commons.utils.JwtUtil;
+import io.my.bbang.commons.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -15,17 +15,14 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 public class JwtController {
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
-    @GetMapping("/api/jwt/issued")
+    @GetMapping(value = "/api/jwt/issued", produces = "application/json")
     public Mono<BbangResponse> accessTokenIssued(ServerHttpRequest request, ServerHttpResponse response){
         log.info("call access token issued api!");
         String accessToken = request.getHeaders().get("Authorization").get(0).substring(7);
 
-        String id = jwtUtil.parseAccessToken(accessToken).get("userId").toString();
-        
-        String responseAccessToken = jwtUtil.createAccessToken(id);
-        response.getHeaders().add("Authorization", responseAccessToken);
+        response.getHeaders().add("Authorization", jwtService.accessTokenIssued(accessToken));
         
         return Mono.just(new BbangResponse("Success"));
     }

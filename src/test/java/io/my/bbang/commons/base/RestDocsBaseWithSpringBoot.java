@@ -9,6 +9,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +31,9 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 import org.springframework.restdocs.request.RequestPartsSnippet;
 import org.springframework.restdocs.snippet.Snippet;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
@@ -40,18 +44,19 @@ import org.springframework.web.reactive.function.BodyInserters.MultipartInserter
 import io.my.bbang.breadstagram.service.BreadstagramService;
 import io.my.bbang.breadstore.service.StoreService;
 import io.my.bbang.comment.service.CommentService;
-import io.my.bbang.commons.security.AuthenticationManager;
+import io.my.bbang.commons.security.SecurityContextRepository;
+import io.my.bbang.commons.service.JwtService;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.ideal.service.IdealService;
 import io.my.bbang.image.service.ImageService;
-import io.my.bbang.pilgrimage.domain.Pilgrimage;
 import io.my.bbang.pilgrimage.service.PilgrimageService;
 import io.my.bbang.user.repository.UserRepository;
+import reactor.core.publisher.Mono;
 
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class RestDocsBaseWithSpringBoot extends TestBase {
-	private String authorization;
+	protected String authorization;
 
 	protected WebTestClient webTestClient;
 	protected Snippet defaultRequestHeader;
@@ -87,15 +92,25 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	protected PilgrimageService pilgrimageService;
 
 	@MockBean
-	protected AuthenticationManager authenticationManager;
-	
+	protected JwtService jwtService;
+
+	@MockBean
+	private SecurityContextRepository securityContextRepository;
+
 	@BeforeEach
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
-				
-		// Mockito.when(authenticationManager.authenticate(Mockito.any())).thenReturn(Mockito.any());
-				
-		authorization = "bearer " + jwtUtil.createAccessToken("userId");
+
+		authorization = jwtUtil.createAccessToken("id");
+		Mockito.when(securityContextRepository.load(Mockito.any()))
+		.thenReturn(
+			Mono.just(
+				(Authentication) new UsernamePasswordAuthenticationToken(
+				"username", 
+				"userPassword", 
+				new ArrayList<>())).map(SecurityContextImpl::new)
+		);
+
 		this.webTestClient = WebTestClient.bindToApplicationContext(applicationContext)
 				.configureClient()
 				.baseUrl("http://125.240.27.115:7000") 

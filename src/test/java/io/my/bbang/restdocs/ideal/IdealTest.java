@@ -1,8 +1,8 @@
 package io.my.bbang.restdocs.ideal;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import java.util.UUID;
 
@@ -17,7 +17,6 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
-import io.my.bbang.commons.payloads.BbangRequest;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.ideal.dto.IdealContentDto;
 import io.my.bbang.ideal.payload.request.IdealSelectedRequest;
