@@ -94,6 +94,10 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("commentList.[].nickname").description("댓글 작성자")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -147,6 +151,10 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("id").description("댓글 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -191,6 +199,10 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("count").description("댓글 갯수")
 											.attributes(
 													RestDocAttributes.length(0), 

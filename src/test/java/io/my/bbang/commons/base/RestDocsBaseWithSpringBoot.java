@@ -101,7 +101,7 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	void setUp(ApplicationContext applicationContext,
 			RestDocumentationContextProvider restDocumentation) {
 
-		authorization = jwtUtil.createAccessToken("id");
+		authorization = "Bearer " + jwtUtil.createAccessToken("id");
 		Mockito.when(securityContextRepository.load(Mockito.any()))
 		.thenReturn(
 			Mono.just(

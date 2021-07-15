@@ -64,7 +64,15 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("createTime").description("생성 시간")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("DateTime"))
+													RestDocAttributes.format("DateTime")),
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
 				);
 		
 		putWebTestClientNotAuth(requestBody, "/join").expectStatus()
@@ -111,7 +119,15 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("accessToken").description("Json Web AccessToken - 유효기간: 720시간")
 											.attributes(
 													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")),
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
 				);
 		
 		postWebTestClientNotAuth(requestBody, "/login").expectStatus()

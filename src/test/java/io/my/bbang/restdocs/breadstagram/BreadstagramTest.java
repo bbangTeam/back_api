@@ -101,6 +101,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")), 
 						fieldWithPath("breadstagramList.[].id").description("게시글 고유 번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -222,6 +226,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("id").description("게시글 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -270,7 +278,11 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
 				);
 		
 		postWebTestClient("/api/breadstagram/like" + params).expectStatus()

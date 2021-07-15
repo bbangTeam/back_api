@@ -52,6 +52,10 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")), 
 						fieldWithPath("breadList.[].id").description("빵 카테고리 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -95,6 +99,10 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("breadList.[].name").description("빵 카테고리 이름")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -137,7 +145,11 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
 				);
 		
 		putWebTestClient(requestBody, "/api/ideal/selected").expectStatus()
