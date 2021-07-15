@@ -3,7 +3,6 @@ package io.my.bbang.user.controller;
 import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +21,7 @@ import reactor.core.publisher.Mono;
 public class LoginController {
 	private final UserLoginService userLoginService;
 	
-	@PutMapping("/join")
+	@PostMapping("/join")
 	public Mono<UserJoinResponse> join(@RequestBody @Valid UserJoinRequest requestBody) {
 		log.info("call user Join!!!");
 		

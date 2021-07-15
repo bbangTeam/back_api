@@ -1,7 +1,7 @@
 package io.my.bbang.ideal.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +31,7 @@ public class IdealController {
 		return idealService.rank();
 	}
 
-	@PutMapping("/selected")
+	@PostMapping("/selected")
 	public Mono<BbangResponse> selected(@RequestBody IdealSelectedRequest requestBody) {
 		String id = requestBody.getId();
 		return idealService.selected(id);

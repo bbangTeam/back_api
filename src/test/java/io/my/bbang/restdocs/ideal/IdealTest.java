@@ -152,7 +152,7 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("integer"))
 				);
 		
-		putWebTestClient(requestBody, "/api/ideal/selected").expectStatus()
+		postWebTestClient(requestBody, "/api/ideal/selected").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/selected", requestSnippet, responseSnippet));

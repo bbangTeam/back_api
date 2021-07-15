@@ -161,7 +161,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("String"))
 				);
 		
-		putWebTestClient(requestBody, "/api/comment/write").expectStatus()
+		postWebTestClient(requestBody, "/api/comment/write").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));

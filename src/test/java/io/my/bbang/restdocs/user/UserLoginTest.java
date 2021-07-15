@@ -75,7 +75,7 @@ class UserLoginTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("integer"))
 				);
 		
-		putWebTestClientNotAuth(requestBody, "/join").expectStatus()
+		postWebTestClientNotAuth(requestBody, "/join").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/join", requestSnippet, responseSnippet));

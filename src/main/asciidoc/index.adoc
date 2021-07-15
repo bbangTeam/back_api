@@ -37,7 +37,7 @@ Bbang ;
 |닉네임 중복
 
 |12
-|닉네임 설정 실패
+|닉네임 변경 실패
 
 |===
 
@@ -58,7 +58,7 @@ Bbang ;
 |404
 |없는 주소
 
-|404
+|405
 |잘못된 요청 메서드
 
 |500
@@ -93,7 +93,7 @@ include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
 
 
 [[resources-user-api]]
-=== 사용자 정보
+=== 로그인 및 회원가입
 
 
 
@@ -116,6 +116,11 @@ include::{snippets}/userlogintest/login/response-fields.adoc[]
 include::{snippets}/userlogintest/login/http-request.adoc[]
 include::{snippets}/userlogintest/login/http-response.adoc[]
 include::{snippets}/userlogintest/login/curl-request.adoc[]
+
+
+
+[[resources-set-api]]
+=== 사용자 설정
 
 
 
@@ -245,15 +250,27 @@ include::{snippets}/breadstagramtest/write/curl-request.adoc[]
 
 
 
-[[resources-breadstagram-like]]
+[[resources-breadstagram-like-post]]
 ==== 빵스타그램 좋아요 API
 
-include::{snippets}/breadstagramtest/like/request-headers.adoc[]
-include::{snippets}/breadstagramtest/like/request-parameters.adoc[]
-include::{snippets}/breadstagramtest/like/response-fields.adoc[]
-include::{snippets}/breadstagramtest/like/http-request.adoc[]
-include::{snippets}/breadstagramtest/like/http-response.adoc[]
-include::{snippets}/breadstagramtest/like/curl-request.adoc[]
+include::{snippets}/breadstagramtest/like-post/request-headers.adoc[]
+include::{snippets}/breadstagramtest/like-post/request-parameters.adoc[]
+include::{snippets}/breadstagramtest/like-post/response-fields.adoc[]
+include::{snippets}/breadstagramtest/like-post/http-request.adoc[]
+include::{snippets}/breadstagramtest/like-post/http-response.adoc[]
+include::{snippets}/breadstagramtest/like-post/curl-request.adoc[]
+
+
+
+[[resources-breadstagram-like-delete]]
+==== 빵스타그램 좋아요 취소 API
+
+include::{snippets}/breadstagramtest/like-delete/request-headers.adoc[]
+include::{snippets}/breadstagramtest/like-delete/request-parameters.adoc[]
+include::{snippets}/breadstagramtest/like-delete/response-fields.adoc[]
+include::{snippets}/breadstagramtest/like-delete/http-request.adoc[]
+include::{snippets}/breadstagramtest/like-delete/http-response.adoc[]
+include::{snippets}/breadstagramtest/like-delete/curl-request.adoc[]
 
 
 
@@ -314,18 +331,6 @@ include::{snippets}/commenttest/count/response-fields.adoc[]
 include::{snippets}/commenttest/count/http-request.adoc[]
 include::{snippets}/commenttest/count/http-response.adoc[]
 include::{snippets}/commenttest/count/curl-request.adoc[]
-
-
-
-[[resources-set-api]]
-=== 사용자 설정
-
-
-
-[[resources-user-set]]
-==== 사용자 개인정보 설정 관련 API
-
-NOTE: API 추가 예정
 
 
 
