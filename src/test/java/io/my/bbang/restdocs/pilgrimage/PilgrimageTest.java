@@ -92,6 +92,10 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")), 
 						fieldWithPath("storeList.[].id").description("빵집 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -162,6 +166,10 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")), 
 						fieldWithPath("areaList.[].id").description("지역 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 

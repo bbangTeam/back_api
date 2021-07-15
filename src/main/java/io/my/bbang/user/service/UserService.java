@@ -1,17 +1,14 @@
 package io.my.bbang.user.service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
-import io.my.bbang.commons.exception.BbangException;
-import io.my.bbang.commons.exception.type.ExceptionTypes;
-import io.my.bbang.commons.security.UserRole;
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.User;
 import io.my.bbang.user.domain.UserHeart;
 import io.my.bbang.user.domain.UserPilgrimage;
-import io.my.bbang.user.payload.response.UserJoinResponse;
-import io.my.bbang.user.payload.response.UserLoginResponse;
 import io.my.bbang.user.repository.UserHeartRepository;
 import io.my.bbang.user.repository.UserPilgrimageRepository;
 import io.my.bbang.user.repository.UserRepository;
@@ -27,49 +24,43 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserHeartRepository userHeartRepository;
 	private final UserPilgrimageRepository userPilgrimageRepository;
-	private final BCryptPasswordEncoder passwordEncoder;
 
-	public Mono<UserJoinResponse> join(String name, String loginId, String password) {
-		log.info("join service");
-		
-		User user = User.newInstance(loginId, passwordEncoder.encode(password));
-		user.setName(name);
-		user.getRoles().add(UserRole.ROLE_USER);
-		
-		return userRepository.save(user).map(this::returnJoinResponse);
+	public Mono<BbangResponse> checkNickname(String nickname) {
+		return userRepository.findByNickname(nickname)
+							.hasElement()
+							.map(this::returnCheckNicknameResponse);
 	}
 
-	private UserJoinResponse returnJoinResponse(User entity) {
-		UserJoinResponse responseBody = new UserJoinResponse();
-		responseBody.setId(entity.getId());
-		responseBody.setLoginId(entity.getLoginId());
-		responseBody.setCreateTime(entity.getCreateDate());
-		return responseBody;
-	}
-	
-	public Mono<UserLoginResponse> login(String loginId, String password) {
-		log.info("login service");
-		
-		return userRepository.findByLoginId(loginId)
-		.map(entity -> checkPassword(entity, password))
-		.map(this::returnLoginResponse);
+	private BbangResponse returnCheckNicknameResponse(boolean bool) {
+		return bool ? new BbangResponse(11, "Alreay Exist!")
+					: new BbangResponse("Success");
 	}
 
-	private User checkPassword(User entity, String password) {
-		if (! passwordEncoder.matches(password, entity.getPassword())) {
-			throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
-		}
-		return entity;
+	public Mono<BbangResponse> modifyNickname(String nickname) {
+		return userRepository.findByNickname(nickname)
+							.hasElement()
+							.flatMap(bool -> {
+								return bool 
+									? Mono.just(new BbangResponse(11, "Already Exist!"))
+									: saveUser(nickname).map(this::returnModifyNicknameResponse);
+							});
 	}
 
-	private UserLoginResponse returnLoginResponse(User entity) {
-		UserLoginResponse responseBody = new UserLoginResponse();
-		String accessToken = jwtUtil.createAccessToken(entity.getId());
-		
-		responseBody.setLoginId(entity.getLoginId());
-		responseBody.setAccessToken(accessToken);
-		
-		return responseBody;
+	private Mono<Boolean> saveUser(String nickname) {
+		return jwtUtil.getMonoUserId()
+		.flatMap(this::findById)
+		.map(user -> {
+			user.setNickname(nickname);
+			user.setModifyDate(LocalDateTime.now());
+			return user;
+		})
+		.flatMap(userRepository::save)
+		.hasElement();
+	}
+
+	private BbangResponse returnModifyNicknameResponse(Boolean bool) {
+		return bool ? new BbangResponse("Success")
+					: new BbangResponse(12, "nickname change fail!");
 	}
 	
 	/**

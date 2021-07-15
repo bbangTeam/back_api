@@ -28,6 +28,8 @@ public class User extends BaseTimeEntity implements UserDetails {
 	private String name;
 	private String loginId;
 	private String password;
+	private String nickname;
+	
 	private List<UserRole> roles;
 	
 	private User(String loginId, String password) {

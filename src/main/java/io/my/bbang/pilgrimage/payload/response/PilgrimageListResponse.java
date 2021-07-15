@@ -5,15 +5,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.dto.PilgrimageListDto;
 import lombok.Data;
 
 @Data
-public class PilgrimageListResponse {
+public class PilgrimageListResponse extends BbangResponse {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String userId;
-	private String result;
 	private List<PilgrimageListDto> storeList;
 	
 	public PilgrimageListResponse() {

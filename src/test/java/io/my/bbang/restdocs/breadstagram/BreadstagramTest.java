@@ -101,6 +101,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")), 
 						fieldWithPath("breadstagramList.[].id").description("게시글 고유 번호")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -222,13 +226,17 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer")),
 						fieldWithPath("id").description("게시글 고유번호")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
 				);
 		
-		putWebTestClient(requestBody, "/api/breadstagram/write").expectStatus()
+		postWebTestClient(requestBody, "/api/breadstagram/write").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
@@ -236,7 +244,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like() throws InterruptedException {
+	void like_post() throws InterruptedException {
 		BbangResponse responseBody = new BbangResponse("Success");
 
 		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
@@ -257,7 +265,8 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						parameterWithName("like").description("좋아요")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Boolean")),
+													RestDocAttributes.format("Boolean"))
+											.description("무조건 true"), 
 						parameterWithName("id").description("store 고유 번호")
 						.attributes(
 								RestDocAttributes.length(0), 
@@ -270,13 +279,67 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
 				);
 		
 		postWebTestClient("/api/breadstagram/like" + params).expectStatus()
 						.isOk()
 						.expectBody()
-						.consumeWith(createConsumer("/like", requestSnippet, responseSnippet));
+						.consumeWith(createConsumer("/like-post", requestSnippet, responseSnippet));
+	}
+
+	@Test
+	@DisplayName("REST Docs 빵스타그램 좋아요")
+	void like_delete() throws InterruptedException {
+		BbangResponse responseBody = new BbangResponse("Success");
+
+		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
+
+		StringBuilder params = new StringBuilder();
+		params.append("?")
+				.append("like")
+				.append("=")
+				.append("false")
+				.append("&")
+				.append("id")
+				.append("=")
+				.append("storeId")
+		;
+		
+		RequestParametersSnippet requestSnippet = 
+				requestParameters(
+						parameterWithName("like").description("좋아요")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("Boolean"))
+													.description("무조건 false"), 
+						parameterWithName("id").description("store 고유 번호")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String"))
+				);
+		
+		
+		ResponseFieldsSnippet responseSnippet = 
+				responseFields(
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
+				);
+		
+		deleteWebTestClient("/api/breadstagram/like" + params).expectStatus()
+						.isOk()
+						.expectBody()
+						.consumeWith(createConsumer("/like-delete", requestSnippet, responseSnippet));
 	}
 	
 }
