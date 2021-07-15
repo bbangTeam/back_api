@@ -1,70 +1,52 @@
 package io.my.bbang.restdocs.user;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.mockito.Mockito;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.restdocs.request.RequestParametersSnippet;
 
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
-import io.my.bbang.user.domain.User;
-import io.my.bbang.user.payload.request.UserJoinRequest;
-import io.my.bbang.user.payload.request.UserLoginRequest;
+import io.my.bbang.commons.payloads.BbangResponse;
+import reactor.core.publisher.Mono;
 
 class UserTest extends RestDocsBaseWithSpringBoot {
 	
 	@BeforeEach
 	void setUp() {
-		testRepository.deleteAll().subscribe();
+		userRepository.deleteAll().subscribe();
 	}
 
 	@Test
-	@DisplayName("REST Docs JOIN API 명세서")
-	void join() throws JsonProcessingException {
+	@DisplayName("REST Docs 닉네임 중복 확인 API 명세서")
+	void checkNickname() throws JsonProcessingException {
+		StringBuilder params = new StringBuilder();
+		params.append("?")
+				.append("nickname")
+				.append("=")
+				.append("testNickname1");
+
+		Mockito.when(userService.checkNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse("Success")));
 		
-		UserJoinRequest requestBody = new UserJoinRequest();
-		requestBody.setName("빵터짐");
-		requestBody.setLoginId("BbangTeam");
-		requestBody.setPassword("BbangPassword");
-		
-		RequestFieldsSnippet requestSnippet = 
-				requestFields(
-						fieldWithPath("name").description("이름")
+		RequestParametersSnippet requestSnippet = 
+			requestParameters(
+					parameterWithName("nickname").description("확인할 닉네임")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("loginId").description("로그인 ID")
-											.attributes(
-													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")),
-						fieldWithPath("password").description("비밀번호")
-											.attributes(
-													RestDocAttributes.length(8, 20), 
 													RestDocAttributes.format("String"))
 				);
 		
-		
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
-						fieldWithPath("id").description("회원 고유 ID")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("loginId").description("로그인 ID")
-											.attributes(
-													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")),
-						fieldWithPath("createTime").description("생성 시간")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("DateTime")),
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -75,51 +57,34 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("integer"))
 				);
 		
-		putWebTestClientNotAuth(requestBody, "/join").expectStatus()
+		getWebTestClient("/api/user/nickname" + params).expectStatus()
 						.isOk()
 						.expectBody()
-						.consumeWith(createConsumer("/join", requestSnippet, responseSnippet));
+						.consumeWith(createConsumer("/check-nickname", requestSnippet, responseSnippet));
 	}
 	
 	@Test
-	@DisplayName("REST Docs LOGIN API 명세서")
-	void login() throws JsonProcessingException {
+	@DisplayName("REST Docs 닉네임 변경 API 명세서")
+	void modifyNickname() throws JsonProcessingException {
+
+		Mockito.when(userService.modifyNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse("Success")));
 		
-		String loginId = "BbangTeam";
-		String password = "BbangPassword";
-		
-		User user = User.newInstance(loginId, passwordEncoder.encode(password));
-		user.setName("빵터짐");
-		
-		testRepository.save(user).subscribe();
-		
-		UserLoginRequest requestBody = new UserLoginRequest();
-		requestBody.setLoginId(loginId);
-		requestBody.setPassword(password);
-		
-		RequestFieldsSnippet requestSnippet = 
-				requestFields(
-						fieldWithPath("loginId").description("로그인 ID")
-											.attributes(
-													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")),
-						fieldWithPath("password").description("비밀번호")
-											.attributes(
-													RestDocAttributes.length(8, 20), 
-													RestDocAttributes.format("String"))
+		StringBuilder params = new StringBuilder();
+		params.append("?")
+				.append("nickname")
+				.append("=")
+				.append("testNickname1");
+
+		RequestParametersSnippet requestSnippet = 
+		requestParameters(
+				parameterWithName("nickname").description("변경할 닉네임")
+										.attributes(
+												RestDocAttributes.length(0), 
+												RestDocAttributes.format("String"))
 				);
-		
 		
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
-						fieldWithPath("loginId").description("로그인 ID")
-											.attributes(
-													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("accessToken").description("Json Web AccessToken - 유효기간: 720시간")
-											.attributes(
-													RestDocAttributes.length(6, 20), 
-													RestDocAttributes.format("String")),
 						fieldWithPath("result").description("결과")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -130,10 +95,10 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("integer"))
 				);
 		
-		postWebTestClientNotAuth(requestBody, "/login").expectStatus()
+		patchWebTestClient("/api/user/nickname" + params).expectStatus()
 						.isOk()
 						.expectBody()
-						.consumeWith(createConsumer("/login", requestSnippet, responseSnippet));
+						.consumeWith(createConsumer("/modify-nickname", requestSnippet, responseSnippet));
 	}
 	
 

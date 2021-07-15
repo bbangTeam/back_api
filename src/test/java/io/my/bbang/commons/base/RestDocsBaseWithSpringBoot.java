@@ -51,6 +51,7 @@ import io.my.bbang.ideal.service.IdealService;
 import io.my.bbang.image.service.ImageService;
 import io.my.bbang.pilgrimage.service.PilgrimageService;
 import io.my.bbang.user.repository.UserRepository;
+import io.my.bbang.user.service.UserService;
 import reactor.core.publisher.Mono;
 
 @SpringBootTest
@@ -68,7 +69,7 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
     protected BCryptPasswordEncoder passwordEncoder;
     
     @Autowired
-    protected UserRepository testRepository;
+    protected UserRepository userRepository;
 
 	@Autowired
 	protected JwtUtil jwtUtil;
@@ -90,6 +91,9 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 
 	@MockBean
 	protected PilgrimageService pilgrimageService;
+
+	@MockBean
+	protected UserService userService;
 
 	@MockBean
 	protected JwtService jwtService;
@@ -151,6 +155,14 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 	
 	protected ResponseSpec putWebTestClient(Object body, String uri) {
 		return this.webTestClient.put().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec patchWebTestClient(Object body, String uri) {
+		return this.webTestClient.patch().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).bodyValue(body).exchange();
+	}
+	
+	protected ResponseSpec patchWebTestClient(String uri) {
+		return this.webTestClient.patch().uri(uri).header(HttpHeaders.AUTHORIZATION, authorization).accept(MediaType.APPLICATION_JSON).exchange();
 	}
 	
 	protected ResponseSpec deleteWebTestClient(String uri) {

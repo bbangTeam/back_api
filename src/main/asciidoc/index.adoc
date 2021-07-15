@@ -16,6 +16,56 @@ Bbang ;
 [[resources]]
 = 리소스
 
+.ResponseBody - code
+[cols="1,1"]
+|===
+|code|description
+
+|0
+|성공
+
+|1
+|실패
+
+|2
+|서버 에러
+
+|3
+|DB 에러
+
+|11
+|닉네임 중복
+
+|12
+|닉네임 설정 실패
+
+|===
+
+.Exception
+[cols="1,1"]
+|===
+|ResponseCode|description
+
+|200
+|성공
+
+|400
+|잘못된 요청
+
+|401
+|인증 에러
+
+|404
+|없는 주소
+
+|404
+|잘못된 요청 메서드
+
+|500
+|서버 에러
+
+|===
+
 
 [[resources-api]]
 == API
@@ -50,22 +100,46 @@ include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
 [[resources-user-join]]
 ==== 회원가입 API
 
-include::{snippets}/usertest/join/request-fields.adoc[]
-include::{snippets}/usertest/join/response-fields.adoc[]
-include::{snippets}/usertest/join/http-request.adoc[]
-include::{snippets}/usertest/join/http-response.adoc[]
-include::{snippets}/usertest/join/curl-request.adoc[]
+include::{snippets}/userlogintest/join/request-fields.adoc[]
+include::{snippets}/userlogintest/join/response-fields.adoc[]
+include::{snippets}/userlogintest/join/http-request.adoc[]
+include::{snippets}/userlogintest/join/http-response.adoc[]
+include::{snippets}/userlogintest/join/curl-request.adoc[]
 
 
 
 [[resources-user-login]]
 ==== 로그인 API
 
-include::{snippets}/usertest/login/request-fields.adoc[]
-include::{snippets}/usertest/login/response-fields.adoc[]
-include::{snippets}/usertest/login/http-request.adoc[]
-include::{snippets}/usertest/login/http-response.adoc[]
-include::{snippets}/usertest/login/curl-request.adoc[]
+include::{snippets}/userlogintest/login/request-fields.adoc[]
+include::{snippets}/userlogintest/login/response-fields.adoc[]
+include::{snippets}/userlogintest/login/http-request.adoc[]
+include::{snippets}/userlogintest/login/http-response.adoc[]
+include::{snippets}/userlogintest/login/curl-request.adoc[]
+
+
+
+[[resources-user-check-nickname]]
+==== 닉네임 중복 확인 API
+
+include::{snippets}/usertest/check-nickname/request-headers.adoc[]
+include::{snippets}/usertest/check-nickname/request-parameters.adoc[]
+include::{snippets}/usertest/check-nickname/response-fields.adoc[]
+include::{snippets}/usertest/check-nickname/http-request.adoc[]
+include::{snippets}/usertest/check-nickname/http-response.adoc[]
+include::{snippets}/usertest/check-nickname/curl-request.adoc[]
+
+
+
+[[resources-user-modify-nickname]]
+==== 닉네임 변경 API
+
+include::{snippets}/usertest/modify-nickname/request-headers.adoc[]
+include::{snippets}/usertest/modify-nickname/request-parameters.adoc[]
+include::{snippets}/usertest/modify-nickname/response-fields.adoc[]
+include::{snippets}/usertest/modify-nickname/http-request.adoc[]
+include::{snippets}/usertest/modify-nickname/http-response.adoc[]
+include::{snippets}/usertest/modify-nickname/curl-request.adoc[]
 
 
 
