@@ -8,10 +8,10 @@ import io.my.bbang.ideal.dto.IdealContentDto;
 import lombok.Data;
 
 @Data
-public class IdealResponse extends BbangResponse {
+public class IdealContentResponse extends BbangResponse {
 	private List<IdealContentDto> breadList;
 	
-	public IdealResponse() {
+	public IdealContentResponse() {
 		breadList = new ArrayList<>();
 	}
 

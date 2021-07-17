@@ -8,8 +8,10 @@ import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.User;
 import io.my.bbang.user.domain.UserHeart;
+import io.my.bbang.user.domain.UserIdeal;
 import io.my.bbang.user.domain.UserPilgrimage;
 import io.my.bbang.user.repository.UserHeartRepository;
+import io.my.bbang.user.repository.UserIdealRepository;
 import io.my.bbang.user.repository.UserPilgrimageRepository;
 import io.my.bbang.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class UserService {
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
 	private final UserHeartRepository userHeartRepository;
+	private final UserIdealRepository userIdealRepository;
 	private final UserPilgrimageRepository userPilgrimageRepository;
 
 	public Mono<BbangResponse> checkNickname(String nickname) {
@@ -103,4 +106,16 @@ public class UserService {
 		});
 	}
 	
+	public Mono<UserIdeal> saveUserIdeal(String idealId) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
+			UserIdeal entity = new UserIdeal();
+			entity.setIdealId(idealId);
+			entity.setUserId(userId);
+			return userIdealRepository.save(entity);
+		});
+	}
+
+	public Mono<UserIdeal> findUserIdealByUserId() {
+		return jwtUtil.getMonoUserId().flatMap(userIdealRepository::findByuserId);
+	}
 }

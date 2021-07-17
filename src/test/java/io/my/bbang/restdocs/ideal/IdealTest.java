@@ -19,8 +19,10 @@ import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.ideal.dto.IdealContentDto;
+import io.my.bbang.ideal.dto.IdealRankDto;
 import io.my.bbang.ideal.payload.request.IdealSelectedRequest;
-import io.my.bbang.ideal.payload.response.IdealResponse;
+import io.my.bbang.ideal.payload.response.IdealContentResponse;
+import io.my.bbang.ideal.payload.response.IdealRankResponse;
 import reactor.core.publisher.Mono;
 
 class IdealTest extends RestDocsBaseWithSpringBoot {
@@ -30,9 +32,32 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 	}
 
 	@Test
+	@DisplayName("REST Docs 빵드컵 진행 여부 확인")
+	void done() throws JsonProcessingException {
+		Mockito.when(idealService.done()).thenReturn(Mono.just(new BbangResponse()));
+		
+		ResponseFieldsSnippet responseSnippet = 
+				responseFields(
+						fieldWithPath("result").description("결과")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("String")), 
+						fieldWithPath("code").description("응답 코드")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("integer"))
+				);
+		
+		getWebTestClient("/api/ideal/done").expectStatus()
+						.isOk()
+						.expectBody()
+						.consumeWith(createConsumer("/done", responseSnippet));
+	}
+
+	@Test
 	@DisplayName("REST Docs 빵드컵 게임")
 	void content() throws JsonProcessingException {
-		IdealResponse responseBody = new IdealResponse();
+		IdealContentResponse responseBody = new IdealContentResponse();
 		
 		responseBody.setResult("Success");
 		
@@ -80,14 +105,15 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 빵드컵 순위 확인")
 	void rank() throws JsonProcessingException {
-		IdealResponse responseBody = new IdealResponse();
+		IdealRankResponse responseBody = new IdealRankResponse();
 
 		responseBody.setResult("Success");
 
 		for (int i=0; i<5; i++) {
-			IdealContentDto dto = new IdealContentDto();
+			IdealRankDto dto = new IdealRankDto();
 			dto.setName("bread" + i);
 			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
+			dto.setSelectedCount(Long.valueOf(1000 - i*i));
 			responseBody.getBreadList().add(dto);
 		}
 
@@ -110,7 +136,11 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("breadList.[].imageUrl").description("이미지 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")),
+						fieldWithPath("breadList.[].selectedCount").description("선택한 사람 수")
+											.attributes(
+													RestDocAttributes.length(0), 
+													RestDocAttributes.format("int"))
 				);
 		
 		getWebTestClient("/api/ideal/rank").expectStatus()

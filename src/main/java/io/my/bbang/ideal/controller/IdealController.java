@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.ideal.payload.request.IdealSelectedRequest;
-import io.my.bbang.ideal.payload.response.IdealResponse;
+import io.my.bbang.ideal.payload.response.IdealContentResponse;
+import io.my.bbang.ideal.payload.response.IdealRankResponse;
 import io.my.bbang.ideal.service.IdealService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -19,15 +20,20 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/ideal")
 public class IdealController {
 	private final IdealService idealService;
+
+	@GetMapping("/done")
+	public Mono<BbangResponse> done() {
+		return idealService.done();
+	}
 	
 	@GetMapping("/content")
-	public Mono<IdealResponse> content() {
+	public Mono<IdealContentResponse> content() {
 		
 		return idealService.content();
 	}
 
 	@GetMapping("/rank")
-	public Mono<IdealResponse> rank() {
+	public Mono<IdealRankResponse> rank() {
 		return idealService.rank();
 	}
 
