@@ -6,7 +6,7 @@ import reactor.util.context.Context;
 
 import reactor.core.publisher.Mono;
 
-public class ReactiveJwtContextHolder {
+public class JwtContextHolder {
     private static final Class<?> JWT_CONTEXT_KEY = JwtContext.class;
 
 

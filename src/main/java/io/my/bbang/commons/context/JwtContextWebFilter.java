@@ -14,7 +14,7 @@ public class JwtContextWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         JwtContext context = new JwtContext(exchange);
         return chain.filter(exchange)
-                .contextWrite(ReactiveJwtContextHolder.withJwtContext(Mono.just(context)));
+                .contextWrite(JwtContextHolder.withJwtContext(Mono.just(context)));
     }
     
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
+import io.my.bbang.commons.context.JwtContextHolder;
 import io.my.bbang.commons.properties.AccessTokenProperties;
 import io.my.bbang.commons.properties.RefreshTokenProperties;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,7 @@ public class JwtUtil {
 	 * ReactiveJwtContextHolder에서 jwt 정보를 가져와서 userId 반환.
 	 */
 	public Mono<String> getMonoUserId() {
-		return ReactiveJwtContextHolder.getContext()
+		return JwtContextHolder.getContext()
 		.flatMap(context -> {
 			String userId = context.getUserId();
 			if (userId == null) {

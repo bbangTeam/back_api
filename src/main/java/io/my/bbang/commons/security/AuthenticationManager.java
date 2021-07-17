@@ -5,7 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import io.my.bbang.commons.context.ReactiveJwtContextHolder;
+import io.my.bbang.commons.context.JwtContextHolder;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.utils.JwtUtil;
@@ -30,7 +30,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 		String userId = jwtUtil.getUserIdByAccessToken(jwt);
 
 		return userService.findById(userId).map(user -> {
-			ReactiveJwtContextHolder.getContext().map(context -> {
+			JwtContextHolder.getContext().map(context -> {
 				context.setUser(user);
 				return context;
 			});
