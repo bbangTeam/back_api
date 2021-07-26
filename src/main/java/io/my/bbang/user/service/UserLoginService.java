@@ -1,5 +1,6 @@
 package io.my.bbang.user.service;
 
+import io.my.bbang.user.service.oauth.SocialOauthService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,15 +25,17 @@ public class UserLoginService {
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private List<SocialOauthService> socialOauthServiceList;
     
-	public Mono<UserJoinResponse> join(String name, String loginId, String password) {
+	public Mono<UserJoinResponse> join(String email, String nickname, String accessToken) {
 		log.info("join service");
 		
-		User user = User.newInstance(loginId, passwordEncoder.encode(password));
-		user.setName(name);
-		user.getRoles().add(UserRole.ROLE_USER);
+//		User user = User.newInstance(loginId, passwordEncoder.encode(password));
+//		user.setName(name);
+//		user.getRoles().add?(UserRole.ROLE_USER);
 		
-		return userRepository.save(user).map(this::returnJoinResponse);
+//		return userRepository.save(user).map(this::returnJoinResponse);
+		return null;
 	}
 
 	private UserJoinResponse returnJoinResponse(User entity) {
@@ -40,30 +45,6 @@ public class UserLoginService {
 		responseBody.setCreateTime(entity.getCreateDate());
 		return responseBody;
 	}
-	
-	public Mono<UserLoginResponse> login(String loginId, String password) {
-		log.info("login service");
-		
-		return userRepository.findByLoginId(loginId)
-		.map(entity -> checkPassword(entity, password))
-		.map(this::returnLoginResponse);
-	}
 
-	private User checkPassword(User entity, String password) {
-		if (! passwordEncoder.matches(password, entity.getPassword())) {
-			throw new BbangException(ExceptionTypes.AUTH_EXCEPTION);
-		}
-		return entity;
-	}
-
-	private UserLoginResponse returnLoginResponse(User entity) {
-		UserLoginResponse responseBody = new UserLoginResponse();
-		String accessToken = jwtUtil.createAccessToken(entity.getId());
-		
-		responseBody.setLoginId(entity.getLoginId());
-		responseBody.setAccessToken(accessToken);
-		
-		return responseBody;
-	}
     
 }

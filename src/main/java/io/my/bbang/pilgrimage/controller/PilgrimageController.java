@@ -1,10 +1,12 @@
 package io.my.bbang.pilgrimage.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageAreaListResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
 import io.my.bbang.pilgrimage.service.PilgrimageService;
@@ -33,6 +35,11 @@ public class PilgrimageController {
 	public Mono<PilgrimageAreaListResponse> areaList() {
 		return pilgrimageService.areaList();
 	}
-	
+
+	@PostMapping
+	public Mono<BbangResponse> write() {
+		return null;
+	}
+
 
 }

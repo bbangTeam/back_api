@@ -78,10 +78,10 @@ public class PilgrimageService {
 		dto.setStoreName(entity.getEntrpNm());
 		dto.setLatitude(entity.getYposLa());
 		dto.setLongitude(entity.getXposLo());
-		dto.setImageUrl(entity.getNaverThumbUrl());
-		dto.setBreadName(entity.getReprsntMenuNm());
-
+		
 		if (option.equals("all")) {
+			dto.setImageUrl(entity.getNaverThumbUrl());
+			dto.setBreadName(entity.getReprsntMenuNm());
 			dto.setOpeningHours(entity.getBusinessHours());
 		}
 
@@ -110,4 +110,6 @@ public class PilgrimageService {
 		})
 		;
 	}
+
+	// public
 }

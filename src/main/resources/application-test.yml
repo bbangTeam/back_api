@@ -1,2 +1,26 @@
 server:
   port: 0
+
+oauth:
+  google:
+    base-url: https://accounts.google.com
+    login-uri: /o/oauth2/v2/auth
+    token-url: https://oauth2.googleapis.com
+    token-uri: /token
+    client-id: 1
+    client-secret: 1
+    callback-url: http://localhost:8080/api/oauth/callback/google
+  kakao:
+    base-url: https://kauth.kakao.com
+    login-uri: /oauth/authorize
+    token-uri: /oauth/token
+    client-id: 1
+    client-secret: 1
+    callback-url: http://localhost:8080/api/oauth/callback/kakao
+  naver:
+    base-url: https://nid.naver.com
+    login-uri: /oauth2.0/authorize
+    token-uri: /oauth2.0/token
+    client-id: 1
+    client-secret: 1
+    callback-url: http://localhost:8080/api/oauth/callback/naver

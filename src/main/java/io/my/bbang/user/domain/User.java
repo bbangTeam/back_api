@@ -24,7 +24,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 	
 	@Id
 	private String id;
-	
+
+	private String email;
+	private String imageUrl;
+
 	private String name;
 	private String loginId;
 	private String password;

@@ -24,22 +24,11 @@ public class LoginController {
 	@PostMapping("/join")
 	public Mono<UserJoinResponse> join(@RequestBody @Valid UserJoinRequest requestBody) {
 		log.info("call user Join!!!");
-		
-		String name = requestBody.getName();
-		String loginId = requestBody.getLoginId();
-		String password = requestBody.getPassword();
-		
-		return userLoginService.join(name, loginId, password);
-	}
-	
-	@PostMapping("/login")
-	public Mono<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest requestBody) {
-		log.info("call user login!!!");
-		
-		String loginId = requestBody.getLoginId();
-		String password = requestBody.getPassword();
-		
-		return userLoginService.login(loginId, password);
+		String nickname = requestBody.getNickname();
+		String accessToken = requestBody.getAccessToken();
+		String email = requestBody.getEmail();
+
+		return userLoginService.join(email, nickname, accessToken);
 	}
 
 }

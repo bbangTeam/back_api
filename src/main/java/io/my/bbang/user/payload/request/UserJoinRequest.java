@@ -8,13 +8,14 @@ import lombok.Data;
 @Data
 public class UserJoinRequest {
 	@NotNull
-	private String name;
-	
+	private String nickname;
+
 	@NotNull
-	@Size(min = 6, max = 20)
-	private String loginId;
-	
-	@NotNull
-	@Size(min = 8, max = 20)
-	private String password;
+	private String accessToken;
+
+	// Apple 로그인인 경우, email 필요
+	private String email;
+
+
+
 }

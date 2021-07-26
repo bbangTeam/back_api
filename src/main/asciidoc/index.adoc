@@ -103,23 +103,30 @@ include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
 [[resources-user-join]]
 ==== 회원가입 API
 
-include::{snippets}/userlogintest/join/request-fields.adoc[]
-include::{snippets}/userlogintest/join/response-fields.adoc[]
-include::{snippets}/userlogintest/join/http-request.adoc[]
-include::{snippets}/userlogintest/join/http-response.adoc[]
-include::{snippets}/userlogintest/join/curl-request.adoc[]
+NOTE: API 명세서 변경 중입니다.
 
 
 
 [[resources-user-login]]
 ==== 로그인 API
 
-include::{snippets}/userlogintest/login/request-fields.adoc[]
-include::{snippets}/userlogintest/login/response-fields.adoc[]
-include::{snippets}/userlogintest/login/http-request.adoc[]
-include::{snippets}/userlogintest/login/http-response.adoc[]
-include::{snippets}/userlogintest/login/curl-request.adoc[]
+NOTE: 로그인 방식이 소셜 로그인으로 변경되었으며, 현재 세부로직 수정중입니다.
 
+.login
+[cols="2,2"]
+|===
+|소셜로그인|uri
+
+|네이버
+|/api/oauth/naver
+
+|구글
+|/api/oauth/google
+
+|카카오
+|/api/oauth/kakao
+
+|===
 
 
 [[resources-set-api]]
