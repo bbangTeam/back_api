@@ -2,6 +2,7 @@ package io.my.bbang.user.controller;
 
 import io.my.bbang.user.dto.SocialLoginType;
 import io.my.bbang.user.payload.request.UserJoinRequest;
+import io.my.bbang.user.payload.response.UserLoginResponse;
 import io.my.bbang.user.service.oauth.OauthService;
 import io.my.bbang.user.service.oauth.SocialOauthService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class OauthController {
     }
 
     @GetMapping("/callback/{socialLoginType}")
-    public Mono<String> callback(
+    public Mono<UserLoginResponse> callback(
             @PathVariable(name = "socialLoginType") String socialLoginType,
             @RequestParam(name = "code") String code,
             @RequestParam(name = "state", required = false) String state) {
@@ -40,12 +41,13 @@ public class OauthController {
     }
 
     @PostMapping("/join/{socialLoginType}")
-    public Mono<String> join(
+    public Mono<UserLoginResponse> join(
             @PathVariable(name = "socialLoginType") String socialLoginType,
             @RequestBody UserJoinRequest requestBody) {
 
         SocialLoginType type = SocialLoginType.findByName(socialLoginType);
-        return null;
+
+        return oauthService.join(type, requestBody);
     }
 
 }

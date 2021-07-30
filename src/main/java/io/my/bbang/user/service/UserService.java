@@ -2,6 +2,7 @@ package io.my.bbang.user.service;
 
 import java.time.LocalDateTime;
 
+import io.my.bbang.user.payload.response.UserLoginResponse;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -64,6 +65,17 @@ public class UserService {
 	private BbangResponse returnModifyNicknameResponse(Boolean bool) {
 		return bool ? new BbangResponse("Success")
 					: new BbangResponse(12, "nickname change fail!");
+	}
+
+	public Mono<User> saveUser(User user) {
+		return userRepository.save(user);
+	}
+
+	public Mono<UserLoginResponse> buildUserLoginResponseByUser(User user) {
+		UserLoginResponse responseBody = new UserLoginResponse();
+		responseBody.setLoginId(user.getEmail());
+		responseBody.setAccessToken(jwtUtil.createAccessToken(user.getId()));
+		return Mono.just(responseBody);
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.my.bbang.user.dto.SocialLoginType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,9 +33,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 	private String loginId;
 	private String password;
 	private String nickname;
-	
+	private String socialType;
+
 	private List<UserRole> roles;
-	
+
 	private User(String loginId, String password) {
 		super();
 		this.loginId = loginId;
@@ -44,6 +46,22 @@ public class User extends BaseTimeEntity implements UserDetails {
 	
 	public static User newInstance(String loginId, String password) {
 		return new User(loginId, password);
+	}
+	public static User newInstance(
+			String email,
+			String name,
+			String nickname,
+			String imageUrl
+	) {
+		User user = new User();
+		List<UserRole> roleList = new ArrayList<>();
+		roleList.add(UserRole.ROLE_USER);
+		user.setRoles(roleList);
+		user.setEmail(email);
+		user.setName(name);
+		user.setNickname(nickname);
+		user.setImageUrl(imageUrl);
+		return user;
 	}
 
 	@Override
@@ -77,5 +95,14 @@ public class User extends BaseTimeEntity implements UserDetails {
 	public boolean isEnabled() {
 		return false;
 	}
+
+	public void setSocialType(SocialLoginType socialLoginType) {
+		this.socialType = socialLoginType.getName();
+	}
+
+	public void setSocialType(String socialType) {
+		this.socialType = socialType;
+	}
+
 
 }

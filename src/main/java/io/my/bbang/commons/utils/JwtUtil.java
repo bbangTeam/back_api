@@ -115,4 +115,21 @@ public class JwtUtil {
 		});
 	}
 
+	/**
+	 * Google Login시, 나오는 jwt토큰 해석을 위함
+	 * @param jwt
+	 * @return
+	 */
+	public Claims parseJwt(String jwt, String accessToken) {
+		return Jwts.parser()
+				.setSigningKey(accessToken)
+				.parseClaimsJws(jwt)
+				.getBody();
+	}
+
+//	public Claims parseJwtHeader(String jwt) {
+//		return Jwts.parser().parseClaimsJws(jwt).getHeader();
+//	}
+
+
 }

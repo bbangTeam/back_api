@@ -103,7 +103,13 @@ include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
 [[resources-user-join]]
 ==== 회원가입 API
 
-NOTE: API 명세서 변경 중입니다.
+include::{snippets}/oauthtest/join/request-headers.adoc[]
+include::{snippets}/oauthtest/join/request-fields.adoc[]
+include::{snippets}/oauthtest/join/response-fields.adoc[]
+include::{snippets}/oauthtest/join/http-request.adoc[]
+include::{snippets}/oauthtest/join/http-response.adoc[]
+include::{snippets}/oauthtest/join/curl-request.adoc[]
+
 
 
 

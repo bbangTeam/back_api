@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.my.bbang.user.service.oauth.OauthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -97,6 +98,9 @@ public class RestDocsBaseWithSpringBoot extends TestBase {
 
 	@MockBean
 	protected JwtService jwtService;
+
+	@MockBean
+	protected OauthService oauthService;
 
 	@MockBean
 	private SecurityContextRepository securityContextRepository;

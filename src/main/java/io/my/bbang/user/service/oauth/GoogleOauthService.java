@@ -1,19 +1,28 @@
 package io.my.bbang.user.service.oauth;
 
 import io.my.bbang.commons.properties.OauthProperties;
+import io.my.bbang.user.domain.User;
+import io.my.bbang.user.payload.request.UserJoinRequest;
+import io.my.bbang.user.payload.response.UserLoginResponse;
 import io.my.bbang.user.payload.response.oauth.GoogleLoginResponse;
+import io.my.bbang.user.payload.response.oauth.GoogleProfileResponse;
+import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class GoogleOauthService implements  SocialOauthService {
+public class GoogleOauthService implements SocialOauthService {
     private final OauthProperties.Google googleProperties;
+    private final UserService userService;
 
     private static final String GRANT_TYPE = "authorization_code";
 
@@ -30,7 +39,7 @@ public class GoogleOauthService implements  SocialOauthService {
     }
 
     @Override
-    public Mono<String> requestAccessToken(String code, String state) {
+    public Mono<UserLoginResponse> requestAccessToken(String code, String state) {
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
         params.put("client_id", googleProperties.getClientId());
@@ -48,10 +57,57 @@ public class GoogleOauthService implements  SocialOauthService {
                 .retrieve()
                 ;
 
+        UserLoginResponse failResponseBody = new UserLoginResponse();
         return responseSpec.toEntity(GoogleLoginResponse.class)
-                .map(response -> {
-                    return response.getBody().getAccessToken();
+                .flatMap(response -> {
+                    String accessToken = response.getBody().getIdToken();
+                    setFailLoginResponse(failResponseBody, accessToken);
+                    return getUserInfoByAccessToken(accessToken).toEntity(GoogleProfileResponse.class);
                 })
+                .map(responseSpecByProperties ->  responseSpecByProperties.getBody().getEmail())
+                .flatMap(userService::findByEmail)
+                .flatMap(userService::buildUserLoginResponseByUser)
+                .switchIfEmpty(Mono.defer(() ->Mono.just(failResponseBody)))
+                ;
+    }
+
+    @Override
+    public Mono<UserLoginResponse> join(UserJoinRequest requestBody) {
+        WebClient.ResponseSpec responseSpec = getUserInfoByAccessToken(requestBody.getAccessToken());
+
+        return responseSpec.toEntity(GoogleProfileResponse.class)
+                .flatMap(response -> {
+                    GoogleProfileResponse body = response.getBody();
+                    User user = User.newInstance(
+                            body.getEmail(),
+                            body.getName(),
+                            requestBody.getNickname(),
+                            body.getPicture()
+                    );
+                    return userService.saveUser(user);
+                })
+                .flatMap(userService::buildUserLoginResponseByUser)
+                ;
+    }
+
+    @Override
+    public WebClient.ResponseSpec getUserInfoByAccessToken(String accessToken) {
+        Map<String, Object> params = new HashMap<>();
+        String idToken = accessToken;
+
+        if (idToken.startsWith("Bearer ")) {
+            idToken = idToken.substring(7);
+        }
+
+        params.put("id_token", idToken);
+
+        WebClient webClient =
+                WebClient.builder().baseUrl(googleProperties.getProfileUrl())
+                        .build();
+
+        return webClient.get()
+                .uri(urlPlusParams(googleProperties.getProfileUri(), params))
+                .retrieve()
                 ;
     }
 

@@ -13,9 +13,9 @@ public class UserJoinRequest {
 	@NotNull
 	private String accessToken;
 
-	// Apple 로그인인 경우, email 필요
-	private String email;
-
+	public String getAccessToken() {
+		return "Bearer " + this.accessToken;
+	}
 
 
 }

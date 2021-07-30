@@ -17,6 +17,8 @@ public class OauthProperties {
         private String callbackUrl;
         private String loginUri;
         private String tokenUri;
+        private String profileUrl;
+        private String profileUri;
     }
 
     @Getter @Setter @Component
@@ -28,6 +30,8 @@ public class OauthProperties {
         private String callbackUrl;
         private String loginUri;
         private String tokenUri;
+        private String profileUrl;
+        private String profileUri;
     }
 
     @Getter @Setter @Component
@@ -39,6 +43,8 @@ public class OauthProperties {
         private String callbackUrl;
         private String loginUri;
         private String tokenUri;
+        private String profileUrl;
+        private String profileUri;
     }
 
 }

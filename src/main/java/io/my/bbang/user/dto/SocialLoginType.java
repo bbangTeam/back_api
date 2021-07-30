@@ -22,4 +22,8 @@ public enum SocialLoginType {
         throw new RuntimeException("socialLogin name is wrong");
     }
 
+    public String getName() {
+        return this.name;
+    }
+
 }

@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import io.jsonwebtoken.Claims;
 import io.my.bbang.commons.base.SpringBootTestBase;
 
+@Slf4j
 class JwtUtilTests extends SpringBootTestBase {
 
 	@Test
@@ -72,7 +74,7 @@ class JwtUtilTests extends SpringBootTestBase {
 		
 		assertTrue(jwtUtil.verifyRefreshToken(refreshToken));
 	}
-	
+
 	
 
 }
