@@ -1,6 +1,5 @@
 package io.my.bbang.user.service.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.my.bbang.commons.properties.OauthProperties;
 import io.my.bbang.user.domain.User;
 import io.my.bbang.user.payload.request.UserJoinRequest;
@@ -27,6 +26,7 @@ public class KakaoOauthService implements SocialOauthService {
 
     private static final String GRANT_TYPE = "authorization_code";
     private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
 
     @Override
     public String getOauthRedirectURL() {
@@ -98,7 +98,7 @@ public class KakaoOauthService implements SocialOauthService {
 
         return webClient.post()
                 .uri(kakaoProperties.getProfileUri())
-                .header(AUTHORIZATION, accessToken)
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .bodyValue(new KakaoProfileRequest())
                 .retrieve()
                 ;

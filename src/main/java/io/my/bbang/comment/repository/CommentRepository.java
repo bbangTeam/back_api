@@ -12,4 +12,6 @@ import reactor.core.publisher.Mono;
 public interface CommentRepository extends ReactiveCrudRepository<Comment, String> {
     Flux<Comment> findByParentId(String id, Pageable pageable);
     Mono<Long> countByParentId(String id);
+    Mono<Long> countByUserIdAndType(String id, String type);
+    Mono<Long> countByuserId(String userId);
 }

@@ -20,6 +20,8 @@ oauth:
     client-id: 1
     client-secret: 1
     callback-url: http://localhost:8080/api/oauth/callback/google
+    profile-url: https://oauth2.googleapis.com
+    profile-uri: /tokeninfo
   kakao:
     base-url: https://kauth.kakao.com
     login-uri: /oauth/authorize
@@ -27,6 +29,8 @@ oauth:
     client-id: 1
     client-secret: 1
     callback-url: http://localhost:8080/api/oauth/callback/kakao
+    profile-url: https://kapi.kakao.com
+    profile-uri: /v2/user/me
   naver:
     base-url: https://nid.naver.com
     login-uri: /oauth2.0/authorize
@@ -34,3 +38,5 @@ oauth:
     client-id: 1
     client-secret: 1
     callback-url: http://localhost:8080/api/oauth/callback/naver
+    profile-url: https://openapi.naver.com
+    profile-uri: /v1/nid/me

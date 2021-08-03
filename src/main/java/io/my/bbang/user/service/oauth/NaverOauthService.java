@@ -28,6 +28,7 @@ public class NaverOauthService implements SocialOauthService {
 
     private static final String GRANT_TYPE = "authorization_code";
     private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
 
     @Override
     public String getOauthRedirectURL() {
@@ -101,7 +102,7 @@ public class NaverOauthService implements SocialOauthService {
 
         return webClient.post()
                 .uri(naverProperties.getProfileUri())
-                .header(AUTHORIZATION, accessToken)
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .retrieve()
                 ;
     }

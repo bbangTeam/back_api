@@ -1,5 +1,6 @@
 package io.my.bbang.user.controller;
 
+import io.my.bbang.user.payload.response.MyProfileResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,11 @@ public class UserController {
     public Mono<BbangResponse> modifyNickname(
         @RequestParam String nickname) {
         return userService.modifyNickname(nickname);
+    }
+
+    @GetMapping("/my/profile")
+    public Mono<MyProfileResponse> getMyProfile() {
+        return userService.getMyProfile();
     }
 
     

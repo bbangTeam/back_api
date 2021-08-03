@@ -4,6 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.my.bbang.commons.payloads.BbangResponse;
+import io.my.bbang.pilgrimage.domain.PilgrimageBoard;
+import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
+import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
+import io.my.bbang.user.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.breadstore.domain.Store;
@@ -27,7 +36,8 @@ public class PilgrimageService {
 	private final JwtUtil jwtUtil;
 
 	private final PilgrimageRepository pilgrimageRepository;
-	
+	private final PilgrimageBoardRepository pilgrimageBoardRepository;
+
 	private final StoreService storeService;
 	private final UserService userService;
 	private final CodeService codeService;
@@ -111,5 +121,39 @@ public class PilgrimageService {
 		;
 	}
 
-	// public
+	 public Mono<BbangResponse> boardWrite(PilgrimageWriteRequest requestBody) {
+		PilgrimageBoard entity = new PilgrimageBoard();
+		entity.setStoreId(requestBody.getStoreName());
+		entity.setTitle(requestBody.getTitle());
+		entity.setContent(requestBody.getContent());
+		entity.setStoreId(requestBody.getStoreId());
+		entity.setStoreName(requestBody.getStoreName());
+
+		return jwtUtil.getMonoUserId().map(userId -> {
+			entity.setUserId(userId);
+			return entity;
+		})
+		.flatMap(e -> pilgrimageBoardRepository.save(e))
+		.map(e -> new BbangResponse());
+	 }
+
+	 public Mono<PilgrimageBoardList> boardList(int pageNum, int pageSize) {
+//		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "createDate"));
+//
+//		return pilgrimageBoardRepository.findByIdNotNull(pageable).map(entity -> {
+//			PilgrimageBoardList.Board board = new PilgrimageBoardList.Board();
+//			board.setTitle(entity.getTitle());
+//			board.setContent(entity.getContent());
+//			board.setStoreName(entity.getStoreName());
+//			board.setUserId(entity.getUserId());
+//			return board;
+//		}).flatMap(board -> {
+//			String userId = board.getUserId();
+//			return userRepository.findById(userId).flatMap(user -> {
+//				board.setNickname(user.getNickname());
+//				return board;
+//			}).;
+//		});
+		 return null;
+	 }
 }

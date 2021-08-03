@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import io.my.bbang.breadstagram.domain.Breadstagram;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 public interface BreadstagramRepository extends ReactiveCrudRepository<Breadstagram, String> {
 
     Flux<Breadstagram> findByIdNotNull(Pageable pageable);
+    Mono<Long> countAllByUserId(String userId);
 
 }

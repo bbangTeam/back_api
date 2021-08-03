@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-@Document("user_ideal")
+@Document("userIdeal")
 public class UserIdeal {
 
     @Id

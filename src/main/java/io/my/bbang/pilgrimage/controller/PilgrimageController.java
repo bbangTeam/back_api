@@ -1,10 +1,8 @@
 package io.my.bbang.pilgrimage.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
+import org.springframework.web.bind.annotation.*;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageAreaListResponse;
@@ -36,9 +34,16 @@ public class PilgrimageController {
 		return pilgrimageService.areaList();
 	}
 
-	@PostMapping
-	public Mono<BbangResponse> write() {
-		return null;
+	@PostMapping("/board")
+	public Mono<BbangResponse> boardWrite(@RequestBody PilgrimageWriteRequest requestBody) {
+		return pilgrimageService.boardWrite(requestBody);
+	}
+
+	@GetMapping("/board/list")
+	public Mono<PilgrimageBoardList> boardList(
+			@RequestParam(defaultValue = "1", required = false) int pageNum,
+			@RequestParam int pageSize) {
+		return pilgrimageService.boardList(pageNum, pageSize);
 	}
 
 

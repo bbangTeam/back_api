@@ -2,7 +2,15 @@ package io.my.bbang.user.service;
 
 import java.time.LocalDateTime;
 
+import io.my.bbang.breadstagram.domain.Breadstagram;
+import io.my.bbang.breadstagram.repository.BreadstagramRepository;
+import io.my.bbang.comment.dto.CommentType;
+import io.my.bbang.comment.repository.CommentRepository;
+import io.my.bbang.pilgrimage.domain.Pilgrimage;
+import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
+import io.my.bbang.user.payload.response.MyProfileResponse;
 import io.my.bbang.user.payload.response.UserLoginResponse;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -28,6 +36,9 @@ public class UserService {
 	private final UserHeartRepository userHeartRepository;
 	private final UserIdealRepository userIdealRepository;
 	private final UserPilgrimageRepository userPilgrimageRepository;
+
+	private final BreadstagramRepository breadstagramRepository;
+	private final CommentRepository commentRepository;
 
 	public Mono<BbangResponse> checkNickname(String nickname) {
 		return userRepository.findByNickname(nickname)
@@ -134,4 +145,43 @@ public class UserService {
 	public Mono<UserIdeal> findUserIdealByUserId() {
 		return jwtUtil.getMonoUserId().flatMap(userIdealRepository::findByuserId);
 	}
+
+	public Mono<MyProfileResponse> getMyProfile() {
+		MyProfileResponse responseBody = new MyProfileResponse();
+		return jwtUtil.getMonoUserId()
+				.flatMap(userId -> userRepository.findById(userId))
+				.map(user -> {
+					responseBody.setUserId(user.getId());
+					responseBody.setNickname(user.getNickname());
+					responseBody.setProfileImageUrl(user.getImageUrl());
+					responseBody.setEmail(user.getEmail());
+					return user;
+				})
+				.flatMap(user -> {
+					Breadstagram breadstagram = new Breadstagram();
+					return breadstagramRepository.countAllByUserId(responseBody.getUserId());
+				})
+				.flatMap(count -> {
+//					responseBody.setPostCount(count);
+//					String userId = responseBody.getUserId();
+//					return commentRepository.countByUserIdAndType(userId, CommentType.PILGRIMAGE.getValue());
+					return Mono.just(0);
+				})
+				.flatMap(count -> {
+					responseBody.setPostCount(responseBody.getPostCount() + count);
+					String userId = responseBody.getUserId();
+					return commentRepository.countByuserId(userId);
+				})
+				.flatMap(count -> {
+					responseBody.setCommentCount(count);
+					String userId = responseBody.getUserId();
+					return userHeartRepository.countByUserId(userId);
+				})
+				.map(count -> {
+					responseBody.setLikeCount(count);
+					return responseBody;
+				})
+				;
+	}
+
 }
