@@ -16,8 +16,6 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.my.bbang.comment.dto.CommentListDto;
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
 import io.my.bbang.comment.payload.response.CommentCountResponse;
@@ -35,7 +33,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 댓글 목록")
-	void list() throws JsonProcessingException {
+	void list() {
 
 		int pageSize = 10;
 		int pageNum = 0;
@@ -55,23 +53,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		Mockito.when(commentService.list(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
 
 
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("id")
-				.append("=")
-				.append("seoul001")
-				.append("&")
-				.append("&")
-				.append("pageNum")
-				.append("=")
-				.append(pageNum)
-				.append("&")
-				.append("pageSize")
-				.append("=")
-				.append(pageSize)
-		;
-		
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
 											.attributes(
@@ -107,7 +89,20 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
 				);
-		
+
+		String params = "?" +
+				"id" +
+				"=" +
+				"seoul001" +
+				"&" +
+				"&" +
+				"pageNum" +
+				"=" +
+				pageNum +
+				"&" +
+				"pageSize" +
+				"=" +
+				pageSize;
 		getWebTestClient("/api/comment/list" + params).expectStatus()
 						.isOk()
 						.expectBody()
@@ -116,7 +111,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 댓글 작성")
-	void write() throws JsonProcessingException {
+	void write() {
 		CommentWriteRequest requestBody = new CommentWriteRequest();
 		requestBody.setId("seoul001");
 		requestBody.setType("breadstagram");
@@ -169,7 +164,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 댓글 갯수")
-	void count() throws JsonProcessingException {
+	void count() {
 
 		CommentCountResponse responseBody = new CommentCountResponse();
 		responseBody.setCount(5);
@@ -177,14 +172,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 
 		Mockito.when(commentService.count(Mockito.any())).thenReturn(Mono.just(responseBody));
 
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("id")
-				.append("=")
-				.append("comment-id-01")
-		;
-		
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
 											.attributes(
@@ -208,7 +196,11 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer"))
 				);
-		
+
+		String params = "?" +
+				"id" +
+				"=" +
+				"comment-id-01";
 		getWebTestClient("/api/comment/count" + params).expectStatus()
 						.isOk()
 						.expectBody()

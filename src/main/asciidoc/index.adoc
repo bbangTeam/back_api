@@ -242,6 +242,33 @@ include::{snippets}/pilgrimagetest/arealist/curl-request.adoc[]
 
 
 
+
+[[resources-pilgrimage-boardWrite]]
+==== 빵지순례 글쓰기 API
+
+include::{snippets}/pilgrimagetest/board/request-headers.adoc[]
+include::{snippets}/pilgrimagetest/board/request-fields.adoc[]
+include::{snippets}/pilgrimagetest/board/response-fields.adoc[]
+include::{snippets}/pilgrimagetest/board/http-request.adoc[]
+include::{snippets}/pilgrimagetest/board/http-response.adoc[]
+include::{snippets}/pilgrimagetest/board/curl-request.adoc[]
+
+
+
+
+[[resources-pilgrimage-boardList]]
+==== 빵지순례 글 목록 API
+
+include::{snippets}/pilgrimagetest/board/list/request-headers.adoc[]
+include::{snippets}/pilgrimagetest/board/list/request-parameters.adoc[]
+include::{snippets}/pilgrimagetest/board/list/response-fields.adoc[]
+include::{snippets}/pilgrimagetest/board/list/http-request.adoc[]
+include::{snippets}/pilgrimagetest/board/list/http-response.adoc[]
+include::{snippets}/pilgrimagetest/board/list/curl-request.adoc[]
+
+
+
+
 [[resources-breadstagram-api]]
 === 빵스타그램
 

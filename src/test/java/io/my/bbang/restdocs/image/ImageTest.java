@@ -61,16 +61,7 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 		multipartData.add("file", imageResource);
 		
 		MultipartInserter multipartInserter = BodyInserters.fromMultipartData(multipartData);
-		
-		// RequestPartFieldsSnippet requestSnippet = 
-		// 		requestPartFields(
-		// 				fieldWithPath("file").description("파일")
-		// 						.attributes(
-		// 								RestDocAttributes.length(0), 
-		// 								RestDocAttributes.format("multipart/form-data"))
-		// 		);
 
-		
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
 						fieldWithPath("id").description("업로드 된 파일 고유번호")
@@ -112,20 +103,8 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 		
 		Mockito.when(imageService.fileDelete(Mockito.any(), Mockito.any()))
 				.thenReturn(Mono.just(responseBody));
-		
-		StringBuilder params = new StringBuilder();
-		
-		params.append("?")
-				.append("fileName")
-				.append("=")
-				.append(fileName)
-				.append("&")
-				.append("id")
-				.append("=")
-				.append(id)
-		;
 
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("삭제할 파일 고유번호")
 											.attributes(
@@ -148,7 +127,15 @@ class ImageTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("integer"))
 				);
-		
+
+		String params = "?" +
+				"fileName" +
+				"=" +
+				fileName +
+				"&" +
+				"id" +
+				"=" +
+				id;
 		deleteWebTestClient("/api/image/delete" + params).expectStatus()
 							.isOk()
 							.expectBody()

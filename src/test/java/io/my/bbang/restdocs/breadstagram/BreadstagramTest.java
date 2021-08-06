@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +36,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 목록")
-	void list() throws JsonProcessingException {
+	void list() {
 		int pageSize = 10;
 
 		BreadstagramListResponse responseBody = new BreadstagramListResponse();
@@ -71,18 +69,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 		Mockito.when(breadstagramService.list(Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
 
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("pageNum")
-				.append("=")
-				.append("1")
-				.append("&")
-				.append("pageSize")
-				.append("=")
-				.append("3")
-		;
-		
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("pageSize").description("페이지당 게시글 개수")
 											.attributes(
@@ -143,7 +130,15 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String"))
 				);
-		
+
+		String params = "?" +
+				"pageNum" +
+				"=" +
+				"1" +
+				"&" +
+				"pageSize" +
+				"=" +
+				"3";
 		getWebTestClient("/api/breadstagram/list" + params).expectStatus()
 						.isOk()
 						.expectBody()
@@ -153,7 +148,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 글쓰기")
-	void write() throws JsonProcessingException {
+	void write() {
 		BreadstagramWriteResponse responseBody = new BreadstagramWriteResponse();
 		
 		responseBody.setId(UUID.randomUUID().toString());
@@ -244,23 +239,12 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like_post() throws InterruptedException {
+	void like_post() {
 		BbangResponse responseBody = new BbangResponse("Success");
 
 		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
 
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("like")
-				.append("=")
-				.append("true")
-				.append("&")
-				.append("id")
-				.append("=")
-				.append("storeId")
-		;
-		
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("like").description("좋아요")
 											.attributes(
@@ -285,7 +269,15 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("integer"))
 				);
-		
+
+		String params = "?" +
+				"like" +
+				"=" +
+				"true" +
+				"&" +
+				"id" +
+				"=" +
+				"storeId";
 		postWebTestClient("/api/breadstagram/like" + params).expectStatus()
 						.isOk()
 						.expectBody()
@@ -294,23 +286,12 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like_delete() throws InterruptedException {
+	void like_delete() {
 		BbangResponse responseBody = new BbangResponse("Success");
 
 		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
 
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("like")
-				.append("=")
-				.append("false")
-				.append("&")
-				.append("id")
-				.append("=")
-				.append("storeId")
-		;
-		
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("like").description("좋아요")
 											.attributes(
@@ -335,7 +316,15 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("integer"))
 				);
-		
+
+		String params = "?" +
+				"like" +
+				"=" +
+				"false" +
+				"&" +
+				"id" +
+				"=" +
+				"storeId";
 		deleteWebTestClient("/api/breadstagram/like" + params).expectStatus()
 						.isOk()
 						.expectBody()

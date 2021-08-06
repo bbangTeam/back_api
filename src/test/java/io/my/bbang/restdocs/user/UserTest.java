@@ -5,8 +5,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,12 +26,7 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 닉네임 중복 확인 API 명세서")
-	void checkNickname() throws JsonProcessingException {
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("nickname")
-				.append("=")
-				.append("testNickname1");
+	void checkNickname() {
 
 		Mockito.when(userService.checkNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse("Success")));
 		
@@ -56,7 +49,11 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("integer"))
 				);
-		
+
+		String params = "?" +
+				"nickname" +
+				"=" +
+				"testNickname1";
 		getWebTestClient("/api/user/nickname" + params).expectStatus()
 						.isOk()
 						.expectBody()
@@ -65,17 +62,11 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	
 	@Test
 	@DisplayName("REST Docs 닉네임 변경 API 명세서")
-	void modifyNickname() throws JsonProcessingException {
+	void modifyNickname() {
 
 		Mockito.when(userService.modifyNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse("Success")));
-		
-		StringBuilder params = new StringBuilder();
-		params.append("?")
-				.append("nickname")
-				.append("=")
-				.append("testNickname1");
 
-		RequestParametersSnippet requestSnippet = 
+		RequestParametersSnippet requestSnippet =
 		requestParameters(
 				parameterWithName("nickname").description("변경할 닉네임")
 										.attributes(
@@ -94,7 +85,11 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("integer"))
 				);
-		
+
+		String params = "?" +
+				"nickname" +
+				"=" +
+				"testNickname1";
 		patchWebTestClient("/api/user/nickname" + params).expectStatus()
 						.isOk()
 						.expectBody()

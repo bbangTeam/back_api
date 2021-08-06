@@ -6,9 +6,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,14 +23,10 @@ import io.my.bbang.ideal.payload.response.IdealRankResponse;
 import reactor.core.publisher.Mono;
 
 class IdealTest extends RestDocsBaseWithSpringBoot {
-	
-	@BeforeEach
-	void setUp() {
-	}
 
 	@Test
 	@DisplayName("REST Docs 빵드컵 진행 여부 확인")
-	void done() throws JsonProcessingException {
+	void done() {
 		Mockito.when(idealService.done()).thenReturn(Mono.just(new BbangResponse()));
 		
 		ResponseFieldsSnippet responseSnippet = 
@@ -56,7 +49,7 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵드컵 게임")
-	void content() throws JsonProcessingException {
+	void content() {
 		IdealContentResponse responseBody = new IdealContentResponse();
 		
 		responseBody.setResult("Success");
@@ -104,7 +97,7 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵드컵 순위 확인")
-	void rank() throws JsonProcessingException {
+	void rank() {
 		IdealRankResponse responseBody = new IdealRankResponse();
 
 		responseBody.setResult("Success");
@@ -113,7 +106,7 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 			IdealRankDto dto = new IdealRankDto();
 			dto.setName("bread" + i);
 			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
-			dto.setSelectedCount(Long.valueOf(1000 - i*i));
+			dto.setSelectedCount((long) (1000 - i * i));
 			responseBody.getBreadList().add(dto);
 		}
 
@@ -151,7 +144,7 @@ class IdealTest extends RestDocsBaseWithSpringBoot {
 
 	@Test
 	@DisplayName("REST Docs 빵드컵 1위 선택")
-	void selected() throws JsonProcessingException {
+	void selected() {
 		
 		String id = "breadIdeal01";
 		IdealSelectedRequest requestBody = new IdealSelectedRequest();
