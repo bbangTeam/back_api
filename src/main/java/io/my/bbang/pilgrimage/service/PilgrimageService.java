@@ -1,8 +1,8 @@
 package io.my.bbang.pilgrimage.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.domain.PilgrimageBoard;
@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class PilgrimageService {
 	private final JwtUtil jwtUtil;
 
+	private final UserRepository userRepository;
 	private final PilgrimageRepository pilgrimageRepository;
 	private final PilgrimageBoardRepository pilgrimageBoardRepository;
 
@@ -64,7 +65,7 @@ public class PilgrimageService {
 				dto.setPilgrimageId(null);
 				return dto;
 			}).collectList().map(list -> {
-				list = dtoMap.values().stream().collect(Collectors.toList());
+				list = new ArrayList<>(dtoMap.values());
 				// 응답 값으로 불필요하므로, null 처리
 				responseBody.setUserId(null);
 				responseBody.setStoreList(list);
@@ -113,9 +114,7 @@ public class PilgrimageService {
 				dto.setName(code.getContent());
 				responseBody.getAreaList().add(dto);
 			});
-			
 			responseBody.setResult("Success");
-
 			return responseBody;
 		})
 		;
@@ -124,7 +123,6 @@ public class PilgrimageService {
 	 public Mono<BbangResponse> boardWrite(PilgrimageWriteRequest requestBody) {
 		PilgrimageBoard entity = new PilgrimageBoard();
 		entity.setStoreId(requestBody.getStoreName());
-		entity.setTitle(requestBody.getTitle());
 		entity.setContent(requestBody.getContent());
 		entity.setStoreId(requestBody.getStoreId());
 		entity.setStoreName(requestBody.getStoreName());
@@ -133,27 +131,31 @@ public class PilgrimageService {
 			entity.setUserId(userId);
 			return entity;
 		})
-		.flatMap(e -> pilgrimageBoardRepository.save(e))
+		.flatMap(pilgrimageBoardRepository::save)
 		.map(e -> new BbangResponse());
 	 }
 
 	 public Mono<PilgrimageBoardList> boardList(int pageNum, int pageSize) {
-//		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "createDate"));
-//
-//		return pilgrimageBoardRepository.findByIdNotNull(pageable).map(entity -> {
-//			PilgrimageBoardList.Board board = new PilgrimageBoardList.Board();
-//			board.setTitle(entity.getTitle());
-//			board.setContent(entity.getContent());
-//			board.setStoreName(entity.getStoreName());
-//			board.setUserId(entity.getUserId());
-//			return board;
-//		}).flatMap(board -> {
-//			String userId = board.getUserId();
-//			return userRepository.findById(userId).flatMap(user -> {
-//				board.setNickname(user.getNickname());
-//				return board;
-//			}).;
-//		});
-		 return null;
+		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "createDate"));
+
+		return pilgrimageBoardRepository.findByIdNotNull(pageable).map(entity -> {
+			PilgrimageBoardList.Board board = new PilgrimageBoardList.Board();
+			board.setContent(entity.getContent());
+			board.setStoreName(entity.getStoreName());
+			board.setUserId(entity.getUserId());
+			board.setCreateDate(entity.getCreateDate());
+			return board;
+		}).flatMap(board -> {
+			String userId = board.getUserId();
+			return userRepository.findById(userId).map(user -> {
+				board.setNickname(user.getNickname());
+				return board;
+			});
+		}).collectList().map(list -> {
+			PilgrimageBoardList responseBody = new PilgrimageBoardList();
+			responseBody.setBoardList(list);
+			return responseBody;
+		})
+		;
 	 }
 }

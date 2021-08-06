@@ -106,12 +106,6 @@ public class BreadstagramService {
 		return responseBody;
 	}
 
-	/**
-	 * @param id
-	 * @param like
-	 * @return
-	 * @throws InterruptedException
-	 */
 	@Transactional
 	public Mono<BbangResponse> like(String id, Boolean like) {
 		return storeService.findOneStore(id)
