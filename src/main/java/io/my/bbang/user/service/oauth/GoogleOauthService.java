@@ -11,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -28,24 +28,23 @@ public class GoogleOauthService implements SocialOauthService {
 
     @Override
     public String getOauthRedirectURL() {
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("scope", "openid%20profile%20email");
-        params.put("response_type", "code");
-        params.put("client_id", googleProperties.getClientId());
-        params.put("redirect_uri", googleProperties.getCallbackUrl());
+        Map<String, Object> params = getOauthRedirectURLParams();
 
         return urlPlusParams(googleProperties.getBaseUrl() + googleProperties.getLoginUri(), params);
     }
 
+    private Map<String, Object> getOauthRedirectURLParams() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("scope", "openid%20profile%20email");
+        params.put("response_type", "code");
+        params.put("client_id", googleProperties.getClientId());
+        params.put("redirect_uri", googleProperties.getCallbackUrl());
+        return params;
+    }
+
     @Override
     public Mono<UserLoginResponse> requestAccessToken(String code, String state) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        params.put("client_id", googleProperties.getClientId());
-        params.put("client_secret", googleProperties.getClientSecret());
-        params.put("redirect_uri", googleProperties.getCallbackUrl());
-        params.put("grant_type", GRANT_TYPE);
+        Map<String, Object> params = requestAccessTokenParams(code);
 
         WebClient webclient =
                 WebClient.builder().baseUrl(googleProperties.getTokenUrl())
@@ -60,15 +59,25 @@ public class GoogleOauthService implements SocialOauthService {
         UserLoginResponse failResponseBody = new UserLoginResponse();
         return responseSpec.toEntity(GoogleLoginResponse.class)
                 .flatMap(response -> {
-                    String accessToken = response.getBody().getIdToken();
+                    String accessToken = Objects.requireNonNull(response.getBody()).getIdToken();
                     setFailLoginResponse(failResponseBody, accessToken);
                     return getUserInfoByAccessToken(accessToken).toEntity(GoogleProfileResponse.class);
                 })
-                .map(responseSpecByProperties ->  responseSpecByProperties.getBody().getEmail())
+                .map(responseSpecByProperties ->  Objects.requireNonNull(responseSpecByProperties.getBody()).getEmail())
                 .flatMap(userService::findByEmail)
                 .flatMap(userService::buildUserLoginResponseByUser)
                 .switchIfEmpty(Mono.defer(() ->Mono.just(failResponseBody)))
                 ;
+    }
+
+    private Map<String, Object> requestAccessTokenParams(String code) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        params.put("client_id", googleProperties.getClientId());
+        params.put("client_secret", googleProperties.getClientSecret());
+        params.put("redirect_uri", googleProperties.getCallbackUrl());
+        params.put("grant_type", GRANT_TYPE);
+        return params;
     }
 
     @Override
@@ -78,6 +87,7 @@ public class GoogleOauthService implements SocialOauthService {
         return responseSpec.toEntity(GoogleProfileResponse.class)
                 .flatMap(response -> {
                     GoogleProfileResponse body = response.getBody();
+                    assert body != null;
                     User user = User.newInstance(
                             body.getEmail(),
                             body.getName(),

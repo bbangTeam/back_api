@@ -2,7 +2,6 @@ package io.my.bbang.restdocs.user;
 
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
-import io.my.bbang.user.domain.User;
 import io.my.bbang.user.payload.request.UserJoinRequest;
 import io.my.bbang.user.payload.response.UserLoginResponse;
 import org.junit.jupiter.api.DisplayName;

@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -30,23 +31,22 @@ public class KakaoOauthService implements SocialOauthService {
 
     @Override
     public String getOauthRedirectURL() {
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("client_id", kakaoProperties.getClientId());
-        params.put("redirect_uri", kakaoProperties.getCallbackUrl());
-        params.put("response_type", "code");
+        Map<String, Object> params =getOauthRedirectURLParams();
 
         return urlPlusParams(kakaoProperties.getBaseUrl() + kakaoProperties.getLoginUri(), params);
     }
 
+    private Map<String, Object> getOauthRedirectURLParams() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("client_id", kakaoProperties.getClientId());
+        params.put("redirect_uri", kakaoProperties.getCallbackUrl());
+        params.put("response_type", "code");
+        return params;
+    }
+
     @Override
     public Mono<UserLoginResponse> requestAccessToken(String code, String state) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        params.put("client_id", kakaoProperties.getClientId());
-        params.put("client_secret", kakaoProperties.getClientSecret());
-        params.put("redirect_uri", kakaoProperties.getCallbackUrl());
-        params.put("grant_type", GRANT_TYPE);
+        Map<String, Object> params = requestAccessTokenParams(code);
 
         WebClient webclient =
                 WebClient.builder().baseUrl(kakaoProperties.getBaseUrl())
@@ -61,15 +61,25 @@ public class KakaoOauthService implements SocialOauthService {
         UserLoginResponse failResponseBody = new UserLoginResponse();
         return responseSpec.toEntity(KakaoLoginResponse.class)
                 .flatMap(response -> {
-                    String accessToken = response.getBody().getAccessToken();
+                    String accessToken = Objects.requireNonNull(response.getBody()).getAccessToken();
                     setFailLoginResponse(failResponseBody, accessToken);
                     return getUserInfoByAccessToken(accessToken).toEntity(KakaoProfileResponse.class);
                 })
-                .map(responseSpecByProperties -> responseSpecByProperties.getBody().getKakaoAcount().getEmail())
+                .map(responseSpecByProperties -> Objects.requireNonNull(responseSpecByProperties.getBody()).getKakaoAcount().getEmail())
                 .flatMap(userService::findByEmail)
                 .flatMap(userService::buildUserLoginResponseByUser)
                 .switchIfEmpty(Mono.defer(() -> Mono.just(failResponseBody)))
                 ;
+    }
+
+    private Map<String, Object> requestAccessTokenParams(String code) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        params.put("client_id", kakaoProperties.getClientId());
+        params.put("client_secret", kakaoProperties.getClientSecret());
+        params.put("redirect_uri", kakaoProperties.getCallbackUrl());
+        params.put("grant_type", GRANT_TYPE);
+        return params;
     }
 
     @Override
@@ -79,6 +89,7 @@ public class KakaoOauthService implements SocialOauthService {
         return responseSpec.toEntity(KakaoProfileResponse.class)
                 .flatMap(response -> {
                     KakaoProfileResponse body = response.getBody();
+                    assert body != null;
                     User user = User.newInstance(
                             body.getKakaoAcount().getEmail(),
                             null,

@@ -11,7 +11,7 @@ public class JwtContextHolder {
 
 
     public static Mono<JwtContext> getContext() {
-        return Mono.deferContextual(ctx -> Mono.just(ctx))
+        return Mono.deferContextual(Mono::just)
                 .filter( c -> c.hasKey(JWT_CONTEXT_KEY))
                 .flatMap( c-> c.<Mono<JwtContext>>get(JWT_CONTEXT_KEY));
         // return Mono.subscriberContext()

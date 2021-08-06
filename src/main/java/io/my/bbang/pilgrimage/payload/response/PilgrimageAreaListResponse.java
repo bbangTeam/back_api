@@ -6,8 +6,10 @@ import java.util.List;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.dto.PilgrimageAreaListDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PilgrimageAreaListResponse extends BbangResponse {
     private List<PilgrimageAreaListDto> areaList;
 

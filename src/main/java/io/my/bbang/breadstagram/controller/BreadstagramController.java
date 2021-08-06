@@ -1,9 +1,7 @@
 package io.my.bbang.breadstagram.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +41,7 @@ public class BreadstagramController {
 	@RequestMapping(value="/like", method = {RequestMethod.POST, RequestMethod.DELETE})
 	public Mono<BbangResponse> like(
 		@RequestParam String id, 
-		@RequestParam Boolean like) throws InterruptedException {
+		@RequestParam Boolean like) {
 		return breadstagramService.like(id, like);
 	}
 	

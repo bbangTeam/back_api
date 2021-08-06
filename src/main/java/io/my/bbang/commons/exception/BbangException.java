@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class BbangException extends RuntimeException {
 	private static final long serialVersionUID = 8888926686884785342L;
-	private ExceptionTypes type;
+	private final ExceptionTypes type;
 	
 	public BbangException(ExceptionTypes type) {
 		this.type = type;

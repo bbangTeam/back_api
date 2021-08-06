@@ -1,6 +1,5 @@
 package io.my.bbang.user.service.oauth;
 
-import io.my.bbang.user.domain.User;
 import io.my.bbang.user.dto.SocialLoginType;
 import io.my.bbang.user.payload.request.UserJoinRequest;
 import io.my.bbang.user.payload.response.UserLoginResponse;

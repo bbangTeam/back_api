@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class JwtController {
     @GetMapping(value = "/api/jwt/issued", produces = "application/json")
     public Mono<BbangResponse> accessTokenIssued(ServerHttpRequest request, ServerHttpResponse response){
         log.info("call access token issued api!");
-        String accessToken = request.getHeaders().get("Authorization").get(0).substring(7);
+        String accessToken = Objects.requireNonNull(request.getHeaders().get("Authorization")).get(0).substring(7);
 
         response.getHeaders().add("Authorization", jwtService.accessTokenIssued(accessToken));
         

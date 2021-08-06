@@ -6,7 +6,7 @@ public enum SocialLoginType {
     KAKAO("kakao"),
     ;
 
-    private String name;
+    private final String name;
 
     SocialLoginType(String name) {
         this.name = name;

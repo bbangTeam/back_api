@@ -5,8 +5,10 @@ import java.util.List;
 import io.my.bbang.breadstagram.dto.BreadstagramImageDto;
 import io.my.bbang.commons.payloads.BbangResponse;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class BreadstagramViewResponse extends BbangResponse {
 	private String cityName;
 	private String storeName;

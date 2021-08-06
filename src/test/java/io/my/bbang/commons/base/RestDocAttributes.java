@@ -17,11 +17,7 @@ public class RestDocAttributes {
 	}
 	
 	public static Attributes.Attribute length(int min, int max) {
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append(min).append("~").append(max);
-		
-		return key("length").value(sb.toString());
+		return key("length").value(min + "~" + max);
 	}
 	
 	public static Attributes.Attribute format(String format) {

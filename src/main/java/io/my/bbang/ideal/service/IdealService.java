@@ -34,8 +34,7 @@ public class IdealService {
 	public Mono<BbangResponse> done() {
 		return userService.findUserIdealByUserId().hasElement().map(bool -> {
 			if (bool) {
-				BbangResponse responseBody = new BbangResponse(21, "Clear game!");
-				return responseBody;
+				return new BbangResponse(21, "Clear game!");
 			} else {
 				return new BbangResponse();
 			}

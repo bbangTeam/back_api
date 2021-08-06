@@ -49,7 +49,7 @@ public class CommentService {
 	}
 	
 	public Mono<CommentWriteResponse> write(String id, String content, String type) {
-		return jwtUtil.getMonoUserId().flatMap(userId -> userService.findById(userId))
+		return jwtUtil.getMonoUserId().flatMap(userService::findById)
 						.map(user -> Comment.build(id, user.getId(), user.getName(), content, type))
 						.flatMap(commentRepository::save)
 						.map(this::returnResponse);

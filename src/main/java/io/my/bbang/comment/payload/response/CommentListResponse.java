@@ -6,8 +6,10 @@ import java.util.List;
 import io.my.bbang.comment.dto.CommentListDto;
 import io.my.bbang.commons.payloads.BbangResponse;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class CommentListResponse extends BbangResponse {
 	private List<CommentListDto> commentList;
 	

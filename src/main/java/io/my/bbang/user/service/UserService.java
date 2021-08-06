@@ -2,15 +2,10 @@ package io.my.bbang.user.service;
 
 import java.time.LocalDateTime;
 
-import io.my.bbang.breadstagram.domain.Breadstagram;
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
-import io.my.bbang.comment.dto.CommentType;
 import io.my.bbang.comment.repository.CommentRepository;
-import io.my.bbang.pilgrimage.domain.Pilgrimage;
-import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
 import io.my.bbang.user.payload.response.MyProfileResponse;
 import io.my.bbang.user.payload.response.UserLoginResponse;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -54,11 +49,13 @@ public class UserService {
 	public Mono<BbangResponse> modifyNickname(String nickname) {
 		return userRepository.findByNickname(nickname)
 							.hasElement()
-							.flatMap(bool -> {
-								return bool 
-									? Mono.just(new BbangResponse(11, "Already Exist!"))
-									: saveUser(nickname).map(this::returnModifyNicknameResponse);
-							});
+							.flatMap(bool -> returnResponse(bool, nickname));
+	}
+
+	private Mono<BbangResponse> returnResponse(boolean bool, String nickname) {
+		return bool
+				? Mono.just(new BbangResponse(11, "Already Exist!"))
+				: saveUser(nickname).map(this::returnModifyNicknameResponse);
 	}
 
 	private Mono<Boolean> saveUser(String nickname) {
@@ -89,11 +86,6 @@ public class UserService {
 		return Mono.just(responseBody);
 	}
 	
-	/**
-	 * Security 에서 사용자 정보를 저장하기 위해 사용
-	 * @param id
-	 * @return
-	 */
 	public Mono<User> findById(String id) {
 		return userRepository.findById(id);
 	}
@@ -149,7 +141,7 @@ public class UserService {
 	public Mono<MyProfileResponse> getMyProfile() {
 		MyProfileResponse responseBody = new MyProfileResponse();
 		return jwtUtil.getMonoUserId()
-				.flatMap(userId -> userRepository.findById(userId))
+				.flatMap(userRepository::findById)
 				.map(user -> {
 					responseBody.setUserId(user.getId());
 					responseBody.setNickname(user.getNickname());
@@ -157,10 +149,7 @@ public class UserService {
 					responseBody.setEmail(user.getEmail());
 					return user;
 				})
-				.flatMap(user -> {
-					Breadstagram breadstagram = new Breadstagram();
-					return breadstagramRepository.countAllByUserId(responseBody.getUserId());
-				})
+				.flatMap(user -> breadstagramRepository.countAllByUserId(responseBody.getUserId()))
 				.flatMap(count -> {
 //					responseBody.setPostCount(count);
 //					String userId = responseBody.getUserId();

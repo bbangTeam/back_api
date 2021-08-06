@@ -108,18 +108,13 @@ public class JwtUtil {
 		.flatMap(context -> {
 			String userId = context.getUserId();
 			if (userId == null) {
-				return context.getJwt().map(jwt -> getUserIdByAccessToken(jwt));
+				return context.getJwt().map(this::getUserIdByAccessToken);
 			} else {
 				return Mono.just(userId);
 			}
 		});
 	}
 
-	/**
-	 * Google Login시, 나오는 jwt토큰 해석을 위함
-	 * @param jwt
-	 * @return
-	 */
 	public Claims parseJwt(String jwt, String accessToken) {
 		return Jwts.parser()
 				.setSigningKey(accessToken)

@@ -1,6 +1,7 @@
 package io.my.bbang.commons.context;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.springframework.web.server.ServerWebExchange;
 
@@ -15,10 +16,8 @@ final public class JwtContext implements Serializable {
    public JwtContext(final ServerWebExchange exchange) {
        jwt = Mono.just(exchange)
                     .map(ServerWebExchange::getRequest)
-                    .map(request -> {
-                        String jwt = request.getHeaders().get("Authorization").toString().substring(8).replace("]", "");
-                        return jwt;
-                    });
+                    .map(request ->
+                            Objects.requireNonNull(request.getHeaders().get("Authorization")).toString().substring(8).replace("]", ""));
    }
 
    public Mono<String> getJwt() { return jwt; }

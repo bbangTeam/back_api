@@ -6,8 +6,10 @@ import java.util.List;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.ideal.dto.IdealRankDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class IdealRankResponse extends BbangResponse {
     private List<IdealRankDto> breadList;
 

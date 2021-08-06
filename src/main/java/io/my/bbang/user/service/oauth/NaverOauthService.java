@@ -1,6 +1,5 @@
 package io.my.bbang.user.service.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.my.bbang.commons.properties.OauthProperties;
 import io.my.bbang.user.domain.User;
 import io.my.bbang.user.payload.request.UserJoinRequest;
@@ -18,6 +17,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -64,11 +64,11 @@ public class NaverOauthService implements SocialOauthService {
         UserLoginResponse failResponseBody = new UserLoginResponse();
         return responseSpec.toEntity(NaverLoginResponse.class)
                 .flatMap(response -> {
-                    String accessToken = response.getBody().getAccessToken();
+                    String accessToken = Objects.requireNonNull(response.getBody()).getAccessToken();
                     setFailLoginResponse(failResponseBody, accessToken);
                     return getUserInfoByAccessToken(accessToken).toEntity(NaverProfileResponse.class);
                 })
-                .map(responseSpecByProperties -> responseSpecByProperties.getBody().getResponse().getEmail())
+                .map(responseSpecByProperties -> Objects.requireNonNull(responseSpecByProperties.getBody()).getResponse().getEmail())
                 .flatMap(userService::findByEmail)
                 .flatMap(userService::buildUserLoginResponseByUser)
                 .switchIfEmpty(Mono.defer(() -> Mono.just(failResponseBody)))
@@ -82,6 +82,7 @@ public class NaverOauthService implements SocialOauthService {
         return responseSpec.toEntity(NaverProfileResponse.class)
                 .flatMap(response -> {
                     NaverProfileResponse body = response.getBody();
+                    assert body != null;
                     User user = User.newInstance(
                             body.getResponse().getEmail(),
                             body.getResponse().getName(),

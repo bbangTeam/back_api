@@ -3,6 +3,7 @@ package io.my.bbang.breadstagram.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import io.my.bbang.breadstore.domain.Store;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -114,22 +115,21 @@ public class BreadstagramService {
 			store.setLike(like ? store.getLike() + 1 : store.getLike() - 1);
 			return storeService.save(store);
 		})
-		.flatMap(store -> {
-			return jwtUtil.getMonoUserId()
-			.map(userId -> {
-				String storeId = store.getId();
-
-				changeUserHeart(like, UserHeart.build(userId, storeId, UserHeartType.STORE));
-
-				return new BbangResponse("Success");
-			});
-		})
+		.flatMap(store ->  returnBbangResponse(store, like))
 		;
 	}
 
 	private void changeUserHeart(Boolean like, UserHeart userHeart) {
 		if (like) userService.saveUserHeart(userHeart).subscribe();
 		else userService.deleteUserHeart(userHeart).subscribe();
+	}
+
+	private Mono<BbangResponse> returnBbangResponse(Store store, Boolean like) {
+		return jwtUtil.getMonoUserId().map(userId -> {
+			String storeId = store.getId();
+			changeUserHeart(like, UserHeart.build(userId, storeId, UserHeartType.STORE));
+			return new BbangResponse("Success");
+		});
 	}
 		
 
