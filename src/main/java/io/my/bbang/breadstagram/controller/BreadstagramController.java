@@ -27,7 +27,7 @@ public class BreadstagramController {
 	@GetMapping("/list")
 	public Mono<BreadstagramListResponse> list(
 			@RequestParam(defaultValue = "0", required = false) int pageNum,
-			@RequestParam int pageSize) {
+			@RequestParam(defaultValue = "5", required = false) int pageSize) {
 		
 		return breadstagramService.list(pageNum, pageSize);
 	}

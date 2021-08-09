@@ -42,7 +42,7 @@ public class PilgrimageController {
 	@GetMapping("/board/list")
 	public Mono<PilgrimageBoardList> boardList(
 			@RequestParam(defaultValue = "0", required = false) int pageNum,
-			@RequestParam int pageSize) {
+			@RequestParam(defaultValue = "5", required = false) int pageSize) {
 		return pilgrimageService.boardList(pageNum, pageSize);
 	}
 

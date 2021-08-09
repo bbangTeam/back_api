@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import io.jsonwebtoken.SignatureException;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -77,7 +78,13 @@ public class JwtUtil {
 	}
 	
 	public boolean verifyAccessToken(String jwt) {
-		return parseAccessToken(jwt).getExpiration().after(new Date());
+		Claims claims = parseAccessToken(jwt);
+
+		if (claims == null) {
+			return false;
+		}
+
+		return claims.getExpiration().after(new Date());
 	}
 	
 	public boolean verifyRefreshToken(String jwt) {
@@ -89,10 +96,14 @@ public class JwtUtil {
 	}
 
 	private Claims parseJwt(String jwt, Key key) {
-		return Jwts.parser()
+		try {
+			return Jwts.parser()
 					.setSigningKey(key)
 					.parseClaimsJws(jwt)
 					.getBody();
+		} catch(SignatureException e) {
+			return null;
+		}
 	}
 	
 	private Key getKey(String secretKey) {

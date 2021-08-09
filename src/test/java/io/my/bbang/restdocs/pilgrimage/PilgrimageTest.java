@@ -250,7 +250,7 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("int")),
-						parameterWithName("pageSize").description("페이지당 글 갯수")
+						parameterWithName("pageSize").description("페이지당 글 갯수(default: 5)").optional()
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("int"))

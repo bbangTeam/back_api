@@ -25,7 +25,7 @@ public class CommentController {
 	public Mono<CommentListResponse> list(
 			@RequestParam String id, 
 			@RequestParam(defaultValue = "0", required = false) int pageNum,
-			@RequestParam int pageSize) {
+			@RequestParam(defaultValue = "5", required = false) int pageSize) {
 		return commentService.list(id, pageSize, pageNum);
 	}
 	

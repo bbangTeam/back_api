@@ -101,9 +101,11 @@ public class NaverOauthService implements SocialOauthService {
                 WebClient.builder().baseUrl(naverProperties.getProfileUrl())
                         .build();
 
+        if (!accessToken.startsWith(BEARER)) accessToken = BEARER + accessToken;
+
         return webClient.post()
                 .uri(naverProperties.getProfileUri())
-                .header(AUTHORIZATION, BEARER + accessToken)
+                .header(AUTHORIZATION, accessToken)
                 .retrieve()
                 ;
     }

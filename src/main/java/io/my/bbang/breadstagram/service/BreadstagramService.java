@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.my.bbang.breadstore.domain.Store;
+import io.my.bbang.user.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +33,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BreadstagramService {
 	private final BreadstagramRepository breadstagramRepository;
+	private final UserRepository userRepository;
+
 	private final StoreService storeService;
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
@@ -39,11 +42,17 @@ public class BreadstagramService {
 	public Mono<BreadstagramListResponse> list(int pageNum, int pageSize) {
 		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Direction.DESC, "createDate"));
 
-		return breadstagramRepository.findByIdNotNull(pageable).map(entity -> {
+		return breadstagramRepository.findByIdNotNull(pageable)
+		.flatMap(entity -> {
 			BreadstagramListDto dto = entityToDto(entity);
 			return setStoreNameAndLikeCount(dto);
 		})
-		.flatMap(map -> map).collectList()
+		.flatMap(dto -> userRepository.findById(dto.getUserId())
+				.map(user -> {
+					dto.setNickname(user.getNickname());
+					return dto;
+				}))
+		.collectList()
 		.map(this::returnResponse)
 		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
 	}
@@ -56,6 +65,8 @@ public class BreadstagramService {
 		dto.setCityName(entity.getCityName());
 		dto.setImageList(entity.getImageList());
 		dto.setStoreId(entity.getStoreId());
+		dto.setUserId(entity.getUserId());
+		dto.setCreateDate(entity.getCreateDate());
 		return dto;
 	}
 
@@ -64,7 +75,8 @@ public class BreadstagramService {
 			dto.setBreadStoreName(store.getEntrpNm());
 			dto.setLike(store.getLike());
 			return dto;
-		});
+		})
+		.switchIfEmpty(Mono.just(dto));
 	}
 
 	private BreadstagramListResponse returnResponse(List<BreadstagramListDto> list) {

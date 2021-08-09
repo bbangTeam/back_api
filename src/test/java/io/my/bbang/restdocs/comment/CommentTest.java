@@ -59,7 +59,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						parameterWithName("pageSize").description("페이지당 댓글 개수")
+						parameterWithName("pageSize").description("페이지당 댓글 개수 (default: 5)").optional()
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),

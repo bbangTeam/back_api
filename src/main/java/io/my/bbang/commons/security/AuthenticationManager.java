@@ -6,8 +6,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.my.bbang.commons.context.JwtContextHolder;
-import io.my.bbang.commons.exception.BbangException;
-import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,24 +22,21 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 		String jwt = authentication.getCredentials().toString();
 		
 		if ( jwt == null || !jwtUtil.verifyAccessToken(jwt) ) {
-			return Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION));
+			return Mono.empty();
 		}
 
 		String userId = jwtUtil.getUserIdByAccessToken(jwt);
 
 		return userService.findById(userId).map(user -> {
-			JwtContextHolder.getContext().map(context -> {
-				context.setUser(user);
-				return context;
-			});
+			JwtContextHolder.getContext().subscribe(context -> context.setUser(user));
 
-			return (Authentication) new UsernamePasswordAuthenticationToken(
-							user.getUsername(), 
-							user.getPassword(), 
-							user.getAuthorities());
+			return new UsernamePasswordAuthenticationToken(
+					user.getUsername(),
+					user.getPassword(),
+					user.getAuthorities());
 		})
-		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION)))
 		;
+
 	}
 
 }

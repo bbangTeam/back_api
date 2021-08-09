@@ -107,9 +107,11 @@ public class KakaoOauthService implements SocialOauthService {
                 WebClient.builder().baseUrl(kakaoProperties.getProfileUrl())
                         .build();
 
+        if (!accessToken.startsWith(BEARER)) accessToken = BEARER + accessToken;
+
         return webClient.post()
                 .uri(kakaoProperties.getProfileUri())
-                .header(AUTHORIZATION, BEARER + accessToken)
+                .header(AUTHORIZATION, accessToken)
                 .bodyValue(new KakaoProfileRequest())
                 .retrieve()
                 ;

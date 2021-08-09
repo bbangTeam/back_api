@@ -1,9 +1,11 @@
 package io.my.bbang.breadstagram.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -15,7 +17,12 @@ public class BreadstagramListDto {
 	private String breadStoreName;
 	private String breadName;
 	private String content;
+	private String nickname;
 	private Integer like;
+	private LocalDateTime createDate;
 	private List<String> imageUrlList;
 	private List<BreadstagramImageDto> imageList;
+
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	private String userId;
 }

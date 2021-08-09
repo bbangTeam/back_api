@@ -6,6 +6,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,6 +62,8 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 			dto.setContent("content" + UUID.randomUUID());
 			dto.setCityName("Seoul");
 			dto.setImageList(imageList);
+			dto.setCreateDate(LocalDateTime.now());
+			dto.setNickname("nickname" + i);
 			dto.setLike((int)((Math.random()*100000)));
 			
 			dto.setId("bread-stagram-id" + i);
@@ -71,13 +74,13 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
-						parameterWithName("pageSize").description("페이지당 게시글 개수")
+						parameterWithName("pageSize").description("페이지당 게시글 개수 (default: 5)").optional()
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),
-											parameterWithName("pageNum").description("페이지 번호").optional()
+						parameterWithName("pageNum").description("페이지 번호").optional()
 											.attributes(
-													RestDocAttributes.length(0), 
+													RestDocAttributes.length(0),
 													RestDocAttributes.format("Integer"))
 				);
 		
@@ -116,6 +119,14 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("Integer")),
+						fieldWithPath("breadstagramList.[].nickname").description("작성자 닉네임")
+										.attributes(
+												RestDocAttributes.length(0),
+												RestDocAttributes.format("String")),
+						fieldWithPath("breadstagramList.[].createDate").description("작성일")
+										.attributes(
+												RestDocAttributes.length(0),
+												RestDocAttributes.format("DateTime")),
 						fieldWithPath("breadstagramList.[].imageList.[].id").description("사진 id")
 											.attributes(
 													RestDocAttributes.length(0), 
