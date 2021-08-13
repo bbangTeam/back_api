@@ -6,7 +6,9 @@ import io.my.bbang.user.payload.response.UserLoginResponse;
 import io.my.bbang.user.service.oauth.OauthService;
 import io.my.bbang.user.service.oauth.SocialOauthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -32,12 +34,28 @@ public class OauthController {
     }
 
     @GetMapping("/callback/{socialLoginType}")
-    public Mono<UserLoginResponse> callback(
+    public Mono<ResponseEntity<Object>> callback(
             @PathVariable(name = "socialLoginType") String socialLoginType,
             @RequestParam(name = "code") String code,
             @RequestParam(name = "state", required = false) String state) {
 
-        return oauthService.requestAccessToken(SocialLoginType.findByName(socialLoginType), code, state);
+        return oauthService
+                .requestAccessToken(
+                        SocialLoginType.findByName(socialLoginType), code, state)
+                .flatMap(response -> {
+                    String accessToken = response.getAccessToken();
+                    String loginId = response.getLoginId();
+                    int resultCode = response.getCode();
+                    String result = response.getResult();
+
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.set("accessToken", accessToken);
+                    httpHeaders.set("loginId", loginId);
+                    httpHeaders.set("code", String.valueOf(resultCode));
+                    httpHeaders.set("result", result);
+
+                    return Mono.just(ResponseEntity.ok().headers(httpHeaders).build());
+                });
     }
 
     @PostMapping("/join/{socialLoginType}")

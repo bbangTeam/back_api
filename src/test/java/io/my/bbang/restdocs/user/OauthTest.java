@@ -1,5 +1,9 @@
 package io.my.bbang.restdocs.user;
 
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import io.my.bbang.user.payload.request.UserJoinRequest;
@@ -12,9 +16,6 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
-
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 class OauthTest extends RestDocsBaseWithSpringBoot {
 
@@ -68,6 +69,5 @@ class OauthTest extends RestDocsBaseWithSpringBoot {
                 .expectBody()
                 .consumeWith(createConsumer("/join", requestSnippet, responseSnippet));
     }
-
 
 }
