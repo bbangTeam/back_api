@@ -32,6 +32,7 @@ public class Store {
     
     private String storeId;
     private Integer like;
-    
+    private double star;
+
     private StoreMenu storeMenu;
 }

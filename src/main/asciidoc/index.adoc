@@ -336,15 +336,12 @@ include::{snippets}/breadstagramtest/like-delete/curl-request.adoc[]
 [[resources-breadstore-list]]
 ==== 주변 빵집 검색 API
 
-NOTE: API 명세서 준비 중입니다.
-
-// include::{snippets}/breadstoretest/map/storelist/request-headers.adoc[]
-// include::{snippets}/breadstoretest/map/storelist/request-fields.adoc[]
-// include::{snippets}/breadstoretest/map/storelist/response-fields.adoc[]
-// include::{snippets}/breadstoretest/map/storelist/http-request.adoc[]
-// include::{snippets}/breadstoretest/map/storelist/http-response.adoc[]
-// include::{snippets}/breadstoretest/map/storelist/curl-request.adoc[]
-
+include::{snippets}/breadstoretest/list/request-headers.adoc[]
+include::{snippets}/breadstoretest/list/request-parameters.adoc[]
+include::{snippets}/breadstoretest/list/response-fields.adoc[]
+include::{snippets}/breadstoretest/list/http-request.adoc[]
+include::{snippets}/breadstoretest/list/http-response.adoc[]
+include::{snippets}/breadstoretest/list/curl-request.adoc[]
 
 
 [[resources-comment-api]]

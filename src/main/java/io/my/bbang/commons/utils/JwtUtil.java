@@ -133,9 +133,5 @@ public class JwtUtil {
 				.getBody();
 	}
 
-//	public Claims parseJwtHeader(String jwt) {
-//		return Jwts.parser().parseClaimsJws(jwt).getHeader();
-//	}
-
 
 }

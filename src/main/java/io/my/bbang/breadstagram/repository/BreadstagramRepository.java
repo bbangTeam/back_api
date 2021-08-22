@@ -13,5 +13,6 @@ public interface BreadstagramRepository extends ReactiveCrudRepository<Breadstag
 
     Flux<Breadstagram> findByIdNotNull(Pageable pageable);
     Mono<Long> countAllByUserId(String userId);
+    Mono<Long> countAllByStoreId(String storeId);
 
 }
