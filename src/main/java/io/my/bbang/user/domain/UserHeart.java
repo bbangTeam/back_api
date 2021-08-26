@@ -16,13 +16,8 @@ public class UserHeart {
 
     @Id
     private String id;
-
     private String userId;
-    
-    // like_id => 현재는 store의 ID만 존재함.
-    private String heartId;
-
-    // 현재는 빵스타그램에만 좋아요 존재. - 빵스타그램의 좋아요는 store로 들어감.
+    private String parentId;
     private String type;
 
     public void setType(UserHeartType type) {
@@ -41,9 +36,9 @@ public class UserHeart {
         return build(userId, heartId, type.getValue());
     }
 
-    public static UserHeart build(String userId, String heartId, String type) {
+    public static UserHeart build(String userId, String parentId, String type) {
         UserHeart userHeart = new UserHeart();
-        userHeart.setHeartId(heartId);
+        userHeart.setParentId(parentId);
         userHeart.setType(type);
         userHeart.setUserId(userId);
         return userHeart;

@@ -20,6 +20,10 @@ public class Comment  extends BaseTimeEntity {
     private String nickname;
     private String content;
 
+    private long likeCount;
+    private long clickCount;
+    private long reCommentCount;
+
     private String type;
 
     public void setType(CommentType type) {
@@ -45,6 +49,7 @@ public class Comment  extends BaseTimeEntity {
         comment.setContent(content);
         comment.setNickname(nickname);
         comment.setType(type);
+
         return comment;
     }
 

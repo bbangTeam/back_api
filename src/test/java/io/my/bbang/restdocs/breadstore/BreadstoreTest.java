@@ -45,6 +45,7 @@ class BreadstoreTest extends RestDocsBaseWithSpringBoot {
             dto.setLoadAddr("서울 강남구 도곡로 405 삼환 아르누보2 1층 10" + index + "호");
             dto.setStar(index + 1.45);
             dto.setReviewCount(index * 100L);
+            dto.setLikeCount(index * 3);
             list.add(dto);
         }
         responseBody.setStoreList(list);
@@ -119,6 +120,10 @@ class BreadstoreTest extends RestDocsBaseWithSpringBoot {
                                         RestDocAttributes.length(0),
                                         RestDocAttributes.format("Double")),
                         fieldWithPath("storeList.[].reviewCount").description("빵스타그램 게시글 수")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("Integer")),
+                        fieldWithPath("storeList.[].likeCount").description("가게 좋아요 수")
                                 .attributes(
                                         RestDocAttributes.length(0),
                                         RestDocAttributes.format("Integer"))

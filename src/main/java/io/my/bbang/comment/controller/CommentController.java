@@ -34,13 +34,8 @@ public class CommentController {
 		String id = requestBody.getId();
 		String content = requestBody.getContent();
 		String type = requestBody.getType();
+		String parentId = requestBody.getParentId();
 		
-		return commentService.write(id, content, type);
+		return commentService.write(id, content, type, parentId);
 	}
-
-	@GetMapping(value="/count")
-	public Mono<CommentCountResponse> count(@RequestParam String id) {
-		return commentService.count(id);
-	}
-	
 }

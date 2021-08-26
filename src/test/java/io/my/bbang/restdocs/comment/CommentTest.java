@@ -8,6 +8,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 
 import java.util.UUID;
 
+import io.my.bbang.comment.dto.CommentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,23 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("commentList.[].content").description("댓글 내용")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("String")),
+						fieldWithPath("commentList.[].likeCount").description("좋아요 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
+						fieldWithPath("commentList.[].reCommentCount").description("대댓글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
+						fieldWithPath("commentList.[].clickCount").description("조회수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
+						fieldWithPath("commentList.[].like").description("좋아요 여부")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Boolean"))
 				);
 
 		String params = "?" +
@@ -114,14 +131,15 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 	void write() {
 		CommentWriteRequest requestBody = new CommentWriteRequest();
 		requestBody.setId("seoul001");
-		requestBody.setType("breadstagram");
+		requestBody.setType(CommentType.BREADSTAGRAM.getValue());
 		requestBody.setContent("맛있어보여요");
+		requestBody.setParentId("parendId");
 
 		CommentWriteResponse responseBody = new CommentWriteResponse();
 		responseBody.setResult("Success");
 		responseBody.setId(UUID.randomUUID().toString());
 
-		Mockito.when(commentService.write(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
+		Mockito.when(commentService.write(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
 		
 		RequestFieldsSnippet requestSnippet = 
 				requestFields(
@@ -136,7 +154,11 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("content").description("댓글 내용")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Integer"))
+													RestDocAttributes.format("Integer")),
+						fieldWithPath("parentId").description("부모글의 고유 번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String"))
 				);
 		
 		
@@ -160,51 +182,6 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
-	}
-
-	@Test
-	@DisplayName("REST Docs 댓글 갯수")
-	void count() {
-
-		CommentCountResponse responseBody = new CommentCountResponse();
-		responseBody.setCount(5);
-		responseBody.setResult("Success");
-
-		Mockito.when(commentService.count(Mockito.any())).thenReturn(Mono.just(responseBody));
-
-		RequestParametersSnippet requestSnippet =
-				requestParameters(
-						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
-				);
-		
-		
-		ResponseFieldsSnippet responseSnippet = 
-				responseFields(
-						fieldWithPath("result").description("결과")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("code").description("응답 코드")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer")),
-						fieldWithPath("count").description("댓글 갯수")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Integer"))
-				);
-
-		String params = "?" +
-				"id" +
-				"=" +
-				"comment-id-01";
-		getWebTestClient("/api/comment/count" + params).expectStatus()
-						.isOk()
-						.expectBody()
-						.consumeWith(createConsumer("/count", requestSnippet, responseSnippet));
 	}
 
 }

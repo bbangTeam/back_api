@@ -21,6 +21,7 @@ public class StoreListResponse extends BbangResponse {
         private String tel;         // telNo
         private String loadAddr;    // loadAddr
         private double star;
-        private Long reviewCount;
+        private long likeCount;
+        private long reviewCount;
     }
 }

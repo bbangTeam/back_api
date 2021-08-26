@@ -38,12 +38,6 @@ public class BreadstagramController {
 		return breadstagramService.write(requestBody);
 	}
 
-	@RequestMapping(value="/like", method = {RequestMethod.POST, RequestMethod.DELETE})
-	public Mono<BbangResponse> like(
-		@RequestParam String id, 
-		@RequestParam Boolean like) {
-		return breadstagramService.like(id, like);
-	}
-	
+
 	
 }

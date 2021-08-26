@@ -44,6 +44,10 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 			dto.setLatitude(37.555107 + (i / 1000d));
 			dto.setLongitude(126.970691 + (i / 1000d));
 
+			dto.setCommentCount((int)((Math.random()*100000)));
+			dto.setLikeCount((int)((Math.random()*100000)));
+			dto.setClickCount((int)((Math.random()*100000)));
+
 			List<Integer> bakeTimeList = new ArrayList<>();
 
 			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
@@ -116,12 +120,32 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.optional()
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
+													RestDocAttributes.format("String")),
+						fieldWithPath("storeList.[].commentCount").description("댓글 갯수")
+											.optional()
+											.attributes(
+													RestDocAttributes.length(0),
+													RestDocAttributes.format("Integer")),
+						fieldWithPath("storeList.[].likeCount").description("좋아요 갯수")
+											.optional()
+											.attributes(
+													RestDocAttributes.length(0),
+													RestDocAttributes.format("Integer")),
+						fieldWithPath("storeList.[].clickCount").description("조회수")
+											.optional()
+											.attributes(
+													RestDocAttributes.length(0),
+													RestDocAttributes.format("Integer")),
+						fieldWithPath("storeList.[].like").description("좋아요 여부")
+											.optional()
+											.attributes(
+													RestDocAttributes.length(0),
+													RestDocAttributes.format("Boolean")),
 						fieldWithPath("storeList.[].bakeTimeList.[]").description("빵 나오는 시간")
 											.optional()
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Integer")) 
+													RestDocAttributes.format("Integer"))
 				);
 
 		String params = "?" +

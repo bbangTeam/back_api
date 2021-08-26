@@ -64,7 +64,7 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@DisplayName("REST Docs 닉네임 변경 API 명세서")
 	void modifyNickname() {
 
-		Mockito.when(userService.modifyNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse("Success")));
+		Mockito.when(userService.modifyNickname(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
 
 		RequestParametersSnippet requestSnippet =
 		requestParameters(

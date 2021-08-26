@@ -13,6 +13,9 @@ public class Pilgrimage {
     @Id
     private String id;
     private String storeId;
+    private long commentCount;
+    private long likeCount;
+    private long clickCount;
 
     // common_code의 parent_code = 001 인 항목 참고
     private String pilgrimageAreaId;

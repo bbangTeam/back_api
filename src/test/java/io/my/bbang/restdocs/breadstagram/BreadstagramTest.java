@@ -26,7 +26,6 @@ import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
-import io.my.bbang.commons.payloads.BbangResponse;
 import reactor.core.publisher.Mono;
 
 class BreadstagramTest extends RestDocsBaseWithSpringBoot {
@@ -50,9 +49,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 			
 			for (int index=0; index< pageSize - 5; index++) {
 				BreadstagramImageDto image = new BreadstagramImageDto();
-				
 				image.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
-				image.setId(UUID.randomUUID().toString());
 				image.setNum(index);
 				imageList.add(image);
 			}
@@ -64,7 +61,11 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 			dto.setImageList(imageList);
 			dto.setCreateDate(LocalDateTime.now());
 			dto.setNickname("nickname" + i);
-			dto.setLike((int)((Math.random()*100000)));
+
+			dto.setLike(false);
+			dto.setLikeCount((int)((Math.random()*100000)));
+			dto.setCommentCount((int)((Math.random()*100000)));
+			dto.setClickCount((int)((Math.random()*100000)));
 			
 			dto.setId("bread-stagram-id" + i);
 			responseBody.getBreadstagramList().add(dto);
@@ -115,10 +116,22 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-						fieldWithPath("breadstagramList.[].like").description("좋아요")
+						fieldWithPath("breadstagramList.[].like").description("좋아요 여부")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Integer")),
+													RestDocAttributes.format("boolean")),
+						fieldWithPath("breadstagramList.[].likeCount").description("좋아요 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
+						fieldWithPath("breadstagramList.[].commentCount").description("댓글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
+						fieldWithPath("breadstagramList.[].clickCount").description("조회수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Integer")),
 						fieldWithPath("breadstagramList.[].nickname").description("작성자 닉네임")
 										.attributes(
 												RestDocAttributes.length(0),
@@ -127,15 +140,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 										.attributes(
 												RestDocAttributes.length(0),
 												RestDocAttributes.format("DateTime")),
-						fieldWithPath("breadstagramList.[].imageList.[].id").description("사진 id")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")),
 						fieldWithPath("breadstagramList.[].imageList.[].imageUrl").description("사진 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-
 						fieldWithPath("breadstagramList.[].imageList.[].num").description("사진 순서")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -174,13 +182,11 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 		requestBody.setBreadName("피자빵");
 		requestBody.setContent("피자빵!!!");
 		
-
 		List<BreadstagramImageDto> imageList = new ArrayList<>();
 
 		for (int index=0; index<(int)((Math.random()*10000)%10)+1; index++) {
 			BreadstagramImageDto dto = new BreadstagramImageDto();
 			dto.setImageUrl("https://t1.daumcdn.net/liveboard/dailylife/16886ca4df48462e911cfac9bf434434.JPG");
-			dto.setId(UUID.randomUUID().toString());
 			dto.setNum(index);
 			imageList.add(dto);
 		}
@@ -210,11 +216,6 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-						fieldWithPath("imageList.[].id").description("사진 고유번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-
 						fieldWithPath("imageList.[].imageUrl").description("사진 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -248,98 +249,4 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
 	}
 
-	@Test
-	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like_post() {
-		BbangResponse responseBody = new BbangResponse("Success");
-
-		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
-
-		RequestParametersSnippet requestSnippet =
-				requestParameters(
-						parameterWithName("like").description("좋아요")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Boolean"))
-											.description("무조건 true"), 
-						parameterWithName("id").description("store 고유 번호")
-						.attributes(
-								RestDocAttributes.length(0), 
-								RestDocAttributes.format("String"))
-				);
-		
-		
-		ResponseFieldsSnippet responseSnippet = 
-				responseFields(
-						fieldWithPath("result").description("결과")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("code").description("응답 코드")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer"))
-				);
-
-		String params = "?" +
-				"like" +
-				"=" +
-				"true" +
-				"&" +
-				"id" +
-				"=" +
-				"storeId";
-		postWebTestClient("/api/breadstagram/like" + params).expectStatus()
-						.isOk()
-						.expectBody()
-						.consumeWith(createConsumer("/like-post", requestSnippet, responseSnippet));
-	}
-
-	@Test
-	@DisplayName("REST Docs 빵스타그램 좋아요")
-	void like_delete() {
-		BbangResponse responseBody = new BbangResponse("Success");
-
-		Mockito.when(breadstagramService.like(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
-
-		RequestParametersSnippet requestSnippet =
-				requestParameters(
-						parameterWithName("like").description("좋아요")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("Boolean"))
-													.description("무조건 false"), 
-						parameterWithName("id").description("store 고유 번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
-				);
-		
-		
-		ResponseFieldsSnippet responseSnippet = 
-				responseFields(
-						fieldWithPath("result").description("결과")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("code").description("응답 코드")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer"))
-				);
-
-		String params = "?" +
-				"like" +
-				"=" +
-				"false" +
-				"&" +
-				"id" +
-				"=" +
-				"storeId";
-		deleteWebTestClient("/api/breadstagram/like" + params).expectStatus()
-						.isOk()
-						.expectBody()
-						.consumeWith(createConsumer("/like-delete", requestSnippet, responseSnippet));
-	}
-	
 }

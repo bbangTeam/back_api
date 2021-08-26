@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.my.bbang.commons.utils.JwtUtil;
+import io.my.bbang.user.domain.UserIdeal;
+import io.my.bbang.user.repository.UserIdealRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,11 +31,13 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class IdealService {
+	private final JwtUtil jwtUtil;
 	private final UserService userService;
 	private final IdealRepository idealRepository;
+	private final UserIdealRepository userIdealRepository;
 
 	public Mono<BbangResponse> done() {
-		return userService.findUserIdealByUserId().hasElement().map(bool -> {
+		return findUserIdealByUserId().hasElement().map(bool -> {
 			if (bool) {
 				return new BbangResponse(21, "Clear game!");
 			} else {
@@ -42,7 +47,7 @@ public class IdealService {
 	}
 	
 	public Mono<IdealContentResponse> content() {
-		return userService.findUserIdealByUserId().hasElement().flatMap(bool -> {
+		return findUserIdealByUserId().hasElement().flatMap(bool -> {
 			if (bool){
 				return Mono.just(returnResponse(21, "Clear game!"));
 			} else {
@@ -53,6 +58,10 @@ public class IdealService {
 				});
 			}
 		});
+	}
+
+	public Mono<UserIdeal> findUserIdealByUserId() {
+		return jwtUtil.getMonoUserId().flatMap(userIdealRepository::findByuserId);
 	}
 
 	private IdealContentResponse returnResponse(int code, String result) {

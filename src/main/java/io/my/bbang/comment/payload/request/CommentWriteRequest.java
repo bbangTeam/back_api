@@ -7,4 +7,5 @@ public class CommentWriteRequest {
 	private String id;
 	private String content;
 	private String type;
+	private String parentId;
 }

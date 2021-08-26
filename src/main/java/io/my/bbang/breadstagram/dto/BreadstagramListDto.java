@@ -18,7 +18,10 @@ public class BreadstagramListDto {
 	private String breadName;
 	private String content;
 	private String nickname;
-	private Integer like;
+	private boolean isLike;
+	private long commentCount;
+	private long likeCount;
+	private long clickCount;
 	private LocalDateTime createDate;
 	private List<String> imageUrlList;
 	private List<BreadstagramImageDto> imageList;

@@ -70,6 +70,63 @@ Bbang ;
 |===
 
 
+.CommentType
+[cols="1,3"]
+|===
+|Type|description
+
+|breadstagram
+|빵스타그램
+
+|pilgrimage
+|빵지 순례
+
+|reComment
+|대댓글
+
+|===
+
+
+.LikeType
+[cols="1,3"]
+|===
+|Type|description
+
+|store
+|빵집
+
+|breadstagram
+|빵스타그램
+
+|pilgrimage
+|빵지 순례
+
+|comment
+|댓글
+
+|===
+
+
+.ClickType
+[cols="1,3"]
+|===
+|Type|description
+
+|store
+|빵집
+
+|breadstagram
+|빵스타그램
+
+|pilgrimage
+|빵지 순례
+
+|comment
+|댓글
+
+|===
+
+
 [[resources-api]]
 == API
 

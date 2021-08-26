@@ -15,6 +15,10 @@ public class PilgrimageListDto {
 	private boolean clear;
 	private Double latitude;
 	private Double longitude;
+	private long commentCount;
+	private long likeCount;
+	private long clickCount;
+	private boolean isLike;
 	
 	// optional
 	private String imageUrl;

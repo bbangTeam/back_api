@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.my.bbang.breadstore.repository.StoreRepository;
+import io.my.bbang.code.repository.CodeRepository;
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.domain.PilgrimageBoard;
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
 import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
+import io.my.bbang.user.domain.UserHeart;
+import io.my.bbang.user.domain.UserPilgrimage;
+import io.my.bbang.user.dto.UserHeartType;
+import io.my.bbang.user.repository.UserHeartRepository;
+import io.my.bbang.user.repository.UserPilgrimageRepository;
 import io.my.bbang.user.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.breadstore.domain.Store;
-import io.my.bbang.breadstore.service.StoreService;
 import io.my.bbang.code.dto.ParentCode;
-import io.my.bbang.code.service.CodeService;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.pilgrimage.domain.Pilgrimage;
 import io.my.bbang.pilgrimage.dto.PilgrimageAreaListDto;
@@ -26,7 +31,6 @@ import io.my.bbang.pilgrimage.dto.PilgrimageListDto;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageAreaListResponse;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageListResponse;
 import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
-import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -35,13 +39,13 @@ import reactor.core.publisher.Mono;
 public class PilgrimageService {
 	private final JwtUtil jwtUtil;
 
+	private final CodeRepository codeRepository;
 	private final UserRepository userRepository;
+	private final StoreRepository storeRepository;
+	private final UserHeartRepository userHeartRepository;
 	private final PilgrimageRepository pilgrimageRepository;
+	private final UserPilgrimageRepository userPilgrimageRepository;
 	private final PilgrimageBoardRepository pilgrimageBoardRepository;
-
-	private final StoreService storeService;
-	private final UserService userService;
-	private final CodeService codeService;
 
 	public Mono<PilgrimageListResponse> list(String id, String option) {
 		PilgrimageListResponse responseBody = new PilgrimageListResponse();
@@ -56,7 +60,7 @@ public class PilgrimageService {
 			return flux.flatMap(entity -> findStore(dtoMap, entity))
 			.flatMap(entity -> {
 				PilgrimageListDto dto = returnPilgrimageListDto(dtoMap, entity, option);
-				return userService.findByUserPilgrimageId(dto.getPilgrimageId());
+				return findByUserPilgrimageId(dto.getPilgrimageId());
 			}).map(entity -> {
 				PilgrimageListDto dto = dtoMap.get(entity.getPilgrimageId());
 				dto.setClear(true);
@@ -64,9 +68,21 @@ public class PilgrimageService {
 				// 응답 값으로 불필요하므로, null 처리
 				dto.setPilgrimageId(null);
 				return dto;
+			})
+			.flatMap(dto -> {
+				UserHeart entity = new UserHeart();
+				entity.setUserId(responseBody.getUserId());
+				entity.setParentId(dto.getId());
+				entity.setType(UserHeartType.PILGRIMAGE.getValue());
+				return userHeartRepository.findByUserIdAndParentIdAndType(entity)
+						.map(e -> true)
+						.defaultIfEmpty(false)
+						.flatMap(bool -> {
+							dto.setLike(bool);
+							return Mono.just(dto);
+						});
 			}).collectList().map(list -> {
 				list = new ArrayList<>(dtoMap.values());
-				// 응답 값으로 불필요하므로, null 처리
 				responseBody.setUserId(null);
 				responseBody.setStoreList(list);
 				responseBody.setResult("Success");
@@ -80,7 +96,8 @@ public class PilgrimageService {
 		PilgrimageListDto dto = new PilgrimageListDto();
 		dtoMap.put(entity.getStoreId(), dto);
 		dto.setPilgrimageId(entity.getId());
-		return storeService.findOneStore(entity.getStoreId());
+		dto.setCommentCount(entity.getCommentCount());
+		return storeRepository.findById(entity.getStoreId());
 	}
 
 	private PilgrimageListDto returnPilgrimageListDto(Map<String, PilgrimageListDto> dtoMap, Store entity, String option) {
@@ -102,8 +119,13 @@ public class PilgrimageService {
 		return dto;
 	}
 
+	public Mono<UserPilgrimage> findByUserPilgrimageId(String pilgrimageId) {
+		return jwtUtil.getMonoUserId()
+				.flatMap(userId -> userPilgrimageRepository.findByUserIdAndPilgrimageId(userId, pilgrimageId));
+	}
+
 	public Mono<PilgrimageAreaListResponse> areaList() {
-		return codeService.findAllByParentCode(ParentCode.PILGRIMAGE_ADDRESS_CODE.getCode())
+		return codeRepository.findAllByCodes(ParentCode.PILGRIMAGE_ADDRESS_CODE.getCode())
 		.collectList()
 		.map(codeList -> {
 			PilgrimageAreaListResponse responseBody = new PilgrimageAreaListResponse();

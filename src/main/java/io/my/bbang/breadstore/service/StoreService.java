@@ -5,14 +5,13 @@ import io.my.bbang.breadstore.payload.resposne.StoreListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import io.my.bbang.breadstore.domain.Store;
 import io.my.bbang.breadstore.repository.StoreRepository;
 import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
-	
+
 	private final StoreRepository storeRepository;
 	private final BreadstagramRepository breadstagramRepository;
 
@@ -21,6 +20,8 @@ public class StoreService {
 			.map(store -> {
 				StoreListResponse.StoreList dto = new StoreListResponse.StoreList();
 				dto.setId(store.getId());
+				dto.setStar(store.getStar());
+				dto.setLikeCount(store.getLikeCount());
 				dto.setLongitude(store.getXposLo());
 				dto.setLatitude(store.getYposLa());
 				dto.setStoreName(store.getEntrpNm());
@@ -28,6 +29,7 @@ public class StoreService {
 				dto.setOpenHour(store.getBusinessHours());
 				dto.setTel(store.getTelNo());
 				dto.setLoadAddr(store.getLoadAddr());
+				dto.setReviewCount(store.getReviewCount());
 				dto.setStar(store.getStar() > 0 ? store.getStar() : 0.0);
 				return dto;
 			})
@@ -43,14 +45,6 @@ public class StoreService {
 				return responseBody;
 			})
 			;
-	}
-
-	public Mono<Store> findOneStore(String id) {
-		return storeRepository.findById(id);
-	}
-
-	public Mono<Store> save(Store store) {
-		return storeRepository.save(store);
 	}
 
 }

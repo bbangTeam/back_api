@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum UserHeartType {
-    STORE("store"), 
+    STORE("store"),
+    BREADSTAGRAM("breadstagram"),
+    PILGRIMAGE("pilgrimage"),
+    COMMENT("comment"),
     ;
     
-    private String value;
+    private final String value;
 
     private final static Map<String, UserHeartType> findTypeMap;
     static {
@@ -25,12 +28,19 @@ public enum UserHeartType {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public static UserHeartType getType(String type) {
         return findTypeMap.get(type);
     }
-    
+
+    public boolean isEqualsType(String type) {
+        return this.value.equals(type);
+    }
+
+    public static boolean isExistType(String type) {
+        for (UserHeartType userHeartType : UserHeartType.values()) {
+            if (userHeartType.isEqualsType(type)) return true;
+        }
+        return false;
+    }
+
 }

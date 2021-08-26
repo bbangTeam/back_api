@@ -14,4 +14,5 @@ public interface CommentRepository extends ReactiveCrudRepository<Comment, Strin
     Mono<Long> countByParentId(String id);
     Mono<Long> countByUserIdAndType(String id, String type);
     Mono<Long> countByuserId(String userId);
+    Mono<Long> countByTypeAndParentId(String parentId, String type);
 }

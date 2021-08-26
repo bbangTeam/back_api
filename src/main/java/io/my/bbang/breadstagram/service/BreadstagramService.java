@@ -3,14 +3,14 @@ package io.my.bbang.breadstagram.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import io.my.bbang.breadstore.domain.Store;
+import io.my.bbang.breadstore.repository.StoreRepository;
+import io.my.bbang.user.repository.UserHeartRepository;
 import io.my.bbang.user.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import io.my.bbang.breadstagram.domain.Breadstagram;
 import io.my.bbang.breadstagram.dto.BreadstagramListDto;
@@ -18,14 +18,11 @@ import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
 import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
-import io.my.bbang.breadstore.service.StoreService;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
-import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import io.my.bbang.user.domain.UserHeart;
 import io.my.bbang.user.dto.UserHeartType;
-import io.my.bbang.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -33,10 +30,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BreadstagramService {
 	private final BreadstagramRepository breadstagramRepository;
+	private final UserHeartRepository userHeartRepository;
 	private final UserRepository userRepository;
+	private final StoreRepository storeRepository;
 
-	private final StoreService storeService;
-	private final UserService userService;
 	private final JwtUtil jwtUtil;
 
 	public Mono<BreadstagramListResponse> list(int pageNum, int pageSize) {
@@ -67,16 +64,30 @@ public class BreadstagramService {
 		dto.setStoreId(entity.getStoreId());
 		dto.setUserId(entity.getUserId());
 		dto.setCreateDate(entity.getCreateDate());
+
+		dto.setCommentCount(entity.getCommentCount());
+		dto.setClickCount(entity.getClickCount());
+		dto.setLikeCount(entity.getLikeCount());
 		return dto;
 	}
 
 	private Mono<BreadstagramListDto> setStoreNameAndLikeCount(BreadstagramListDto dto) {
-		return storeService.findOneStore(dto.getStoreId()).map(store -> {
+		return storeRepository.findById(dto.getStoreId()).flatMap(store -> {
 			dto.setBreadStoreName(store.getEntrpNm());
-			dto.setLike(store.getLike());
-			return dto;
-		})
-		.switchIfEmpty(Mono.just(dto));
+
+			UserHeart userHeart = new UserHeart();
+			userHeart.setUserId(dto.getUserId());
+			userHeart.setType(UserHeartType.BREADSTAGRAM);
+			userHeart.setParentId(dto.getId());
+
+			return userHeartRepository.findByUserIdAndParentIdAndType(userHeart)
+					.map(heartEntity -> true)
+					.switchIfEmpty(Mono.just(false))
+					.flatMap(bool -> {
+						dto.setLike(bool);
+						return Mono.just(dto);
+					});
+		});
 	}
 
 	private BreadstagramListResponse returnResponse(List<BreadstagramListDto> list) {
@@ -109,6 +120,10 @@ public class BreadstagramService {
 		entity.setContent(content);
 		entity.setImageList(requestBody.getImageList());
 		entity.setCreateDate(LocalDateTime.now());
+
+		entity.setCommentCount(0L);
+		entity.setClickCount(0L);
+		entity.setLikeCount(0L);
 		return entity;
 	}
 
@@ -119,30 +134,6 @@ public class BreadstagramService {
 		return responseBody;
 	}
 
-	@Transactional
-	public Mono<BbangResponse> like(String id, Boolean like) {
-		return storeService.findOneStore(id)
-		.flatMap(store -> {
-			if (store.getLike() == null) store.setLike(0);
-			store.setLike(like ? store.getLike() + 1 : store.getLike() - 1);
-			return storeService.save(store);
-		})
-		.flatMap(store ->  returnBbangResponse(store, like))
-		;
-	}
-
-	private void changeUserHeart(Boolean like, UserHeart userHeart) {
-		if (like) userService.saveUserHeart(userHeart).subscribe();
-		else userService.deleteUserHeart(userHeart).subscribe();
-	}
-
-	private Mono<BbangResponse> returnBbangResponse(Store store, Boolean like) {
-		return jwtUtil.getMonoUserId().map(userId -> {
-			String storeId = store.getId();
-			changeUserHeart(like, UserHeart.build(userId, storeId, UserHeartType.STORE));
-			return new BbangResponse("Success");
-		});
-	}
 		
 
 }

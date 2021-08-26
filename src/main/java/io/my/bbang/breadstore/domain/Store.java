@@ -31,8 +31,13 @@ public class Store {
     private String naverThumbUrl;
     
     private String storeId;
-    private Integer like;
+
+    private long likeCount;
+    private long clickCount;
     private double star;
+    private long starCount;
+    private long starSum;
+    private long reviewCount;
 
     private StoreMenu storeMenu;
 }

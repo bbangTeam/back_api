@@ -1,11 +1,11 @@
 package io.my.bbang.user.controller;
 
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.user.dto.UserClickType;
+import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.payload.response.MyProfileResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.user.service.UserService;
@@ -29,7 +29,8 @@ public class UserController {
     @PatchMapping("/nickname")
     public Mono<BbangResponse> modifyNickname(
         @RequestParam String nickname) {
-        return userService.modifyNickname(nickname);
+        userService.modifyNickname(nickname);
+        return Mono.just(new BbangResponse());
     }
 
     @GetMapping("/my/profile")
@@ -37,5 +38,61 @@ public class UserController {
         return userService.getMyProfile();
     }
 
-    
+    @PostMapping("/click")
+    public Mono<BbangResponse> userClick(
+            @RequestParam("type") String type,
+            @RequestParam("id") String id) {
+        log.info("/api/breadstagram/userClick");
+
+        if (UserClickType.isExistType(type)) userService.click(id, type);
+        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+        return Mono.just(new BbangResponse());
+    }
+
+    @PostMapping("/like")
+    public Mono<BbangResponse> postUserLike(
+            @RequestParam("type") String type,
+            @RequestParam("id") String id) {
+        log.info("POST /api/breadstagram/userLike");
+
+        if (UserHeartType.isExistType(type)) userService.postLike(id, type);
+        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+        return Mono.just(new BbangResponse());
+    }
+
+    @DeleteMapping("/like")
+    public Mono<BbangResponse> deleteUserLike(
+            @RequestParam("type") String type,
+            @RequestParam("id") String id) {
+        log.info("DELETE /api/breadstagram/userLike");
+
+        if (UserHeartType.isExistType(type)) userService.deleteLike(id, type);
+        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+        return Mono.just(new BbangResponse());
+    }
+
+    @PostMapping("/star")
+    public Mono<BbangResponse> postUserStar(
+            @RequestParam("id") String id,
+            @RequestParam("type") String type,
+            @RequestParam("star") int star) {
+
+        if (UserHeartType.isExistType(type)) userService.postStar(id, type, star);
+        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+
+        return Mono.just(new BbangResponse());
+    }
+
+    @DeleteMapping("/star")
+    public Mono<BbangResponse> deleteUserStar(
+            @RequestParam("id") String id,
+            @RequestParam("type") String type,
+            @RequestParam("star") int star) {
+
+        if (UserHeartType.isExistType(type)) userService.deleteStar(id, type, star);
+        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+
+        return Mono.just(new BbangResponse());
+    }
+
 }

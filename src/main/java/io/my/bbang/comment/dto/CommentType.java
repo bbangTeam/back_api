@@ -8,7 +8,6 @@ public enum CommentType {
     RE_COMMENT("reComment"), 
     PILGRIMAGE("pilgrimage"), 
     STORE("store"), 
-
     ;
 
     private String value;
@@ -36,5 +35,9 @@ public enum CommentType {
     public static CommentType getType(String type) {
         return findTypeMap.get(type);
     }
-    
+
+    public boolean equalsType(String type) {
+        return this.value.equals(type);
+    }
+
 }

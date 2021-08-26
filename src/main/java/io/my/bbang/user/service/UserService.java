@@ -3,21 +3,20 @@ package io.my.bbang.user.service;
 import java.time.LocalDateTime;
 
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
+import io.my.bbang.breadstore.repository.StoreRepository;
 import io.my.bbang.comment.repository.CommentRepository;
+import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
+import io.my.bbang.user.domain.*;
+import io.my.bbang.user.dto.UserClickType;
+import io.my.bbang.user.dto.UserHeartType;
+import io.my.bbang.user.dto.UserStarType;
 import io.my.bbang.user.payload.response.MyProfileResponse;
 import io.my.bbang.user.payload.response.UserLoginResponse;
+import io.my.bbang.user.repository.*;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
-import io.my.bbang.user.domain.User;
-import io.my.bbang.user.domain.UserHeart;
-import io.my.bbang.user.domain.UserIdeal;
-import io.my.bbang.user.domain.UserPilgrimage;
-import io.my.bbang.user.repository.UserHeartRepository;
-import io.my.bbang.user.repository.UserIdealRepository;
-import io.my.bbang.user.repository.UserPilgrimageRepository;
-import io.my.bbang.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -28,12 +27,15 @@ import reactor.core.publisher.Mono;
 public class UserService {
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
+	private final UserStarRepository userStarRepository;
+	private final UserClickRepository userClickRepository;
 	private final UserHeartRepository userHeartRepository;
 	private final UserIdealRepository userIdealRepository;
-	private final UserPilgrimageRepository userPilgrimageRepository;
 
-	private final BreadstagramRepository breadstagramRepository;
+	private final StoreRepository storeRepository;
 	private final CommentRepository commentRepository;
+	private final PilgrimageRepository pilgrimageRepository;
+	private final BreadstagramRepository breadstagramRepository;
 
 	public Mono<BbangResponse> checkNickname(String nickname) {
 		return userRepository.findByNickname(nickname)
@@ -94,37 +96,6 @@ public class UserService {
 		return userRepository.findByEmail(email);
 	}
 
-	public Mono<UserHeart> saveUserHeart(UserHeart entity) {
-		return userHeartRepository.save(entity);
-	}
-
-	public Mono<Void> deleteUserHeart(UserHeart entity) {
-		return userHeartRepository.deleteAllByUserIdAndHeartIdAndType(
-			entity.getUserId(),
-			entity.getHeartId(), 
-			entity.getType());
-	}
-
-	public Mono<UserHeart> findUserLike(UserHeart entity) {
-		return userHeartRepository.findByUserIdAndHeartIdAndType(entity);
-	}
-
-	public Mono<UserPilgrimage> findByUserPilgrimageId(String pilgrimageId) {
-		return jwtUtil.getMonoUserId()
-		.flatMap(userId -> userPilgrimageRepository.findByUserIdAndPilgrimageId(userId, pilgrimageId));
-	}
-
-	public Mono<UserPilgrimage> saveUserPilgrimage(String pilgrimageId) {
-		UserPilgrimage entity = new UserPilgrimage();
-		entity.setPilgrimageId(pilgrimageId);
-
-		return jwtUtil.getMonoUserId()
-		.flatMap(userId -> {
-			entity.setUserId(userId);
-			return userPilgrimageRepository.save(entity);
-		});
-	}
-	
 	public Mono<UserIdeal> saveUserIdeal(String idealId) {
 		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			UserIdeal entity = new UserIdeal();
@@ -132,10 +103,6 @@ public class UserService {
 			entity.setUserId(userId);
 			return userIdealRepository.save(entity);
 		});
-	}
-
-	public Mono<UserIdeal> findUserIdealByUserId() {
-		return jwtUtil.getMonoUserId().flatMap(userIdealRepository::findByuserId);
 	}
 
 	public Mono<MyProfileResponse> getMyProfile() {
@@ -151,12 +118,6 @@ public class UserService {
 				})
 				.flatMap(user -> breadstagramRepository.countAllByUserId(responseBody.getUserId()))
 				.flatMap(count -> {
-//					responseBody.setPostCount(count);
-//					String userId = responseBody.getUserId();
-//					return commentRepository.countByUserIdAndType(userId, CommentType.PILGRIMAGE.getValue());
-					return Mono.just(0);
-				})
-				.flatMap(count -> {
 					responseBody.setPostCount(responseBody.getPostCount() + count);
 					String userId = responseBody.getUserId();
 					return commentRepository.countByuserId(userId);
@@ -171,6 +132,138 @@ public class UserService {
 					return responseBody;
 				})
 				;
+	}
+
+	public void click(String id, String type) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			UserClick entity = new UserClick();
+			entity.setUserId(userId);
+			entity.setType(type);
+			entity.setParentId(id);
+			userClickRepository.save(entity).subscribe();
+		})
+		;
+
+		if (UserClickType.BREADSTAGRAM.isEqualsType(type)) {
+			breadstagramRepository.findById(id).subscribe(entity -> {
+				entity.setClickCount(entity.getClickCount() + 1);
+				breadstagramRepository.save(entity).subscribe();
+			});
+		} else if (UserClickType.PILGRIMAGE.isEqualsType(type)) {
+			pilgrimageRepository.findById(id).subscribe(entity -> {
+				entity.setClickCount(entity.getClickCount());
+				pilgrimageRepository.save(entity).subscribe();
+			});
+		} else if (UserClickType.STORE.isEqualsType(type)) {
+			storeRepository.findById(id).subscribe(entity -> {
+				entity.setClickCount(entity.getClickCount() + 1);
+				storeRepository.save(entity).subscribe();
+			});
+		}
+	}
+
+	public void postLike(String id, String type) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			UserHeart entity = new UserHeart();
+			entity.setUserId(userId);
+			entity.setType(type);
+			entity.setParentId(id);
+			userHeartRepository.save(entity).subscribe();
+		})
+		;
+
+		if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
+			breadstagramRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() + 1);
+				breadstagramRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
+			pilgrimageRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() + 1);
+				pilgrimageRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.STORE.isEqualsType(type)) {
+			storeRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() + 1);
+				storeRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.COMMENT.isEqualsType(type)) {
+			commentRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() + 1);
+				commentRepository.save(entity).subscribe();
+			});
+		}
+	}
+
+	public void deleteLike(String id, String type) {
+		jwtUtil.getMonoUserId()
+				.subscribe(userId ->
+					userHeartRepository
+							.deleteByUserIdAndParentIdAndType(userId, id, type).subscribe())
+		;
+
+		if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
+			breadstagramRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() - 1);
+				breadstagramRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
+			pilgrimageRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() - 1);
+				pilgrimageRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.STORE.isEqualsType(type)) {
+			storeRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() - 1);
+				storeRepository.save(entity).subscribe();
+			});
+		} else if (UserHeartType.COMMENT.isEqualsType(type)) {
+			commentRepository.findById(id).subscribe(entity -> {
+				entity.setLikeCount(entity.getLikeCount() - 1);
+				commentRepository.save(entity).subscribe();
+			});
+		}
+	}
+
+	public void postStar(String id, String type, int star) {
+
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			UserStar entity = new UserStar();
+			entity.setUserId(userId);
+			entity.setType(type);
+			entity.setParentId(id);
+			entity.setStar(star);
+			userStarRepository.save(entity).subscribe();
+		});
+
+		if (UserStarType.STORE.isEqualsType(type)) {
+			storeRepository.findById(id).subscribe(entity -> {
+				entity.setStarCount(entity.getStarCount() + 1);
+				entity.setStarSum(entity.getStarSum() + star);
+				entity.setStar((double) entity.getStarSum() / entity.getStarCount());
+				storeRepository.save(entity).subscribe();
+			});
+		}
+	}
+
+	public void deleteStar(String id, String type, int star) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			UserStar entity = new UserStar();
+			entity.setType(type);
+			entity.setUserId(userId);
+			entity.setParentId(id);
+			entity.setStar(star);
+			userStarRepository.deleteByTypeAndUserIdAndParentId(entity).subscribe();
+		});
+
+		if (UserStarType.STORE.isEqualsType(type)) {
+			storeRepository.findById(id).subscribe(entity -> {
+				entity.setStarCount(entity.getStarCount() - 1);
+				entity.setStarSum(entity.getStarSum() - star);
+				entity.setStar((double) entity.getStarSum() / entity.getStarCount());
+				storeRepository.save(entity).subscribe();
+			});
+		}
 	}
 
 }

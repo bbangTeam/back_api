@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 @JsonInclude(value = Include.NON_NULL)
 public class BreadstagramImageDto {
-	private String id;
 	private Integer num;
 	private String imageUrl;
 
