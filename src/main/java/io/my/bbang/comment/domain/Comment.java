@@ -17,7 +17,6 @@ public class Comment  extends BaseTimeEntity {
     private String id;
     private String parentId;
     private String userId;
-    private String nickname;
     private String content;
 
     private long likeCount;
@@ -38,16 +37,15 @@ public class Comment  extends BaseTimeEntity {
         return type;
     }
 
-    public static Comment build(String parentId, String userId, String nickname, String content, CommentType type) {
-        return build(parentId, userId, nickname, content, type.getValue());
+    public static Comment build(String parentId, String userId, String content, CommentType type) {
+        return build(parentId, userId, content, type.getValue());
     }
 
-    public static Comment build(String parentId, String userId, String nickname, String content, String type) {
+    public static Comment build(String parentId, String userId, String content, String type) {
         Comment comment = new Comment();
         comment.setParentId(parentId);
         comment.setUserId(userId);
         comment.setContent(content);
-        comment.setNickname(nickname);
         comment.setType(type);
 
         return comment;

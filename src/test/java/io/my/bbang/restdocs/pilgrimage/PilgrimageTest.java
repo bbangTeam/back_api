@@ -9,9 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
-import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardListResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,15 +37,16 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 		
 		for (int i=0; i<15; i++) {
 			PilgrimageListDto dto = new PilgrimageListDto();
-			dto.setStoreName("bakery" + i);
 			dto.setId(UUID.randomUUID().toString());
+			dto.setStoreName("bakery" + i);
 			dto.setClear(i%2==0);
+			dto.setLike(i%2!=0);
 			dto.setLatitude(37.555107 + (i / 1000d));
 			dto.setLongitude(126.970691 + (i / 1000d));
 
-			dto.setCommentCount((int)((Math.random()*100000)));
-			dto.setLikeCount((int)((Math.random()*100000)));
-			dto.setClickCount((int)((Math.random()*100000)));
+			dto.setLikeCount((long)((Math.random()*100000)));
+			dto.setReviewCount((long)((Math.random()*100000)));
+			dto.setStar(3.6874);
 
 			List<Integer> bakeTimeList = new ArrayList<>();
 
@@ -55,28 +55,20 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 			dto.setBreadName("소보루");
 			dto.setBakeTimeList(bakeTimeList);
 
-			for (int j=8; j<20; j+=2) {
-				bakeTimeList.add(j);
-			}
+			for (int j=8; j<20; j+=2) bakeTimeList.add(j);
 
 			responseBody.getStoreList().add(dto);
 		}
 
-		Mockito.when(pilgrimageService.list(Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
+		Mockito.when(pilgrimageService.list(Mockito.any())).thenReturn(Mono.just(responseBody));
 
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("도시 고유번호")
 											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						parameterWithName("option").description("optional 포함 여부 - 기본 값: none").optional()
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
-				);
-		
-		
+													RestDocAttributes.length(0),
+													RestDocAttributes.format("String")));
+
 		ResponseFieldsSnippet responseSnippet = 
 				responseFields(
 						fieldWithPath("result").description("결과")
@@ -91,6 +83,10 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
+						fieldWithPath("storeList.[].star").description("평점")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("double")),
 						fieldWithPath("storeList.[].storeName").description("빵집 이름")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -121,17 +117,12 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
-						fieldWithPath("storeList.[].commentCount").description("댓글 갯수")
+						fieldWithPath("storeList.[].reviewCount").description("빵스타그램 게시글 갯수")
 											.optional()
 											.attributes(
 													RestDocAttributes.length(0),
 													RestDocAttributes.format("Integer")),
 						fieldWithPath("storeList.[].likeCount").description("좋아요 갯수")
-											.optional()
-											.attributes(
-													RestDocAttributes.length(0),
-													RestDocAttributes.format("Integer")),
-						fieldWithPath("storeList.[].clickCount").description("조회수")
 											.optional()
 											.attributes(
 													RestDocAttributes.length(0),
@@ -151,11 +142,7 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 		String params = "?" +
 				"id" +
 				"=" +
-				"seoul001" +
-				"&" +
-				"option" +
-				"=" +
-				"all";
+				"seoul001";
 		getWebTestClient("/api/pilgrimage/list" + params).expectStatus()
 						.isOk()
 						.expectBody()
@@ -205,16 +192,12 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 	}
 
 	@Test
-	@DisplayName("REST Docs 빵지순례 글쓰기")
-	void boardWrite() {
-		BbangResponse responseBody = new BbangResponse();
-
-		Mockito.when(pilgrimageService.boardWrite(Mockito.any())).thenReturn(Mono.just(responseBody));
-
+	@DisplayName("REST Docs 빵지순례 리뷰")
+	void board() {
 		PilgrimageWriteRequest requestBody = new PilgrimageWriteRequest();
-		requestBody.setContent("content");
-		requestBody.setStoreName("빵터짐 1호점");
 		requestBody.setStoreId("storeId_01ff0d");
+		requestBody.setContent("content content content");
+		requestBody.setTitle("title title title");
 
 		RequestFieldsSnippet requestSnippet =
 				requestFields(
@@ -222,11 +205,11 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("String")),
-						fieldWithPath("content").description("내용")
+						fieldWithPath("title").description("제목")
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("String")),
-						fieldWithPath("storeName").description("빵집 이름")
+						fieldWithPath("content").description("내용")
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("String"))
@@ -251,53 +234,17 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 	}
 
 	@Test
-	@DisplayName("REST Docs 빵지순례 글목록 조회")
-	void boardList() {
-		PilgrimageBoardList responseBody = new PilgrimageBoardList();
-		List<PilgrimageBoardList.Board> boardList = new ArrayList<>();
-		responseBody.setBoardList(boardList);
-
-		for(int index=0; index<3; index++) {
-			PilgrimageBoardList.Board board = new PilgrimageBoardList.Board();
-			board.setCreateDate(LocalDateTime.now());
-			board.setNickname("nickname");
-			board.setStoreName("storeName");
-			board.setContent("content");
-			boardList.add(board);
-		}
-
-		Mockito.when(pilgrimageService.boardList(Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
-
+	@DisplayName("REST Docs 빵지순례 방문")
+	void visit() {
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
-						parameterWithName("pageNum").description("페이지 번호").optional()
+						parameterWithName("id").description("빵지순례 고유 번호")
 								.attributes(
 										RestDocAttributes.length(0),
-										RestDocAttributes.format("int")),
-						parameterWithName("pageSize").description("페이지당 글 갯수(default: 5)").optional()
-								.attributes(
-										RestDocAttributes.length(0),
-										RestDocAttributes.format("int"))
-				);
+										RestDocAttributes.format("String")));
 
 		ResponseFieldsSnippet responseSnippet =
 				responseFields(
-						fieldWithPath("boardList.[].content").description("내용")
-								.attributes(
-										RestDocAttributes.length(0),
-										RestDocAttributes.format("String")),
-						fieldWithPath("boardList.[].storeName").description("가게이름")
-								.attributes(
-										RestDocAttributes.length(0),
-										RestDocAttributes.format("String")),
-						fieldWithPath("boardList.[].nickname").description("작성자 닉네임")
-								.attributes(
-										RestDocAttributes.length(0),
-										RestDocAttributes.format("String")),
-						fieldWithPath("boardList.[].createDate").description("글 등록일")
-								.attributes(
-										RestDocAttributes.length(0),
-										RestDocAttributes.format("date")),
 						fieldWithPath("result").description("결과")
 								.attributes(
 										RestDocAttributes.length(0),
@@ -308,12 +255,115 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 										RestDocAttributes.format("integer"))
 				);
 
-		String params = "?pageNum=0&pageSize=3";
+		String params = "?" +
+				"id" +
+				"=" +
+				"pilgrimageId01";
+
+		postWebTestClient("/api/pilgrimage/visit" + params).expectStatus()
+				.isOk()
+				.expectBody()
+				.consumeWith(createConsumer("/visit", requestSnippet, responseSnippet));
+	}
+
+	@Test
+	@DisplayName("REST Docs 빵지순례 리뷰 목록 API")
+	void boardList() {
+
+		PilgrimageBoardListResponse responseBody = new PilgrimageBoardListResponse();
+		List<PilgrimageBoardListResponse.Board> list = new ArrayList<>();
+		for (int i=0; i<5; i++) {
+			PilgrimageBoardListResponse.Board board = new PilgrimageBoardListResponse.Board();
+			board.setNickname("nickname" + i);
+			board.setModifyDate(LocalDateTime.now());
+			board.setCreateDate(LocalDateTime.now());
+			board.setTitle("title" + i);
+			board.setCommentCount(i * 201);
+			board.setStoreName("storeName" + i);
+			board.setStoreId("storeId0124128");
+			board.setId("boardId9241432");
+			board.setContent("board content content content");
+			list.add(board);
+		}
+		responseBody.setBoardList(list);
+
+		Mockito.when(pilgrimageService.boardList(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(Mono.just(responseBody));
+
+		RequestParametersSnippet requestSnippet =
+				requestParameters(
+						parameterWithName("id").description("도시 고유번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						parameterWithName("pageSize").description("페이지당 게시글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						parameterWithName("pageNum").description("페이지 번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")));
+
+		ResponseFieldsSnippet responseSnippet =
+				responseFields(
+						fieldWithPath("result").description("결과")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("boardList.[].id").description("게시글 고유번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].title").description("게시글 제목")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].content").description("게시글 내용")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].storeId").description("가게 고유 번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].storeName").description("가게명")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].nickname").description("작성자")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("boardList.[].commentCount").description("댓글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("boardList.[].createDate").description("작성일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("date")),
+						fieldWithPath("boardList.[].modifyDate").description("수정일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("date"))
+				);
+		String id = "storeId041341234";
+		int pageSize = 5;
+		int pageNum = 0;
+
+		String params =
+				"?id=" + id +
+				"&pageSize=" + pageSize +
+				"&pageNum=" + pageNum;
+
 
 		getWebTestClient("/api/pilgrimage/board/list" + params).expectStatus()
 				.isOk()
 				.expectBody()
-				.consumeWith(createConsumer("/board/list", requestSnippet, responseSnippet));
+				.consumeWith(createConsumer("/boardList", requestSnippet, responseSnippet));
 	}
-	
 }

@@ -10,8 +10,8 @@ public class BreadstagramWriteRequest {
 	private String id;
 	private String cityName;
 	private String storeName;
-	private String breadName;
 	private String content;
+	private List<String> breadNameList;
 	private List<BreadstagramImageDto> imageList;
 
 }

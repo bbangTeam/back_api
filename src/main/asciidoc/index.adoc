@@ -70,7 +70,7 @@ Bbang ;
 |===
 
 
-.CommentType
+.댓글 타입(comment)
 [cols="1,3"]
 |===
 |Type|description
@@ -87,7 +87,7 @@ Bbang ;
 |===
 
 
-.LikeType
+.좋아요 타입(like)
 [cols="1,3"]
 |===
 |Type|description
@@ -107,7 +107,7 @@ Bbang ;
 |===
 
 
-.ClickType
+.조회수 타입(click)
 [cols="1,3"]
 |===
 |Type|description
@@ -118,11 +118,19 @@ Bbang ;
 |breadstagram
 |빵스타그램
 
+|===
+
+
+.평점 타입(star)
+[cols="1,3"]
+|===
+|Type|description
+
+|store
+|빵집
+
 |pilgrimage
 |빵지 순례
-
-|comment
-|댓글
 
 |===
 
@@ -173,9 +181,7 @@ include::{snippets}/oauthtest/join/curl-request.adoc[]
 [[resources-user-login]]
 ==== 로그인 API
 
-NOTE: 로그인 방식이 소셜 로그인으로 변경되었으며, 현재 세부로직 수정중입니다.
-
-.login
+.uri
 [cols="2,2"]
 |===
 |소셜로그인|uri
@@ -191,6 +197,28 @@ NOTE: 로그인 방식이 소셜 로그인으로 변경되었으며, 현재 세�
 
 |===
 
+.responseHeader
+[cols="2,2"]
+|===
+|key|description
+
+|code
+|결과 (0: 로그인 성공 - 1인 경우, 회원가입 필요)
+
+|result
+|결과
+
+|accessToken
+|로그인 성공시, 서비스 토큰(jwt) 실패시 회원 가입에 필요한 토큰
+
+|loginId
+|로그인 아이디
+
+
+|===
+
+
+
 
 [[resources-set-api]]
 === 사용자 설정
@@ -200,7 +228,6 @@ NOTE: 로그인 방식이 소셜 로그인으로 변경되었으며, 현재 세�
 [[resources-user-check-nickname]]
 ==== 닉네임 중복 확인 API
 
-include::{snippets}/usertest/check-nickname/request-headers.adoc[]
 include::{snippets}/usertest/check-nickname/request-parameters.adoc[]
 include::{snippets}/usertest/check-nickname/response-fields.adoc[]
 include::{snippets}/usertest/check-nickname/http-request.adoc[]
@@ -220,6 +247,70 @@ include::{snippets}/usertest/modify-nickname/http-response.adoc[]
 include::{snippets}/usertest/modify-nickname/curl-request.adoc[]
 
 
+[[resources-user-api]]
+=== 사용자
+
+
+
+[[resources-user-click]]
+==== 조회수 추가
+
+include::{snippets}/usertest/click/request-headers.adoc[]
+include::{snippets}/usertest/click/request-parameters.adoc[]
+include::{snippets}/usertest/click/response-fields.adoc[]
+include::{snippets}/usertest/click/http-request.adoc[]
+include::{snippets}/usertest/click/http-response.adoc[]
+include::{snippets}/usertest/click/curl-request.adoc[]
+
+
+
+[[resources-user-like]]
+==== 좋아요 추가
+
+include::{snippets}/usertest/like/request-headers.adoc[]
+include::{snippets}/usertest/like/request-parameters.adoc[]
+include::{snippets}/usertest/like/response-fields.adoc[]
+include::{snippets}/usertest/like/http-request.adoc[]
+include::{snippets}/usertest/like/http-response.adoc[]
+include::{snippets}/usertest/like/curl-request.adoc[]
+
+
+
+[[resources-user-like-delete]]
+==== 좋아요 삭제
+
+include::{snippets}/usertest/delete-like/request-headers.adoc[]
+include::{snippets}/usertest/delete-like/request-parameters.adoc[]
+include::{snippets}/usertest/delete-like/response-fields.adoc[]
+include::{snippets}/usertest/delete-like/http-request.adoc[]
+include::{snippets}/usertest/delete-like/http-response.adoc[]
+include::{snippets}/usertest/delete-like/curl-request.adoc[]
+
+
+
+[[resources-user-star]]
+==== 별점 추가 / 수정
+
+include::{snippets}/usertest/star/request-headers.adoc[]
+include::{snippets}/usertest/star/request-parameters.adoc[]
+include::{snippets}/usertest/star/response-fields.adoc[]
+include::{snippets}/usertest/star/http-request.adoc[]
+include::{snippets}/usertest/star/http-response.adoc[]
+include::{snippets}/usertest/star/curl-request.adoc[]
+
+
+
+[[resources-user-star-delete]]
+==== 별점 삭제
+
+include::{snippets}/usertest/delete-star/request-headers.adoc[]
+include::{snippets}/usertest/delete-star/request-parameters.adoc[]
+include::{snippets}/usertest/delete-star/response-fields.adoc[]
+include::{snippets}/usertest/delete-star/http-request.adoc[]
+include::{snippets}/usertest/delete-star/http-response.adoc[]
+include::{snippets}/usertest/delete-star/curl-request.adoc[]
+
+
 
 [[resources-ideal-api]]
 === 빵드컵
@@ -237,7 +328,7 @@ include::{snippets}/idealtest/done/curl-request.adoc[]
 
 
 
-[[resources-ideal-content]]
+[[resources-ideal]]
 ==== 빵드컵 API
 
 include::{snippets}/idealtest/content/request-headers.adoc[]
@@ -301,7 +392,7 @@ include::{snippets}/pilgrimagetest/arealist/curl-request.adoc[]
 
 
 [[resources-pilgrimage-boardWrite]]
-==== 빵지순례 글쓰기 API
+==== 빵지순례 리뷰쓰기 API
 
 include::{snippets}/pilgrimagetest/board/request-headers.adoc[]
 include::{snippets}/pilgrimagetest/board/request-fields.adoc[]
@@ -314,14 +405,27 @@ include::{snippets}/pilgrimagetest/board/curl-request.adoc[]
 
 
 [[resources-pilgrimage-boardList]]
-==== 빵지순례 글 목록 API
+==== 빵지순례 리뷰목록 API
 
-include::{snippets}/pilgrimagetest/board/list/request-headers.adoc[]
-include::{snippets}/pilgrimagetest/board/list/request-parameters.adoc[]
-include::{snippets}/pilgrimagetest/board/list/response-fields.adoc[]
-include::{snippets}/pilgrimagetest/board/list/http-request.adoc[]
-include::{snippets}/pilgrimagetest/board/list/http-response.adoc[]
-include::{snippets}/pilgrimagetest/board/list/curl-request.adoc[]
+include::{snippets}/pilgrimagetest/boardList/request-headers.adoc[]
+include::{snippets}/pilgrimagetest/boardList/request-parameters.adoc[]
+include::{snippets}/pilgrimagetest/boardList/response-fields.adoc[]
+include::{snippets}/pilgrimagetest/boardList/http-request.adoc[]
+include::{snippets}/pilgrimagetest/boardList/http-response.adoc[]
+include::{snippets}/pilgrimagetest/boardList/curl-request.adoc[]
+
+
+
+
+[[resources-pilgrimage-visit]]
+==== 빵지순례 방문 API
+
+include::{snippets}/pilgrimagetest/visit/request-headers.adoc[]
+include::{snippets}/pilgrimagetest/visit/request-parameters.adoc[]
+include::{snippets}/pilgrimagetest/visit/response-fields.adoc[]
+include::{snippets}/pilgrimagetest/visit/http-request.adoc[]
+include::{snippets}/pilgrimagetest/visit/http-response.adoc[]
+include::{snippets}/pilgrimagetest/visit/curl-request.adoc[]
 
 
 
@@ -342,13 +446,6 @@ include::{snippets}/breadstagramtest/list/http-response.adoc[]
 include::{snippets}/breadstagramtest/list/curl-request.adoc[]
 
 
-
-[[resources-breadstagram-view]]
-==== 빵스타그램 상세 조회 API
-
-NOTE: 06.27일자로 삭제된 API 입니다.
-
-
 [[resources-breadstagram-write]]
 ==== 빵스타그램 글쓰기 API
 
@@ -358,30 +455,6 @@ include::{snippets}/breadstagramtest/write/response-fields.adoc[]
 include::{snippets}/breadstagramtest/write/http-request.adoc[]
 include::{snippets}/breadstagramtest/write/http-response.adoc[]
 include::{snippets}/breadstagramtest/write/curl-request.adoc[]
-
-
-
-[[resources-breadstagram-like-post]]
-==== 빵스타그램 좋아요 API
-
-include::{snippets}/breadstagramtest/like-post/request-headers.adoc[]
-include::{snippets}/breadstagramtest/like-post/request-parameters.adoc[]
-include::{snippets}/breadstagramtest/like-post/response-fields.adoc[]
-include::{snippets}/breadstagramtest/like-post/http-request.adoc[]
-include::{snippets}/breadstagramtest/like-post/http-response.adoc[]
-include::{snippets}/breadstagramtest/like-post/curl-request.adoc[]
-
-
-
-[[resources-breadstagram-like-delete]]
-==== 빵스타그램 좋아요 취소 API
-
-include::{snippets}/breadstagramtest/like-delete/request-headers.adoc[]
-include::{snippets}/breadstagramtest/like-delete/request-parameters.adoc[]
-include::{snippets}/breadstagramtest/like-delete/response-fields.adoc[]
-include::{snippets}/breadstagramtest/like-delete/http-request.adoc[]
-include::{snippets}/breadstagramtest/like-delete/http-response.adoc[]
-include::{snippets}/breadstagramtest/like-delete/curl-request.adoc[]
 
 
 
@@ -430,53 +503,12 @@ include::{snippets}/commenttest/write/curl-request.adoc[]
 
 
 
-[[resources-comment-count]]
-==== 댓글 갯수 확인 API
+[[resources-comment-delete]]
+==== 댓글 삭제 API
 
-include::{snippets}/commenttest/count/request-headers.adoc[]
-include::{snippets}/commenttest/count/request-parameters.adoc[]
-include::{snippets}/commenttest/count/response-fields.adoc[]
-include::{snippets}/commenttest/count/http-request.adoc[]
-include::{snippets}/commenttest/count/http-response.adoc[]
-include::{snippets}/commenttest/count/curl-request.adoc[]
-
-
-
-[[resources-set-api]]
-=== 사진
-
-
-
-[[resources-image-upload]]
-==== 이미지 업로드 API
-
-include::{snippets}/imagetest/upload/request-headers.adoc[]
-
-.RequestParameters
-[cols="2,1,1,1,4"]
-|===
-|Name|Length|Format|Optional|Description
-
-|file
-|0
-|file
-|
-|업로드할 파일
-
-|===
-include::{snippets}/imagetest/upload/response-fields.adoc[]
-include::{snippets}/imagetest/upload/http-request.adoc[]
-include::{snippets}/imagetest/upload/http-response.adoc[]
-include::{snippets}/imagetest/upload/curl-request.adoc[]
-
-
-
-[[resources-image-delete]]
-==== 이미지 삭제 API
-
-include::{snippets}/imagetest/delete/request-headers.adoc[]
-include::{snippets}/imagetest/delete/request-parameters.adoc[]
-include::{snippets}/imagetest/delete/response-fields.adoc[]
-include::{snippets}/imagetest/delete/http-request.adoc[]
-include::{snippets}/imagetest/delete/http-response.adoc[]
-include::{snippets}/imagetest/delete/curl-request.adoc[]
+include::{snippets}/commenttest/delete/request-headers.adoc[]
+include::{snippets}/commenttest/delete/request-parameters.adoc[]
+include::{snippets}/commenttest/delete/response-fields.adoc[]
+include::{snippets}/commenttest/delete/http-request.adoc[]
+include::{snippets}/commenttest/delete/http-response.adoc[]
+include::{snippets}/commenttest/delete/curl-request.adoc[]

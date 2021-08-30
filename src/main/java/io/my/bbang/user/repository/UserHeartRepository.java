@@ -8,8 +8,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface UserHeartRepository extends ReactiveCrudRepository<UserHeart, String> {
-    Mono<Void> deleteAllByUserIdAndParentIdAndType(String userId, String heartId, String type);
-    Mono<UserHeart> findByUserIdAndParentIdAndType(UserHeart entity);
+    Mono<UserHeart> findByUserIdAndParentIdAndType(String userId, String parentId, String type);
     Mono<Long> countByUserId(String userId);
     Mono<Void> deleteByUserIdAndParentIdAndType(String userId, String parentId, String type);
 }

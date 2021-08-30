@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface UserStarRepository extends ReactiveCrudRepository<UserStar, String> {
-    Mono<Void> deleteByTypeAndUserIdAndParentId(UserStar entity);
+    Mono<Void> deleteByTypeAndUserIdAndParentId(String type, String userId, String parentId);
+    Mono<UserStar> findByTypeAndUserIdAndParentId(String type, String userId, String parentId);
 }

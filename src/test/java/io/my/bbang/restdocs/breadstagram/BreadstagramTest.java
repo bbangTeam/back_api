@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,10 +28,6 @@ import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import reactor.core.publisher.Mono;
 
 class BreadstagramTest extends RestDocsBaseWithSpringBoot {
-	
-	@BeforeEach
-	void setUp() {
-	}
 
 	@Test
 	@DisplayName("REST Docs 빵스타그램 목록")
@@ -53,14 +48,19 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 				image.setNum(index);
 				imageList.add(image);
 			}
-			
-			dto.setBreadName("bread" + i);
+			List<String> breadNameList = new ArrayList<>();
+			breadNameList.add("소보루");
+			breadNameList.add("바게트");
+
+			dto.setBreadNameList(breadNameList);
 			dto.setBreadStoreName("breadStore" + i);
 			dto.setContent("content" + UUID.randomUUID());
 			dto.setCityName("Seoul");
 			dto.setImageList(imageList);
 			dto.setCreateDate(LocalDateTime.now());
+			dto.setModifyDate(LocalDateTime.now());
 			dto.setNickname("nickname" + i);
+			dto.setStar(3.0);
 
 			dto.setLike(false);
 			dto.setLikeCount((int)((Math.random()*100000)));
@@ -108,7 +108,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						fieldWithPath("breadstagramList.[].breadName").description("먹은 빵")
+						fieldWithPath("breadstagramList.[].breadNameList.[]").description("먹은 빵 목록")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
@@ -132,6 +132,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("Integer")),
+						fieldWithPath("breadstagramList.[].star").description("가게 평점")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("Double")),
 						fieldWithPath("breadstagramList.[].nickname").description("작성자 닉네임")
 										.attributes(
 												RestDocAttributes.length(0),
@@ -140,6 +144,10 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 										.attributes(
 												RestDocAttributes.length(0),
 												RestDocAttributes.format("DateTime")),
+						fieldWithPath("breadstagramList.[].modifyDate").description("수정일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("DateTime")),
 						fieldWithPath("breadstagramList.[].imageList.[].imageUrl").description("사진 경로")
 											.attributes(
 													RestDocAttributes.length(0), 
@@ -176,10 +184,14 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 		Mockito.when(breadstagramService.write(Mockito.any())).thenReturn(Mono.just(responseBody));
 
 		BreadstagramWriteRequest requestBody = new BreadstagramWriteRequest();
+		List<String> breadList = new ArrayList<>();
+		breadList.add("소보루");
+		breadList.add("바게트");
+
 		requestBody.setId("id");
 		requestBody.setCityName("서울");
 		requestBody.setStoreName("빵터짐");
-		requestBody.setBreadName("피자빵");
+		requestBody.setBreadNameList(breadList);
 		requestBody.setContent("피자빵!!!");
 		
 		List<BreadstagramImageDto> imageList = new ArrayList<>();
@@ -208,7 +220,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")), 
-						fieldWithPath("breadName").description("먹은 빵")
+						fieldWithPath("breadNameList.[]").description("먹은 빵 목록")
 											.attributes(
 													RestDocAttributes.length(0), 
 													RestDocAttributes.format("String")),
@@ -243,7 +255,7 @@ class BreadstagramTest extends RestDocsBaseWithSpringBoot {
 													RestDocAttributes.format("String"))
 				);
 		
-		postWebTestClient(requestBody, "/api/breadstagram/write").expectStatus()
+		postWebTestClient(requestBody, "/api/breadstagram").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));

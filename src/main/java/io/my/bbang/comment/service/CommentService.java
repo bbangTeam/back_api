@@ -1,11 +1,11 @@
 package io.my.bbang.comment.service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.comment.dto.CommentType;
-import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
-import io.my.bbang.user.domain.UserHeart;
+import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.repository.UserHeartRepository;
 import io.my.bbang.user.repository.UserRepository;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import io.my.bbang.comment.domain.Comment;
 import io.my.bbang.comment.dto.CommentListDto;
 import io.my.bbang.comment.payload.response.CommentListResponse;
-import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.comment.repository.CommentRepository;
 import io.my.bbang.commons.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,7 @@ public class CommentService {
 
 	private final UserRepository userRepository;
 	private final UserHeartRepository userHeartRepository;
-	private final PilgrimageRepository pilgrimageRepository;
+	private final PilgrimageBoardRepository pilgrimageBoardRepository;
 	private final BreadstagramRepository breadstagramRepository;
 
 	private final JwtUtil jwtUtil;
@@ -41,26 +40,29 @@ public class CommentService {
 		
 		return commentRepository.findByParentId(id, pageable)
 		.flatMap(this::returnDto).collectList()
-		.map(this::returnResponse);
+		.map(list -> {
+			list.sort(Comparator.comparing(CommentListDto::getCreateDate).reversed());
+			return returnResponse(list);
+		});
 	}
 
 	private Mono<CommentListDto> returnDto(Comment entity) {
 		CommentListDto dto = new CommentListDto();
 		dto.setContent(entity.getContent());
-		dto.setNickname(entity.getNickname());
 		dto.setLikeCount(entity.getLikeCount());
 		dto.setReCommentCount(entity.getReCommentCount());
 		dto.setClickCount(entity.getClickCount());
+		dto.setCreateDate(entity.getCreateDate());
+		dto.setModifyDate(entity.getModifyDate());
 
-		return jwtUtil.getMonoUserId().flatMap(userId -> {
-			UserHeart userHeart = new UserHeart();
-			userHeart.setUserId(userId);
-			userHeart.setParentId(entity.getParentId());
-			userHeart.setType(UserHeartType.COMMENT.getValue());
-			return userHeartRepository.findByUserIdAndParentIdAndType(userHeart);
+		return userRepository.findById(entity.getUserId()).flatMap(user -> {
+			dto.setNickname(user.getNickname());
+			return userHeartRepository.findByUserIdAndParentIdAndType(
+					user.getId(), entity.getParentId(), UserHeartType.COMMENT.getValue())
+					.switchIfEmpty(Mono.empty());
 		})
 		.flatMap(userHeart -> Mono.just(true))
-		.defaultIfEmpty(false)
+		.switchIfEmpty(Mono.just(false))
 		.map(bool -> {
 			dto.setLike(bool);
 			return dto;
@@ -74,13 +76,14 @@ public class CommentService {
 		return responseBody;
 	}
 	
-	public Mono<CommentWriteResponse> write(String id, String content, String type, String parentId) {
+	public void write(String id, String content, String type, String parentId) {
 		commentCountPlus(type, parentId);
 
-		return jwtUtil.getMonoUserId().flatMap(userRepository::findById)
-						.map(user -> Comment.build(id, user.getId(), user.getName(), content, type))
-						.flatMap(commentRepository::save)
-						.map(this::returnResponse);
+		jwtUtil.getMonoUserId().subscribe(userId ->
+			userRepository.findById(userId).subscribe(user -> {
+				Comment comment = Comment.build(id, user.getId(), content, type);
+				commentRepository.save(comment).subscribe();
+			}));
 	}
 
 	public void commentCountPlus(String type, String parentId) {
@@ -91,9 +94,9 @@ public class CommentService {
 					commentRepository.save(entity).subscribe();
 				});
 			} else if (CommentType.PILGRIMAGE.equalsType(type)) {
-				pilgrimageRepository.findById(parentId).subscribe(entity -> {
+				pilgrimageBoardRepository.findById(parentId).subscribe(entity -> {
 					entity.setCommentCount(entity.getCommentCount() + 1);
-					pilgrimageRepository.save(entity).subscribe();
+					pilgrimageBoardRepository.save(entity).subscribe();
 				});
 			} else if (CommentType.BREADSTAGRAM.equalsType(type)) {
 				breadstagramRepository.findById(parentId).subscribe(entity -> {
@@ -104,11 +107,32 @@ public class CommentService {
 		}
 	}
 
-	private CommentWriteResponse returnResponse(Comment entity) {
-		CommentWriteResponse responseBody = new CommentWriteResponse();
-		responseBody.setId(entity.getId());
-		responseBody.setResult("Success");
-		return responseBody;
+	public void delete(String id) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			commentRepository.findById(id).subscribe(entity -> {
+				String type = entity.getType();
+				String parentId = entity.getParentId();
+
+				if (CommentType.RE_COMMENT.equalsType(type)) {
+					commentRepository.findById(parentId).subscribe(e -> {
+						e.setReCommentCount(e.getReCommentCount() - 1);
+						commentRepository.save(e).subscribe();
+					});
+				} else if (CommentType.PILGRIMAGE.equalsType(type)) {
+					pilgrimageBoardRepository.findById(parentId).subscribe(e -> {
+						e.setCommentCount(e.getCommentCount() - 1);
+						pilgrimageBoardRepository.save(e).subscribe();
+					});
+				} else if (CommentType.BREADSTAGRAM.equalsType(type)) {
+					breadstagramRepository.findById(parentId).subscribe(e -> {
+						e.setCommentCount(e.getCommentCount() - 1);
+						breadstagramRepository.save(e).subscribe();
+					});
+				}
+				commentRepository.delete(entity).subscribe();
+			});
+		});
+
 	}
 
 }

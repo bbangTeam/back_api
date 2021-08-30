@@ -1,145 +1,145 @@
-package io.my.bbang.restdocs.image;
-
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-
-import java.util.UUID;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.restdocs.payload.ResponseFieldsSnippet;
-import org.springframework.restdocs.request.RequestParametersSnippet;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.BodyInserters.MultipartInserter;
-
-import io.my.bbang.commons.base.RestDocAttributes;
-import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
-import io.my.bbang.commons.payloads.BbangResponse;
-import io.my.bbang.image.payload.UploadResponse;
-import reactor.core.publisher.Mono;
-
-class ImageTest extends RestDocsBaseWithSpringBoot {
-	
-	@BeforeEach
-	void setUp() {
-		
-	}
-	
-	@Test
-	@DisplayName("이미지 업로드")
-	void upload() {
-		String fileName = UUID.randomUUID() + "image.jpg";
-		String id = UUID.randomUUID().toString();
-
-		UploadResponse responseBody = new UploadResponse();
-		responseBody.setFileName(fileName);
-		responseBody.setId(id);
-		responseBody.setImageUrl("http://localhost:8080/" + UUID.randomUUID() + fileName);
-		responseBody.setResult("Success");
-		
-		Mockito.when(imageService.fileUpload(Mockito.any())).thenReturn(Mono.just(responseBody));
-		
-		MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
-		
-		Resource imageResource = new ByteArrayResource("<<jpg data>>".getBytes()) {
-
-			@Override
-			public String getFilename() {
-				return "image.jpg";
-			}
-
-		};
-		
-		multipartData.add("file", imageResource);
-		
-		MultipartInserter multipartInserter = BodyInserters.fromMultipartData(multipartData);
-
-		ResponseFieldsSnippet responseSnippet = 
-				responseFields(
-						fieldWithPath("id").description("업로드 된 파일 고유번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("fileName").description("업로드 된 파일명")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("imageUrl").description("이미지 url")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("result").description("결과")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("code").description("응답 코드")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer"))
-				);
-		
-		postWebTestClient(multipartInserter, "/api/image/upload").expectStatus()
-						.isOk()
-						.expectBody()
-						.consumeWith(createConsumer("/upload", responseSnippet));
-	}
-	
-	@Test
-	@DisplayName("이미지 삭제")
-	void delete() {
-		String fileName = UUID.randomUUID() + "image.jpg";
-		String id = UUID.randomUUID().toString();
-		
-		String message = fileName + " delete success!";
-		BbangResponse responseBody = new BbangResponse(message);
-		
-		Mockito.when(imageService.fileDelete(Mockito.any(), Mockito.any()))
-				.thenReturn(Mono.just(responseBody));
-
-		RequestParametersSnippet requestSnippet =
-				requestParameters(
-						parameterWithName("id").description("삭제할 파일 고유번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")),
-						parameterWithName("fileName").description("삭제할 파일명")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
-				);
-		
-		ResponseFieldsSnippet responseSnippet = 
-				responseFields(
-						fieldWithPath("result").description("결과")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String")), 
-						fieldWithPath("code").description("응답 코드")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer"))
-				);
-
-		String params = "?" +
-				"fileName" +
-				"=" +
-				fileName +
-				"&" +
-				"id" +
-				"=" +
-				id;
-		deleteWebTestClient("/api/image/delete" + params).expectStatus()
-							.isOk()
-							.expectBody()
-							.consumeWith(createConsumer("/delete", requestSnippet, responseSnippet));
-	}
-
-}
+//package io.my.bbang.restdocs.image;
+//
+//import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+//import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+//import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+//import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+//
+//import java.util.UUID;
+//
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.mockito.Mockito;
+//import org.springframework.core.io.ByteArrayResource;
+//import org.springframework.core.io.Resource;
+//import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+//import org.springframework.restdocs.request.RequestParametersSnippet;
+//import org.springframework.util.LinkedMultiValueMap;
+//import org.springframework.util.MultiValueMap;
+//import org.springframework.web.reactive.function.BodyInserters;
+//import org.springframework.web.reactive.function.BodyInserters.MultipartInserter;
+//
+//import io.my.bbang.commons.base.RestDocAttributes;
+//import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
+//import io.my.bbang.commons.payloads.BbangResponse;
+//import io.my.bbang.image.payload.UploadResponse;
+//import reactor.core.publisher.Mono;
+//
+//class ImageTest extends RestDocsBaseWithSpringBoot {
+//
+//	@BeforeEach
+//	void setUp() {
+//
+//	}
+//
+//	@Test
+//	@DisplayName("이미지 업로드")
+//	void upload() {
+//		String fileName = UUID.randomUUID() + "image.jpg";
+//		String id = UUID.randomUUID().toString();
+//
+//		UploadResponse responseBody = new UploadResponse();
+//		responseBody.setFileName(fileName);
+//		responseBody.setId(id);
+//		responseBody.setImageUrl("http://localhost:8080/" + UUID.randomUUID() + fileName);
+//		responseBody.setResult("Success");
+//
+//		Mockito.when(imageService.fileUpload(Mockito.any())).thenReturn(Mono.just(responseBody));
+//
+//		MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+//
+//		Resource imageResource = new ByteArrayResource("<<jpg data>>".getBytes()) {
+//
+//			@Override
+//			public String getFilename() {
+//				return "image.jpg";
+//			}
+//
+//		};
+//
+//		multipartData.add("file", imageResource);
+//
+//		MultipartInserter multipartInserter = BodyInserters.fromMultipartData(multipartData);
+//
+//		ResponseFieldsSnippet responseSnippet =
+//				responseFields(
+//						fieldWithPath("id").description("업로드 된 파일 고유번호")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						fieldWithPath("fileName").description("업로드 된 파일명")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						fieldWithPath("imageUrl").description("이미지 url")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						fieldWithPath("result").description("결과")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						fieldWithPath("code").description("응답 코드")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("integer"))
+//				);
+//
+//		postWebTestClient(multipartInserter, "/api/image/upload").expectStatus()
+//						.isOk()
+//						.expectBody()
+//						.consumeWith(createConsumer("/upload", responseSnippet));
+//	}
+//
+//	@Test
+//	@DisplayName("이미지 삭제")
+//	void delete() {
+//		String fileName = UUID.randomUUID() + "image.jpg";
+//		String id = UUID.randomUUID().toString();
+//
+//		String message = fileName + " delete success!";
+//		BbangResponse responseBody = new BbangResponse(message);
+//
+//		Mockito.when(imageService.fileDelete(Mockito.any(), Mockito.any()))
+//				.thenReturn(Mono.just(responseBody));
+//
+//		RequestParametersSnippet requestSnippet =
+//				requestParameters(
+//						parameterWithName("id").description("삭제할 파일 고유번호")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						parameterWithName("fileName").description("삭제할 파일명")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String"))
+//				);
+//
+//		ResponseFieldsSnippet responseSnippet =
+//				responseFields(
+//						fieldWithPath("result").description("결과")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("String")),
+//						fieldWithPath("code").description("응답 코드")
+//											.attributes(
+//													RestDocAttributes.length(0),
+//													RestDocAttributes.format("integer"))
+//				);
+//
+//		String params = "?" +
+//				"fileName" +
+//				"=" +
+//				fileName +
+//				"&" +
+//				"id" +
+//				"=" +
+//				id;
+//		deleteWebTestClient("/api/image/delete" + params).expectStatus()
+//							.isOk()
+//							.expectBody()
+//							.consumeWith(createConsumer("/delete", requestSnippet, responseSnippet));
+//	}
+//
+//}

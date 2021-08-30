@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Document(collection = "store")
 @Getter
 @Setter
@@ -38,6 +40,8 @@ public class Store {
     private long starCount;
     private long starSum;
     private long reviewCount;
+
+    private List<Integer> bakeTimeList;
 
     private StoreMenu storeMenu;
 }

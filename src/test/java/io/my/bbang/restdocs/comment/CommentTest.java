@@ -6,10 +6,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import io.my.bbang.comment.dto.CommentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,7 +19,6 @@ import org.springframework.restdocs.request.RequestParametersSnippet;
 
 import io.my.bbang.comment.dto.CommentListDto;
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
-import io.my.bbang.comment.payload.response.CommentCountResponse;
 import io.my.bbang.comment.payload.response.CommentListResponse;
 import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
@@ -27,10 +26,6 @@ import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import reactor.core.publisher.Mono;
 
 class CommentTest extends RestDocsBaseWithSpringBoot {
-
-	@BeforeEach
-	void setUp() {
-	}
 
 	@Test
 	@DisplayName("REST Docs 댓글 목록")
@@ -45,9 +40,15 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		
 		for (int index=0; index<pageSize; index++) {
 			CommentListDto dto = new CommentListDto();
-			dto.setNickname("빵터짐" + index);
 			dto.setContent("맛있어보여요." + index);
-			
+			dto.setNickname("빵터짐" + index);
+			dto.setLikeCount(index);
+			dto.setReCommentCount(index);
+			dto.setClickCount(index);
+			dto.setLike(false);
+			dto.setModifyDate(LocalDateTime.now());
+			dto.setCreateDate(LocalDateTime.now());
+
 			responseBody.getCommentList().add(dto);
 		}
 
@@ -104,7 +105,15 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("commentList.[].like").description("좋아요 여부")
 								.attributes(
 										RestDocAttributes.length(0),
-										RestDocAttributes.format("Boolean"))
+										RestDocAttributes.format("Boolean")),
+						fieldWithPath("commentList.[].createDate").description("등록일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("date")),
+						fieldWithPath("commentList.[].modifyDate").description("수정일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("date"))
 				);
 
 		String params = "?" +
@@ -139,9 +148,7 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		responseBody.setResult("Success");
 		responseBody.setId(UUID.randomUUID().toString());
 
-		Mockito.when(commentService.write(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(responseBody));
-		
-		RequestFieldsSnippet requestSnippet = 
+		RequestFieldsSnippet requestSnippet =
 				requestFields(
 						fieldWithPath("id").description("게시글(혹은 상위 댓글) 고유 번호")
 											.attributes(
@@ -171,17 +178,47 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 						fieldWithPath("code").description("응답 코드")
 											.attributes(
 													RestDocAttributes.length(0), 
-													RestDocAttributes.format("integer")),
-						fieldWithPath("id").description("댓글 고유번호")
-											.attributes(
-													RestDocAttributes.length(0), 
-													RestDocAttributes.format("String"))
+													RestDocAttributes.format("integer"))
 				);
 		
-		postWebTestClient(requestBody, "/api/comment/write").expectStatus()
+		postWebTestClient(requestBody, "/api/comment").expectStatus()
 						.isOk()
 						.expectBody()
 						.consumeWith(createConsumer("/write", requestSnippet, responseSnippet));
 	}
 
+	@Test
+	@DisplayName("REST Docs 댓글 삭제")
+	void delete() {
+		RequestParametersSnippet requestSnippet =
+				requestParameters(
+						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String"))
+				);
+
+
+		ResponseFieldsSnippet responseSnippet =
+				responseFields(
+						fieldWithPath("result").description("결과")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer"))
+				);
+
+		String params = "?" +
+				"id" +
+				"=" +
+				"commentId001dfafew"
+				;
+		deleteWebTestClient("/api/comment" + params).expectStatus()
+				.isOk()
+				.expectBody()
+				.consumeWith(createConsumer("/delete", requestSnippet, responseSnippet));
+	}
 }

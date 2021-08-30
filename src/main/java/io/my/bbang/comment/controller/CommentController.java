@@ -1,16 +1,13 @@
 package io.my.bbang.comment.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import io.my.bbang.comment.dto.CommentType;
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.commons.payloads.BbangResponse;
+import org.springframework.web.bind.annotation.*;
 
 import io.my.bbang.comment.payload.request.CommentWriteRequest;
-import io.my.bbang.comment.payload.response.CommentCountResponse;
 import io.my.bbang.comment.payload.response.CommentListResponse;
-import io.my.bbang.comment.payload.response.CommentWriteResponse;
 import io.my.bbang.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -29,13 +26,22 @@ public class CommentController {
 		return commentService.list(id, pageSize, pageNum);
 	}
 	
-	@PostMapping("/write")
-	public Mono<CommentWriteResponse> write(@RequestBody CommentWriteRequest requestBody) {
+	@PostMapping
+	public Mono<BbangResponse> write(@RequestBody CommentWriteRequest requestBody) {
 		String id = requestBody.getId();
 		String content = requestBody.getContent();
 		String type = requestBody.getType();
 		String parentId = requestBody.getParentId();
+
+		if (!CommentType.isExistType(type)) throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
 		
-		return commentService.write(id, content, type, parentId);
+		commentService.write(id, content, type, parentId);
+		return Mono.just(new BbangResponse());
+	}
+
+	@DeleteMapping
+	public Mono<BbangResponse> delete(@RequestParam("id") String id) {
+		commentService.delete(id);
+		return Mono.just(new BbangResponse());
 	}
 }

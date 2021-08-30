@@ -2,6 +2,7 @@ package io.my.bbang.user.dto;
 
 public enum UserStarType {
     STORE("store"),
+    PILGRIMAGE("pilgrimage")
     ;
 
     private final String value;
@@ -10,7 +11,6 @@ public enum UserStarType {
         this.value = value;
     }
 
-    private String getValue;
     public String getValue() { return value; }
 
     public boolean isEqualsType(String type) {

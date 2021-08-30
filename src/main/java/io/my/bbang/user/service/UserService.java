@@ -149,11 +149,6 @@ public class UserService {
 				entity.setClickCount(entity.getClickCount() + 1);
 				breadstagramRepository.save(entity).subscribe();
 			});
-		} else if (UserClickType.PILGRIMAGE.isEqualsType(type)) {
-			pilgrimageRepository.findById(id).subscribe(entity -> {
-				entity.setClickCount(entity.getClickCount());
-				pilgrimageRepository.save(entity).subscribe();
-			});
 		} else if (UserClickType.STORE.isEqualsType(type)) {
 			storeRepository.findById(id).subscribe(entity -> {
 				entity.setClickCount(entity.getClickCount() + 1);
@@ -225,45 +220,125 @@ public class UserService {
 		}
 	}
 
-	public void postStar(String id, String type, int star) {
-
+	public void postStar(String parentId, String type, int star) {
 		jwtUtil.getMonoUserId().subscribe(userId -> {
-			UserStar entity = new UserStar();
-			entity.setUserId(userId);
-			entity.setType(type);
-			entity.setParentId(id);
-			entity.setStar(star);
-			userStarRepository.save(entity).subscribe();
+			if (UserStarType.STORE.isEqualsType(type)) {
+				storeStar(userId, parentId, star);
+			} else if (UserStarType.PILGRIMAGE.isEqualsType(type)) {
+				pilgrimageStar(userId, parentId, star);
+			}
 		});
-
-		if (UserStarType.STORE.isEqualsType(type)) {
-			storeRepository.findById(id).subscribe(entity -> {
-				entity.setStarCount(entity.getStarCount() + 1);
-				entity.setStarSum(entity.getStarSum() + star);
-				entity.setStar((double) entity.getStarSum() / entity.getStarCount());
-				storeRepository.save(entity).subscribe();
-			});
-		}
 	}
 
-	public void deleteStar(String id, String type, int star) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
-			UserStar entity = new UserStar();
-			entity.setType(type);
-			entity.setUserId(userId);
-			entity.setParentId(id);
-			entity.setStar(star);
-			userStarRepository.deleteByTypeAndUserIdAndParentId(entity).subscribe();
+	private void storeStar(String userId, String storeId, int star) {
+		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).subscribe(entity -> {
+			if (entity == null) saveStoreStar(userId, storeId, star);
+			else updateStoreStar(entity, star);
 		});
+	}
 
-		if (UserStarType.STORE.isEqualsType(type)) {
-			storeRepository.findById(id).subscribe(entity -> {
-				entity.setStarCount(entity.getStarCount() - 1);
-				entity.setStarSum(entity.getStarSum() - star);
-				entity.setStar((double) entity.getStarSum() / entity.getStarCount());
-				storeRepository.save(entity).subscribe();
+	private void saveStoreStar(String userId, String storeId, int star) {
+		UserStar userStar = new UserStar();
+		userStar.setUserId(userId);
+		userStar.setStar(star);
+		userStar.setParentId(storeId);
+		userStar.setType(UserStarType.STORE.getValue());
+
+		userStarRepository.save(userStar).subscribe();
+		storeRepository.findById(storeId).subscribe(store -> {
+			store.setStarCount(store.getStarCount() + 1);
+			store.setStarSum(store.getStarSum() + star);
+			store.setStar(
+					setStar(store.getStarSum(), store.getStarCount())
+			);
+			storeRepository.save(store).subscribe();
+		});
+	}
+
+	private void updateStoreStar(UserStar userStar, int star) {
+		storeRepository.findById(userStar.getParentId()).subscribe(store -> {
+			store.setStarSum(store.getStarSum() - userStar.getStar() + star);
+			store.setStar(setStar(store.getStarSum(), store.getStarCount()));
+
+			userStar.setStar(star);
+			userStarRepository.save(userStar).subscribe();
+			storeRepository.save(store).subscribe();
+		});
+	}
+
+	private void pilgrimageStar(String userId, String pilgrimageId, int star) {
+		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId).subscribe(entity -> {
+			if (entity == null) savePilgrimageStar(userId, pilgrimageId, star);
+			else updatePilgrimageStar(entity, star);
+		});
+	}
+
+	private void savePilgrimageStar(String userId, String pilgrimageId, int star) {
+		UserStar userStar = new UserStar();
+		userStar.setUserId(userId);
+		userStar.setParentId(pilgrimageId);
+		userStar.setStar(star);
+
+		userStarRepository.save(userStar).subscribe();
+		pilgrimageRepository.findById(pilgrimageId).subscribe(entity -> {
+			entity.setStarCount(entity.getStarCount() + 1);
+			entity.setStarSum(entity.getStarSum() + star);
+			entity.setStar(
+					setStar(entity.getStarSum(), entity.getStarCount())
+			);
+			pilgrimageRepository.save(entity);
+		});
+	}
+
+	private void updatePilgrimageStar(UserStar userStar, int star) {
+		pilgrimageRepository.findById(userStar.getParentId()).subscribe(pilgrimage -> {
+			pilgrimage.setStarSum(pilgrimage.getStarSum() - userStar.getStar() + star);
+			pilgrimage.setStar(setStar(pilgrimage.getStarSum(), pilgrimage.getStarCount()));
+
+			userStar.setStar(star);
+			pilgrimageRepository.save(pilgrimage).subscribe();
+			userStarRepository.save(userStar).subscribe();
+		});
+	}
+
+	private double setStar(long starSum, long starCount) {
+		return ((double) starSum / starCount) / 2;
+	}
+
+	public void deleteStar(String parentId, String type) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			if (UserStarType.STORE.isEqualsType(type)) {
+				deleteStoreStar(userId, parentId);
+			} else if (UserStarType.PILGRIMAGE.isEqualsType(type)) {
+				deletePilgrimageStar(userId, parentId);
+			}
+		});
+	}
+
+	private void deleteStoreStar(String userId, String storeId) {
+		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).subscribe(userStar -> {
+			int star = userStar.getStar();
+			userStarRepository.deleteById(userStar.getId()).subscribe();
+			storeRepository.findById(storeId).subscribe(store -> {
+				store.setStarSum(store.getStarSum() - star);
+				store.setStarCount(store.getStarCount() - 1);
+				store.setStar(setStar(store.getStarSum(), store.getStarCount()));
+				storeRepository.save(store).subscribe();
 			});
-		}
+		});
+	}
+
+	private void deletePilgrimageStar(String userId, String pilgrimageId) {
+		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId).subscribe(userStar -> {
+			int star = userStar.getStar();
+			userStarRepository.deleteById(userStar.getId()).subscribe();
+			pilgrimageRepository.findById(pilgrimageId).subscribe(pilgrimage -> {
+				pilgrimage.setStarSum(pilgrimage.getStarSum() - star);
+				pilgrimage.setStarCount(pilgrimage.getStarCount() - 1);
+				pilgrimage.setStar(setStar(pilgrimage.getStarSum(), pilgrimage.getStarCount()));
+				pilgrimageRepository.save(pilgrimage).subscribe();
+			});
+		});
 	}
 
 }

@@ -1,6 +1,5 @@
 package io.my.bbang.breadstore.service;
 
-import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.breadstore.payload.resposne.StoreListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,9 +10,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class StoreService {
-
 	private final StoreRepository storeRepository;
-	private final BreadstagramRepository breadstagramRepository;
 
 	public Mono<StoreListResponse> list (double xposLo, double yposLa, int minDistance, int maxDistance) {
 		return storeRepository.findByLocation(xposLo, yposLa, minDistance, maxDistance)
@@ -30,15 +27,9 @@ public class StoreService {
 				dto.setTel(store.getTelNo());
 				dto.setLoadAddr(store.getLoadAddr());
 				dto.setReviewCount(store.getReviewCount());
-				dto.setStar(store.getStar() > 0 ? store.getStar() : 0.0);
 				return dto;
 			})
-			.flatMap(dto -> breadstagramRepository.countAllByStoreId(dto.getId())
-				.map(count -> {
-					dto.setReviewCount(count != null ? count : 0);
-					return dto;
-				})
-			).collectList()
+			.collectList()
 			.map(list -> {
 				StoreListResponse responseBody = new StoreListResponse();
 				responseBody.setStoreList(list);

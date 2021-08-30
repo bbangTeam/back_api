@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +11,6 @@ import io.my.bbang.breadstagram.payload.request.BreadstagramWriteRequest;
 import io.my.bbang.breadstagram.payload.response.BreadstagramListResponse;
 import io.my.bbang.breadstagram.payload.response.BreadstagramWriteResponse;
 import io.my.bbang.breadstagram.service.BreadstagramService;
-import io.my.bbang.commons.payloads.BbangResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -32,12 +30,9 @@ public class BreadstagramController {
 		return breadstagramService.list(pageNum, pageSize);
 	}
 	
-	@PostMapping("/write")
+	@PostMapping
 	public Mono<BreadstagramWriteResponse> write(@RequestBody BreadstagramWriteRequest requestBody) {
-		log.info("/api/breadstagram/write 요청전문: {}", requestBody);
 		return breadstagramService.write(requestBody);
 	}
 
-
-	
 }

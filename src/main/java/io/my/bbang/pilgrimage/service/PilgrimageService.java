@@ -6,12 +6,12 @@ import java.util.Map;
 
 import io.my.bbang.breadstore.repository.StoreRepository;
 import io.my.bbang.code.repository.CodeRepository;
-import io.my.bbang.commons.payloads.BbangResponse;
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.pilgrimage.domain.PilgrimageBoard;
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
-import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardListResponse;
 import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
-import io.my.bbang.user.domain.UserHeart;
 import io.my.bbang.user.domain.UserPilgrimage;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.repository.UserHeartRepository;
@@ -39,79 +39,73 @@ import reactor.core.publisher.Mono;
 public class PilgrimageService {
 	private final JwtUtil jwtUtil;
 
-	private final CodeRepository codeRepository;
 	private final UserRepository userRepository;
+	private final CodeRepository codeRepository;
 	private final StoreRepository storeRepository;
 	private final UserHeartRepository userHeartRepository;
 	private final PilgrimageRepository pilgrimageRepository;
 	private final UserPilgrimageRepository userPilgrimageRepository;
 	private final PilgrimageBoardRepository pilgrimageBoardRepository;
 
-	public Mono<PilgrimageListResponse> list(String id, String option) {
+	public Mono<PilgrimageListResponse> list(String id) {
 		PilgrimageListResponse responseBody = new PilgrimageListResponse();
-
 		return jwtUtil.getMonoUserId()
-		.map(userId -> {
-			responseBody.setUserId(userId);
-			return pilgrimageRepository.findAllByPilgrimageAreaId(id);
-		})
-		.map(flux -> {
-			Map<String, PilgrimageListDto> dtoMap = new HashMap<>();
-			return flux.flatMap(entity -> findStore(dtoMap, entity))
-			.flatMap(entity -> {
-				PilgrimageListDto dto = returnPilgrimageListDto(dtoMap, entity, option);
-				return findByUserPilgrimageId(dto.getPilgrimageId());
-			}).map(entity -> {
-				PilgrimageListDto dto = dtoMap.get(entity.getPilgrimageId());
-				dto.setClear(true);
+				.flatMap(userId -> {
+					responseBody.setUserId(userId);
+					Map<String, PilgrimageListDto> dtoMap = new HashMap<>();
+					return pilgrimageRepository.findAllByPilgrimageAreaId(id)
+							.flatMap(entity -> findStore(dtoMap, entity))
+							.flatMap(entity -> {
+								PilgrimageListDto dto = returnPilgrimageListDto(dtoMap, entity);
+								return findByUserPilgrimageId(dto.getPilgrimageId());
+							})
+							.flatMap(entity -> {
+								PilgrimageListDto dto = dtoMap.get(entity.getPilgrimageId());
+								dto.setClear(true);
 
-				// 응답 값으로 불필요하므로, null 처리
-				dto.setPilgrimageId(null);
-				return dto;
-			})
-			.flatMap(dto -> {
-				UserHeart entity = new UserHeart();
-				entity.setUserId(responseBody.getUserId());
-				entity.setParentId(dto.getId());
-				entity.setType(UserHeartType.PILGRIMAGE.getValue());
-				return userHeartRepository.findByUserIdAndParentIdAndType(entity)
-						.map(e -> true)
-						.defaultIfEmpty(false)
-						.flatMap(bool -> {
-							dto.setLike(bool);
-							return Mono.just(dto);
-						});
-			}).collectList().map(list -> {
-				list = new ArrayList<>(dtoMap.values());
-				responseBody.setUserId(null);
-				responseBody.setStoreList(list);
-				responseBody.setResult("Success");
-				return responseBody;
-			})
-			;
-		}).flatMap(map -> map);
+								// 응답 값으로 불필요하므로, null 처리
+								dto.setPilgrimageId(null);
+								return userHeartRepository.findByUserIdAndParentIdAndType(
+										responseBody.getUserId(), dto.getId(), UserHeartType.PILGRIMAGE.getValue()
+								)
+								.map(e -> {
+									dto.setLike(true);
+									return dto;
+								})
+								.switchIfEmpty(Mono.just(dto));
+							})
+							.collectList()
+							.map(list -> {
+								list = new ArrayList<>(dtoMap.values());
+								responseBody.setUserId(null);
+								responseBody.setStoreList(list);
+								responseBody.setResult("Success");
+								return responseBody;
+							})
+							;
+				});
 	}
 
 	private Mono<Store> findStore(Map<String, PilgrimageListDto> dtoMap, Pilgrimage entity) {
 		PilgrimageListDto dto = new PilgrimageListDto();
 		dtoMap.put(entity.getStoreId(), dto);
 		dto.setPilgrimageId(entity.getId());
-		dto.setCommentCount(entity.getCommentCount());
+		dto.setLikeCount(entity.getLikeCount());
+		dto.setStar(entity.getStar());
+		dto.setReviewCount(entity.getReviewCount());
 		return storeRepository.findById(entity.getStoreId());
 	}
 
-	private PilgrimageListDto returnPilgrimageListDto(Map<String, PilgrimageListDto> dtoMap, Store entity, String option) {
+	private PilgrimageListDto returnPilgrimageListDto(Map<String, PilgrimageListDto> dtoMap, Store entity) {
 		PilgrimageListDto dto = dtoMap.get(entity.getId());
 		dto.setId(entity.getId());
+		dto.setImageUrl(entity.getNaverThumbUrl());
 		dto.setStoreName(entity.getEntrpNm());
 		dto.setLatitude(entity.getYposLa());
 		dto.setLongitude(entity.getXposLo());
-		
-		if (option.equals("all")) {
-			dto.setImageUrl(entity.getNaverThumbUrl());
-			dto.setBreadName(entity.getReprsntMenuNm());
-			dto.setOpeningHours(entity.getBusinessHours());
-		}
+		dto.setBreadName(entity.getReprsntMenuNm());
+		dto.setOpeningHours(entity.getBusinessHours());
+		dto.setBakeTimeList(entity.getBakeTimeList());
 
 		dtoMap.remove(entity.getId());
 		dtoMap.put(dto.getPilgrimageId(), dto);
@@ -142,42 +136,66 @@ public class PilgrimageService {
 		;
 	}
 
-	 public Mono<BbangResponse> boardWrite(PilgrimageWriteRequest requestBody) {
+	 public void write(PilgrimageWriteRequest requestBody) {
 		PilgrimageBoard entity = new PilgrimageBoard();
-		entity.setStoreId(requestBody.getStoreName());
-		entity.setContent(requestBody.getContent());
-		entity.setStoreId(requestBody.getStoreId());
-		entity.setStoreName(requestBody.getStoreName());
 
-		return jwtUtil.getMonoUserId().map(userId -> {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			String storeId = requestBody.getStoreId();
 			entity.setUserId(userId);
-			return entity;
-		})
-		.flatMap(pilgrimageBoardRepository::save)
-		.map(e -> new BbangResponse());
+			entity.setTitle(requestBody.getTitle());
+			entity.setContent(requestBody.getContent());
+			entity.setStoreId(storeId);
+			entity.setCommentCount(0);
+
+			pilgrimageBoardRepository.save(entity).subscribe();
+			pilgrimageRepository.findByStoreId(storeId).subscribe(pilgrimage -> {
+				pilgrimage.setReviewCount(pilgrimage.getReviewCount() + 1);
+				pilgrimageRepository.save(pilgrimage).subscribe();
+			});
+		});
 	 }
 
-	 public Mono<PilgrimageBoardList> boardList(int pageNum, int pageSize) {
-		Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "createDate"));
+	 public void visit(String id) {
+		jwtUtil.getMonoUserId().subscribe(userId -> {
+			UserPilgrimage entity = new UserPilgrimage();
+			entity.setPilgrimageId(id);
+			entity.setUserId(userId);
+			userPilgrimageRepository.save(entity).subscribe();
+		});
+	 }
 
-		return pilgrimageBoardRepository.findByIdNotNull(pageable).map(entity -> {
-			PilgrimageBoardList.Board board = new PilgrimageBoardList.Board();
-			board.setContent(entity.getContent());
-			board.setStoreName(entity.getStoreName());
-			board.setUserId(entity.getUserId());
+	 public Mono<PilgrimageBoardListResponse> boardList(String id, int pageNum, int pageSize) {
+		 Sort sort = Sort.by(Sort.Direction.DESC, "modifyDate");
+		 Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+		return pilgrimageBoardRepository.findByStoreId(id, pageable).flatMap(entity -> {
+			PilgrimageBoardListResponse.Board board = new PilgrimageBoardListResponse.Board();
+			board.setTitle(entity.getTitle());
+			board.setCommentCount(entity.getCommentCount());
+			board.setId(entity.getId());
 			board.setCreateDate(entity.getCreateDate());
-			return board;
-		}).flatMap(board -> {
-			String userId = board.getUserId();
-			return userRepository.findById(userId).map(user -> {
+			board.setModifyDate(entity.getModifyDate());
+			board.setStoreId(entity.getStoreId());
+
+			return userRepository.findById(entity.getUserId()).map(user -> {
 				board.setNickname(user.getNickname());
 				return board;
-			});
-		}).collectList().map(list -> {
-			PilgrimageBoardList responseBody = new PilgrimageBoardList();
+			}).switchIfEmpty(Mono.just(board));
+		})
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.REQUEST_EXCEPTION)))
+		.flatMap(board -> storeRepository.findById(board.getStoreId())
+			.flatMap(store -> {
+				board.setStoreName(store.getEntrpNm());
+				return Mono.just(board);
+			})
+			.switchIfEmpty(Mono.just(board))
+		)
+		.collectList().map(list -> {
+			PilgrimageBoardListResponse responseBody = new PilgrimageBoardListResponse();
 			responseBody.setBoardList(list);
 			return responseBody;
 		})
-		;
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.REQUEST_EXCEPTION)));
 	 }
+
 }

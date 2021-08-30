@@ -4,6 +4,7 @@ import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.user.dto.UserClickType;
 import io.my.bbang.user.dto.UserHeartType;
+import io.my.bbang.user.dto.UserStarType;
 import io.my.bbang.user.payload.response.MyProfileResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,6 @@ public class UserController {
     public Mono<BbangResponse> userClick(
             @RequestParam("type") String type,
             @RequestParam("id") String id) {
-        log.info("/api/breadstagram/userClick");
-
         if (UserClickType.isExistType(type)) userService.click(id, type);
         else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
         return Mono.just(new BbangResponse());
@@ -64,8 +63,6 @@ public class UserController {
     public Mono<BbangResponse> deleteUserLike(
             @RequestParam("type") String type,
             @RequestParam("id") String id) {
-        log.info("DELETE /api/breadstagram/userLike");
-
         if (UserHeartType.isExistType(type)) userService.deleteLike(id, type);
         else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
         return Mono.just(new BbangResponse());
@@ -77,7 +74,7 @@ public class UserController {
             @RequestParam("type") String type,
             @RequestParam("star") int star) {
 
-        if (UserHeartType.isExistType(type)) userService.postStar(id, type, star);
+        if (UserStarType.isExistType(type)) userService.postStar(id, type, star);
         else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
 
         return Mono.just(new BbangResponse());
@@ -86,10 +83,9 @@ public class UserController {
     @DeleteMapping("/star")
     public Mono<BbangResponse> deleteUserStar(
             @RequestParam("id") String id,
-            @RequestParam("type") String type,
-            @RequestParam("star") int star) {
+            @RequestParam("type") String type) {
 
-        if (UserHeartType.isExistType(type)) userService.deleteStar(id, type, star);
+        if (UserStarType.isExistType(type)) userService.deleteStar(id, type);
         else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
 
         return Mono.just(new BbangResponse());

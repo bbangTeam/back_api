@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class PilgrimageWriteRequest {
-    private String content;
     private String storeId;
-    private String storeName;
+    private String title;
+    private String content;
 }

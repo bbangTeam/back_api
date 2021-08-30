@@ -1,24 +1,20 @@
 package io.my.bbang.comment.dto;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum CommentType {
     BREADSTAGRAM("breadstagram"), 
     RE_COMMENT("reComment"), 
     PILGRIMAGE("pilgrimage"), 
-    STORE("store"), 
     ;
 
     private String value;
 
-    private final static Map<String, CommentType> findTypeMap;
-    static {
-        findTypeMap = new HashMap<>();
-        for(CommentType type : CommentType.values()) {
-            findTypeMap.put(type.getValue(), type);
-        }
-    }
+//    private final static Map<String, CommentType> findTypeMap;
+//    static {
+//        findTypeMap = new HashMap<>();
+//        for(CommentType type : CommentType.values()) {
+//            findTypeMap.put(type.getValue(), type);
+//        }
+//    }
 
     CommentType(String value) {
         this.value = value;
@@ -32,12 +28,15 @@ public enum CommentType {
         this.value = value;
     }
 
-    public static CommentType getType(String type) {
-        return findTypeMap.get(type);
-    }
-
     public boolean equalsType(String type) {
         return this.value.equals(type);
+    }
+
+    public static boolean isExistType(String type) {
+        for (CommentType commentType : CommentType.values()) {
+            if (commentType.equalsType(type)) return true;
+        }
+        return false;
     }
 
 }

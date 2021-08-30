@@ -3,8 +3,6 @@ package io.my.bbang.user.dto;
 public enum UserClickType {
     STORE("store"),
     BREADSTAGRAM("breadstagram"),
-    PILGRIMAGE("pilgrimage"),
-    COMMENT("comment"),
     ;
     private final String value;
 

@@ -2,6 +2,8 @@ package io.my.bbang.comment.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class CommentListDto {
 	private String nickname;
@@ -10,4 +12,6 @@ public class CommentListDto {
 	private long reCommentCount;
 	private long clickCount;
 	private boolean isLike;
+	private LocalDateTime createDate;
+	private LocalDateTime modifyDate;
 }

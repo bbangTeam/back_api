@@ -15,16 +15,16 @@ public class PilgrimageListDto {
 	private boolean clear;
 	private Double latitude;
 	private Double longitude;
-	private long commentCount;
-	private long likeCount;
-	private long clickCount;
-	private boolean isLike;
-	
-	// optional
+
 	private String imageUrl;
 	private String openingHours;
 	private String breadName;
 	private List<Integer> bakeTimeList;
+
+	private long likeCount;
+	private long reviewCount;
+	private boolean isLike;
+	private double star;
 
 	// 서비스에서 함수 안에 접근하기 위한 값으로, 응답값으로 불필요함
 	private String pilgrimageId;

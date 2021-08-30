@@ -1,7 +1,7 @@
 package io.my.bbang.pilgrimage.controller;
 
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
-import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardList;
+import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardListResponse;
 import org.springframework.web.bind.annotation.*;
 
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -20,13 +20,8 @@ public class PilgrimageController {
 	private final PilgrimageService pilgrimageService;
 
 	@GetMapping("/list")
-	public Mono<PilgrimageListResponse> list(
-			@RequestParam String id, 
-			@RequestParam(required = false, defaultValue = "none") String option
-	) {
-		log.info("call pilgrimage list!!!");
-		
-		return pilgrimageService.list(id, option);
+	public Mono<PilgrimageListResponse> list(@RequestParam String id) {
+		return pilgrimageService.list(id);
 	}
 
 	@GetMapping("/area/list")
@@ -35,16 +30,23 @@ public class PilgrimageController {
 	}
 
 	@PostMapping("/board")
-	public Mono<BbangResponse> boardWrite(@RequestBody PilgrimageWriteRequest requestBody) {
-		return pilgrimageService.boardWrite(requestBody);
+	public Mono<BbangResponse> writePilgrimage(@RequestBody PilgrimageWriteRequest requestBody) {
+		pilgrimageService.write(requestBody);
+		return Mono.just(new BbangResponse());
+	}
+
+	@PostMapping("/visit")
+	public Mono<BbangResponse> visit(@RequestParam("id") String id) {
+		pilgrimageService.visit(id);
+		return Mono.just(new BbangResponse());
 	}
 
 	@GetMapping("/board/list")
-	public Mono<PilgrimageBoardList> boardList(
-			@RequestParam(defaultValue = "0", required = false) int pageNum,
-			@RequestParam(defaultValue = "5", required = false) int pageSize) {
-		return pilgrimageService.boardList(pageNum, pageSize);
+	public Mono<PilgrimageBoardListResponse> boardList(
+			@RequestParam("id") String id,
+			@RequestParam(name = "pageSize", defaultValue = "5", required = false) Integer pageSize,
+			@RequestParam(name = "pageNum", defaultValue = "0") Integer pageNum) {
+		return pilgrimageService.boardList(id, pageNum, pageSize);
 	}
-
 
 }

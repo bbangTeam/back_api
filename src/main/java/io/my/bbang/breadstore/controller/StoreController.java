@@ -22,6 +22,4 @@ public class StoreController {
 		return storeService.list(longitude, latitude, minDistance, maxDistance);
 	}
 
-
-	
 }

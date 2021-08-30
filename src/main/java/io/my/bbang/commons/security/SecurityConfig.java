@@ -35,6 +35,7 @@ public class SecurityConfig {
 					.pathMatchers("/api/specification/**").permitAll()
 					.pathMatchers("/api/healthcheck").permitAll()
 					.pathMatchers("/api/oauth/**").permitAll()
+					.pathMatchers(HttpMethod.GET, "/api/user/nickname").permitAll()
 					.pathMatchers("/api/**").authenticated()
 					.pathMatchers("/**").permitAll()
 					.and()

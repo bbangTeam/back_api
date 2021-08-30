@@ -21,12 +21,12 @@ public class Breadstagram extends BaseTimeEntity {
     private String storeId;
     private String userId;
     private String cityName;
-    private String breadName;
     private String storeName;
     private String content;
     private long commentCount;
     private long clickCount;
     private long likeCount;
+    private List<String> breadNameList;
     private List<BreadstagramImageDto> imageList;
 
 }

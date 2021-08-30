@@ -7,12 +7,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter @Setter
-@Document("pilgrimageBoard")
+@Document("pilgrimageVisit")
 public class PilgrimageBoard extends BaseTimeEntity {
     @Id
     private String id;
     private String storeId;
     private String userId;
+    private String title;
     private String content;
-    private String storeName;
+
+    private long commentCount;
 }
