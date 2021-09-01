@@ -5,20 +5,31 @@ import java.time.LocalDateTime;
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.breadstore.repository.StoreRepository;
 import io.my.bbang.comment.repository.CommentRepository;
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.commons.utils.SpaceUtil;
+import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
 import io.my.bbang.pilgrimage.repository.PilgrimageRepository;
 import io.my.bbang.user.domain.*;
+import io.my.bbang.user.dto.RecentlyDto;
 import io.my.bbang.user.dto.UserClickType;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.dto.UserStarType;
-import io.my.bbang.user.payload.response.MyProfileResponse;
+import io.my.bbang.user.payload.response.MyPageResponse;
+import io.my.bbang.user.payload.response.MyRecentlyStoreResponse;
 import io.my.bbang.user.payload.response.UserLoginResponse;
 import io.my.bbang.user.repository.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -26,6 +37,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserService {
 	private final JwtUtil jwtUtil;
+	private final SpaceUtil spaceUtil;
+
 	private final UserRepository userRepository;
 	private final UserStarRepository userStarRepository;
 	private final UserClickRepository userClickRepository;
@@ -36,6 +49,7 @@ public class UserService {
 	private final CommentRepository commentRepository;
 	private final PilgrimageRepository pilgrimageRepository;
 	private final BreadstagramRepository breadstagramRepository;
+	private final PilgrimageBoardRepository pilgrimageBoardRepository;
 
 	public Mono<BbangResponse> checkNickname(String nickname) {
 		return userRepository.findByNickname(nickname)
@@ -103,35 +117,6 @@ public class UserService {
 			entity.setUserId(userId);
 			return userIdealRepository.save(entity);
 		});
-	}
-
-	public Mono<MyProfileResponse> getMyProfile() {
-		MyProfileResponse responseBody = new MyProfileResponse();
-		return jwtUtil.getMonoUserId()
-				.flatMap(userRepository::findById)
-				.map(user -> {
-					responseBody.setUserId(user.getId());
-					responseBody.setNickname(user.getNickname());
-					responseBody.setProfileImageUrl(user.getImageUrl());
-					responseBody.setEmail(user.getEmail());
-					return user;
-				})
-				.flatMap(user -> breadstagramRepository.countAllByUserId(responseBody.getUserId()))
-				.flatMap(count -> {
-					responseBody.setPostCount(responseBody.getPostCount() + count);
-					String userId = responseBody.getUserId();
-					return commentRepository.countByuserId(userId);
-				})
-				.flatMap(count -> {
-					responseBody.setCommentCount(count);
-					String userId = responseBody.getUserId();
-					return userHeartRepository.countByUserId(userId);
-				})
-				.map(count -> {
-					responseBody.setLikeCount(count);
-					return responseBody;
-				})
-				;
 	}
 
 	public void click(String id, String type) {
@@ -339,6 +324,91 @@ public class UserService {
 				pilgrimageRepository.save(pilgrimage).subscribe();
 			});
 		});
+	}
+
+	public Mono<MyPageResponse> getMyPage() {
+		MyPageResponse responseBody = new MyPageResponse();
+		return jwtUtil.getMonoUserId()
+				.flatMap(userRepository::findById)
+				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+				.flatMap(user -> {
+					responseBody.setNickname(user.getNickname());
+					responseBody.setProfileImageUrl(user.getImageUrl());
+					responseBody.setEmail(user.getEmail());
+					responseBody.setUserId(user.getId());
+					return breadstagramRepository.countByUserId(responseBody.getUserId());
+				})
+				.switchIfEmpty(Mono.just(0L))
+				.flatMap(count -> {
+					responseBody.setPostCount(count);
+					return pilgrimageBoardRepository.countByUserId(responseBody.getUserId());
+				})
+				.switchIfEmpty(Mono.just(0L))
+				.flatMap(count -> {
+					responseBody.setPostCount(responseBody.getPostCount() + count);
+					return commentRepository.countByuserId(responseBody.getUserId());
+				})
+				.switchIfEmpty(Mono.just(0L))
+				.flatMap(count -> {
+					responseBody.setCommentCount(count);
+					return userHeartRepository.countByUserId(responseBody.getUserId());
+				})
+				.switchIfEmpty(Mono.just(0L))
+				.flatMap(count -> {
+					responseBody.setLikeCount(count);
+					return Mono.just(responseBody);
+				})
+				.switchIfEmpty(Mono.just(responseBody))
+				;
+	}
+
+	public Mono<MyRecentlyStoreResponse> getMyRecentlyStoreList(
+			double x, double y, int pageNum, int pageSize) {
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "createDate");
+		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+		return jwtUtil.getMonoUserId().flatMap(userId ->
+				userClickRepository.findByUserIdAndType(userId, UserClickType.STORE.getValue(), pageable)
+						.flatMap(userClick -> {
+							MyRecentlyStoreResponse.RecentlyStore recentlyStore = new MyRecentlyStoreResponse.RecentlyStore();
+							recentlyStore.setId(userClick.getParentId());
+							recentlyStore.setClickDate(userClick.getCreateDate());
+							return storeRepository.findById(userClick.getParentId()).flatMap(store -> {
+								double distance = spaceUtil.haversine(x, y, store.getXposLo(), store.getYposLa());
+								recentlyStore.setImageUrl(store.getNaverThumbUrl());
+								recentlyStore.setStoreName(store.getEntrpNm());
+								recentlyStore.setDistance(distance);
+
+								String url = spaceUtil.getSigCdUrl(store.getCityGnGuCd());
+
+								WebClient.ResponseSpec responseSpec = WebClient.builder()
+										.baseUrl(url)
+										.build()
+										.get()
+										.retrieve();
+
+								return responseSpec.bodyToMono(RecentlyDto.class)
+										.flatMap(dto -> {
+											RecentlyDto.Properties properties = dto.getResult().getFeatureCollection().getFeatures().get(0).getProperties();
+											recentlyStore.setFullNm(properties.getFullNm());
+											recentlyStore.setSigKorNm(properties.getSigKorNm());
+											return Mono.just(recentlyStore);
+										})
+										.switchIfEmpty(Mono.just(recentlyStore));
+							})
+									.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
+						})
+						.switchIfEmpty(Flux.empty())
+						.collectList()
+						.map(list -> {
+							MyRecentlyStoreResponse responseBody = new MyRecentlyStoreResponse();
+							responseBody.setList(list);
+							return responseBody;
+						})
+						.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.REQUEST_EXCEPTION)))
+		)
+				;
 	}
 
 }

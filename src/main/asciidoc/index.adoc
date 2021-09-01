@@ -312,6 +312,29 @@ include::{snippets}/usertest/delete-star/curl-request.adoc[]
 
 
 
+[[resources-user-info]]
+==== 사용자 페이지 정보 조회
+
+include::{snippets}/usertest/my/page/request-headers.adoc[]
+include::{snippets}/usertest/my/page/response-fields.adoc[]
+include::{snippets}/usertest/my/page/http-request.adoc[]
+include::{snippets}/usertest/my/page/http-response.adoc[]
+include::{snippets}/usertest/my/page/curl-request.adoc[]
+
+
+
+[[resources-user-recently-store]]
+==== 최근 조회한 가게 목록
+
+include::{snippets}/usertest/my/recently/store/request-headers.adoc[]
+include::{snippets}/usertest/my/recently/store/request-parameters.adoc[]
+include::{snippets}/usertest/my/recently/store/response-fields.adoc[]
+include::{snippets}/usertest/my/recently/store/http-request.adoc[]
+include::{snippets}/usertest/my/recently/store/http-response.adoc[]
+include::{snippets}/usertest/my/recently/store/curl-request.adoc[]
+
+
+
 [[resources-ideal-api]]
 === 빵드컵
 

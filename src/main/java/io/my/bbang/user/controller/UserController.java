@@ -5,7 +5,8 @@ import io.my.bbang.commons.exception.type.ExceptionTypes;
 import io.my.bbang.user.dto.UserClickType;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.dto.UserStarType;
-import io.my.bbang.user.payload.response.MyProfileResponse;
+import io.my.bbang.user.payload.response.MyPageResponse;
+import io.my.bbang.user.payload.response.MyRecentlyStoreResponse;
 import org.springframework.web.bind.annotation.*;
 
 import io.my.bbang.commons.payloads.BbangResponse;
@@ -32,11 +33,6 @@ public class UserController {
         @RequestParam String nickname) {
         userService.modifyNickname(nickname);
         return Mono.just(new BbangResponse());
-    }
-
-    @GetMapping("/my/profile")
-    public Mono<MyProfileResponse> getMyProfile() {
-        return userService.getMyProfile();
     }
 
     @PostMapping("/click")
@@ -89,6 +85,20 @@ public class UserController {
         else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
 
         return Mono.just(new BbangResponse());
+    }
+
+    @GetMapping("/my/page")
+    public Mono<MyPageResponse> getMyPage() {
+        return userService.getMyPage();
+    }
+
+    @GetMapping("/my/recently/store")
+    public Mono<MyRecentlyStoreResponse> getMyRecentlyStoreList(
+            @RequestParam("x") double x,
+            @RequestParam("y") double y,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+            @RequestParam(name = "pageNum", required = false, defaultValue = "0") int pageNum) {
+        return userService.getMyRecentlyStoreList(x, y, pageNum, pageSize);
     }
 
 }

@@ -8,6 +8,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import io.my.bbang.user.dto.UserClickType;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.dto.UserStarType;
+import io.my.bbang.user.payload.response.MyPageResponse;
+import io.my.bbang.user.payload.response.MyRecentlyStoreResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,10 @@ import io.my.bbang.commons.base.RestDocAttributes;
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import io.my.bbang.commons.payloads.BbangResponse;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 class UserTest extends RestDocsBaseWithSpringBoot {
 	
@@ -319,5 +325,169 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 				.isOk()
 				.expectBody()
 				.consumeWith(createConsumer("/delete-star", requestSnippet, responseSnippet));
+	}
+
+	@Test
+	@DisplayName("REST Docs 사용자 정보 조회")
+	void getMyPage() {
+		MyPageResponse responseBody = new MyPageResponse();
+		responseBody.setEmail("bbang@bbang.com");
+		responseBody.setNickname("nickname001");
+		responseBody.setProfileImageUrl("https://oopy.lazyrockets.com/api/v2/notion/image?src=https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fd9c7808e-79b5-4ed8-b6c3-d7dc1239813b%2F827502_page_512x512.png&blockId=a9dbb28c-f2db-4db8-a54e-71ee14f42c98&width=256");
+		responseBody.setPostCount(12);
+		responseBody.setLikeCount(33);
+		responseBody.setCommentCount(100);
+
+		Mockito.when(userService.getMyPage()).thenReturn(Mono.just(responseBody));
+
+		ResponseFieldsSnippet responseSnippet =
+				responseFields(
+						fieldWithPath("result").description("결과")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("nickname").description("닉네임")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("email").description("이메일")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("profileImageUrl").description("이미지 경로")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("postCount").description("게시글 갯수 (총)")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("commentCount").description("댓글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("likeCount").description("좋아요 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer"))
+				);
+
+		getWebTestClient("/api/user/my/page").expectStatus()
+				.isOk()
+				.expectBody()
+				.consumeWith(createConsumer("/my/page", responseSnippet));
+	}
+
+	@Test
+	@DisplayName("REST Docs 사용자 최근 봤던 가게 목록 조회")
+	void getMyRecentlyStoreList() {
+
+		MyRecentlyStoreResponse responseBody = new MyRecentlyStoreResponse();
+		List<MyRecentlyStoreResponse.RecentlyStore> list = new ArrayList<>();
+
+		for (int index=0; index<3; index++) {
+			MyRecentlyStoreResponse.RecentlyStore recentlyStore = new MyRecentlyStoreResponse.RecentlyStore();
+			recentlyStore.setStoreName("storeName");
+			recentlyStore.setFullNm("서울특별시 종로");
+			recentlyStore.setSigKorNm("종로구");
+			recentlyStore.setClickDate(LocalDateTime.now());
+			recentlyStore.setImageUrl("https://oopy.lazyrockets.com/api/v2/notion/image?src=https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fd9c7808e-79b5-4ed8-b6c3-d7dc1239813b%2F827502_page_512x512.png&blockId=a9dbb28c-f2db-4db8-a54e-71ee14f42c98&width=256");
+			recentlyStore.setDistance(300);
+			recentlyStore.setId("storeId001242");
+			list.add(recentlyStore);
+		}
+
+		responseBody.setList(list);
+
+		Mockito.when(
+				userService.getMyRecentlyStoreList(
+						Mockito.anyDouble(),
+						Mockito.anyDouble(),
+						Mockito.anyInt(),
+						Mockito.anyInt()))
+				.thenReturn(Mono.just(responseBody));
+
+		RequestParametersSnippet requestSnippet =
+				requestParameters(
+						parameterWithName("x").description("x 좌표 (위도)")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("double")),
+						parameterWithName("y").description("y 좌표 (경도)")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("double")),
+						parameterWithName("pageSize").description("페이지당 갯수 (기본값: 5)")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						parameterWithName("pageNum").description("페이지 번호 (기본값: 0)")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer"))
+				);
+
+		ResponseFieldsSnippet responseSnippet =
+				responseFields(
+						fieldWithPath("result").description("결과")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("String")),
+						fieldWithPath("code").description("응답 코드")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("list.[].id").description("빵집 고유 번호")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("list.[].storeName").description("빵집명")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("list.[].imageUrl").description("빵집 이미지")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("list.[].fullNm").description("행정구역명")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("list.[].sigKorNm").description("시군구명")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("string")),
+						fieldWithPath("list.[].distance").description("거리, km단위")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("double")),
+						fieldWithPath("list.[].clickDate").description("조회한 날짜")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("date"))
+				);
+
+		String params = "?" +
+				"x" +
+				"=" +
+				126.99427815951064 +
+				"&y" +
+				"=" +
+				37.540882507109906 +
+				"&pageSize" +
+				"=" +
+				3 +
+				"&pageNum" +
+				"=" +
+				0
+		;
+		getWebTestClient("/api/user/my/recently/store" + params).expectStatus()
+				.isOk()
+				.expectBody()
+				.consumeWith(createConsumer("/my/recently/store", requestSnippet, responseSnippet));
 	}
 }

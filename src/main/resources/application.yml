@@ -40,3 +40,9 @@ oauth:
     callback-url: http://localhost:8080/api/oauth/callback/naver
     profile-url: https://openapi.naver.com
     profile-uri: /v1/nid/me
+vword:
+  domain: http://localhost:8080
+  key: 1
+  url: https://api.vworld.kr
+  uri: /req/data
+  common-params: request=GetFeature&data=LT_C_ADSIGG_INFO

@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public interface BreadstagramRepository extends ReactiveCrudRepository<Breadstagram, String> {
 
     Flux<Breadstagram> findByIdNotNull(Pageable pageable);
-    Mono<Long> countAllByUserId(String userId);
-    Mono<Long> countAllByStoreId(String storeId);
+    Mono<Long> countByUserId(String userId);
+    Mono<Long> countByStoreId(String storeId);
 
 }
