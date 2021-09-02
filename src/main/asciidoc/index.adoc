@@ -168,7 +168,6 @@ include::{snippets}/jwttest/jwt/issued/curl-request.adoc[]
 [[resources-user-join]]
 ==== 회원가입 API
 
-include::{snippets}/oauthtest/join/request-headers.adoc[]
 include::{snippets}/oauthtest/join/request-fields.adoc[]
 include::{snippets}/oauthtest/join/response-fields.adoc[]
 include::{snippets}/oauthtest/join/http-request.adoc[]
@@ -495,6 +494,42 @@ include::{snippets}/breadstoretest/list/response-fields.adoc[]
 include::{snippets}/breadstoretest/list/http-request.adoc[]
 include::{snippets}/breadstoretest/list/http-response.adoc[]
 include::{snippets}/breadstoretest/list/curl-request.adoc[]
+
+
+
+[[resources-breadstore-bread-list]]
+==== 빵집 메뉴 목록 조회 API
+
+include::{snippets}/breadstoretest/bread/list/request-headers.adoc[]
+include::{snippets}/breadstoretest/bread/list/request-parameters.adoc[]
+include::{snippets}/breadstoretest/bread/list/response-fields.adoc[]
+include::{snippets}/breadstoretest/bread/list/http-request.adoc[]
+include::{snippets}/breadstoretest/bread/list/http-response.adoc[]
+include::{snippets}/breadstoretest/bread/list/curl-request.adoc[]
+
+
+
+[[resources-breadstore-bread-post]]
+==== 빵집 메뉴 등록 API
+
+include::{snippets}/breadstoretest/bread/post/request-headers.adoc[]
+include::{snippets}/breadstoretest/bread/post/request-fields.adoc[]
+include::{snippets}/breadstoretest/bread/post/response-fields.adoc[]
+include::{snippets}/breadstoretest/bread/post/http-request.adoc[]
+include::{snippets}/breadstoretest/bread/post/http-response.adoc[]
+include::{snippets}/breadstoretest/bread/post/curl-request.adoc[]
+
+
+
+[[resources-breadstore-bread-patch]]
+==== 빵집 메뉴 수정 API
+
+include::{snippets}/breadstoretest/bread/patch/request-headers.adoc[]
+include::{snippets}/breadstoretest/bread/patch/request-fields.adoc[]
+include::{snippets}/breadstoretest/bread/patch/response-fields.adoc[]
+include::{snippets}/breadstoretest/bread/patch/http-request.adoc[]
+include::{snippets}/breadstoretest/bread/patch/http-response.adoc[]
+include::{snippets}/breadstoretest/bread/patch/curl-request.adoc[]
 
 
 [[resources-comment-api]]

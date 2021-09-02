@@ -139,6 +139,11 @@ public class UserService {
 				entity.setClickCount(entity.getClickCount() + 1);
 				storeRepository.save(entity).subscribe();
 			});
+		} else if (UserClickType.PILGRIMAGE_BOARD.isEqualsType(type)) {
+			pilgrimageBoardRepository.findById(id).subscribe(entity -> {
+				entity.setClickCount(entity.getClickCount() + 1);
+				pilgrimageBoardRepository.save(entity).subscribe();
+			});
 		}
 	}
 

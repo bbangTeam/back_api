@@ -20,10 +20,14 @@ class JwtTest extends RestDocsBaseWithSpringBoot {
         responseFields(
                 fieldWithPath("result")
                     .description("결과")
-                    .attributes(RestDocAttributes.length(Integer.MAX_VALUE), RestDocAttributes.format("")), 
+                    .attributes(
+                            RestDocAttributes.length(0),
+                            RestDocAttributes.format("")),
                 fieldWithPath("code")
                     .description("응답 코드")
-                    .attributes(RestDocAttributes.length(0), RestDocAttributes.format("integer"))
+                    .attributes(
+                            RestDocAttributes.length(0),
+                            RestDocAttributes.format("integer"))
         );
 
         getWebTestClient("/api/jwt/issued").expectStatus()

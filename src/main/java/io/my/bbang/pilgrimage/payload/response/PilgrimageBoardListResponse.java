@@ -22,6 +22,7 @@ public class PilgrimageBoardListResponse extends BbangResponse {
         private String nickname;
 
         private long commentCount;
+        private long clickCount;
 
         private LocalDateTime createDate;
         private LocalDateTime modifyDate;

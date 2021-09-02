@@ -1,5 +1,6 @@
 package io.my.bbang.commons.base;
 
+import io.my.bbang.commons.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,6 +16,9 @@ public class SpringBootTestBase extends TestBase {
 	
 	@Autowired
 	protected JwtUtil jwtUtil;
+
+	@Autowired
+	protected DateUtil dateUtil;
 	
 	@Autowired
 	protected UserService testService;

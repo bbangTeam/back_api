@@ -17,4 +17,5 @@ public class PilgrimageBoard extends BaseTimeEntity {
     private String content;
 
     private long commentCount;
+    private long clickCount;
 }

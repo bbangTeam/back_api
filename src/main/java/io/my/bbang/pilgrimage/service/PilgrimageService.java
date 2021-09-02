@@ -176,6 +176,7 @@ public class PilgrimageService {
 			board.setCreateDate(entity.getCreateDate());
 			board.setModifyDate(entity.getModifyDate());
 			board.setStoreId(entity.getStoreId());
+			board.setClickCount(entity.getClickCount());
 
 			return userRepository.findById(entity.getUserId()).map(user -> {
 				board.setNickname(user.getNickname());

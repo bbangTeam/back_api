@@ -1,5 +1,8 @@
 package io.my.bbang.restdocs.breadstore;
 
+import io.my.bbang.breadstore.payload.request.StoreMenuPatchRequest;
+import io.my.bbang.breadstore.payload.request.StoreMenuPostRequest;
+import io.my.bbang.breadstore.payload.resposne.StoreBreadListResponse;
 import io.my.bbang.breadstore.payload.resposne.StoreListResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
 import org.junit.jupiter.api.DisplayName;
@@ -7,16 +10,17 @@ import org.junit.jupiter.api.Test;
 
 import io.my.bbang.commons.base.RestDocsBaseWithSpringBoot;
 import org.mockito.Mockito;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 
@@ -150,5 +154,174 @@ class BreadstoreTest extends RestDocsBaseWithSpringBoot {
                 .expectBody()
                 .consumeWith(createConsumer("/list", requestSnippet, responseSnippet));
     }
+
+    @Test
+    @DisplayName("REST Docs 빵집 메뉴 목록")
+    void stroeBreadList() {
+        StoreBreadListResponse responseBody = new StoreBreadListResponse();
+        List<StoreBreadListResponse.BreadList> list = new ArrayList<>();
+
+        for (int index=0; index<3; index++) {
+            StoreBreadListResponse.BreadList bread = new StoreBreadListResponse.BreadList();
+            bread.setModifyDate(LocalDateTime.now());
+            bread.setName("bread");
+            bread.setId(UUID.randomUUID().toString());
+            bread.setPrice(1000);
+            list.add(bread);
+        }
+        responseBody.setBreadList(list);
+
+        String id = "storeId0184201adfawe";
+        Mockito.when(storeService.stroeBreadList(id)).thenReturn(Mono.just(responseBody));
+
+        RequestParametersSnippet requestSnippet =
+                requestParameters(
+                        parameterWithName("id").description("빵집 고유 번호")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("Double"))
+                );
+
+        ResponseFieldsSnippet responseSnippet =
+                responseFields(
+                        fieldWithPath("result").description("결과")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("code").description("응답 코드")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("integer")),
+                        fieldWithPath("breadList.[].id").description("메뉴 고유 번호")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("breadList.[].name").description("메뉴명")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("breadList.[].price").description("가격")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("integer")),
+                        fieldWithPath("breadList.[].modifyDate").description("마지막 수정일")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("date"))
+                );
+
+        String params = "?" +
+                "id" +
+                "=" +
+                id;
+        getWebTestClient("/api/store/bread/list" + params).expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(createConsumer("/bread/list", requestSnippet, responseSnippet));
+    }
+
+    @Test
+    @DisplayName("REST Docs 빵집 메뉴 등록")
+    void postStoreBread() {
+        StoreMenuPostRequest requestBody = new StoreMenuPostRequest();
+        requestBody.setName("breadName");
+        requestBody.setPrice(3000);
+        List<String> list = new ArrayList<>();
+        list.add("2021-09-01 11:10");
+        requestBody.setBakeTimeList(list);
+        requestBody.setStoreId("storeId001adfawe");
+
+        RequestFieldsSnippet requestSnippet =
+                requestFields(
+                        fieldWithPath("storeId").description("빵집 id")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("name").description("메뉴명")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("price").description("가격")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("Integer")),
+                        fieldWithPath("bakeTimeList.[]").description("빵 나오는 시간 (yyyy-MM-dd HH:mm)")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("[]"))
+                );
+
+        ResponseFieldsSnippet responseSnippet =
+                responseFields(
+                        fieldWithPath("result").description("결과")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("code").description("응답 코드")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("integer"))
+                );
+
+        postWebTestClient(requestBody, "/api/store/bread").expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(createConsumer("/bread/post", requestSnippet, responseSnippet));
+    }
+
+    @Test
+    @DisplayName("REST Docs 빵집 메뉴 수정")
+    void patchStoreBread() {
+        StoreMenuPatchRequest requestBody = new StoreMenuPatchRequest();
+        requestBody.setId("storeMenuId01941asdfwa");
+        requestBody.setName("breadName");
+        requestBody.setPrice(3000);
+        List<String> list = new ArrayList<>();
+        list.add("2021-09-01 11:10");
+        requestBody.setBakeTimeList(list);
+        requestBody.setStoreId("storeId001adfawe");
+
+        RequestFieldsSnippet requestSnippet =
+                requestFields(
+                        fieldWithPath("id").description("빵집 메뉴 고유 번호")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("storeId").description("빵집 고유 번호")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("name").description("메뉴명")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("price").description("가격")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("Integer")),
+                        fieldWithPath("bakeTimeList.[]").description("빵 나오는 시간")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("yyyy-MM-dd HH:mm"))
+                );
+
+        ResponseFieldsSnippet responseSnippet =
+                responseFields(
+                        fieldWithPath("result").description("결과")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("String")),
+                        fieldWithPath("code").description("응답 코드")
+                                .attributes(
+                                        RestDocAttributes.length(0),
+                                        RestDocAttributes.format("integer"))
+                );
+
+        patchWebTestClient(requestBody, "/api/store/bread").expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(createConsumer("/bread/patch", requestSnippet, responseSnippet));
+    }
+
 
 }

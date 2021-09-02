@@ -282,6 +282,7 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 			board.setStoreName("storeName" + i);
 			board.setStoreId("storeId0124128");
 			board.setId("boardId9241432");
+			board.setClickCount(1000L);
 			board.setContent("board content content content");
 			list.add(board);
 		}
@@ -339,6 +340,10 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("String")),
 						fieldWithPath("boardList.[].commentCount").description("댓글 갯수")
+								.attributes(
+										RestDocAttributes.length(0),
+										RestDocAttributes.format("integer")),
+						fieldWithPath("boardList.[].clickCount").description("조회수")
 								.attributes(
 										RestDocAttributes.length(0),
 										RestDocAttributes.format("integer")),
