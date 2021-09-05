@@ -5,6 +5,9 @@ import java.util.List;
 
 import io.my.bbang.breadstagram.repository.BreadstagramRepository;
 import io.my.bbang.comment.dto.CommentType;
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.repository.PilgrimageBoardRepository;
 import io.my.bbang.user.dto.UserHeartType;
 import io.my.bbang.user.repository.UserHeartRepository;
@@ -76,62 +79,68 @@ public class CommentService {
 		return responseBody;
 	}
 	
-	public void write(String id, String content, String type, String parentId) {
-		commentCountPlus(type, parentId);
-
-		jwtUtil.getMonoUserId().subscribe(userId ->
-			userRepository.findById(userId).subscribe(user -> {
-				Comment comment = Comment.build(id, user.getId(), content, type);
-				commentRepository.save(comment).subscribe();
-			}));
+	public Mono<BbangResponse> write(String id, String content, String type, String parentId) {
+		return jwtUtil.getMonoUserId().flatMap(userId ->
+			userRepository.findById(userId)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+					.flatMap(user -> {
+						Comment comment = Comment.build(id, user.getId(), content, type);
+						return commentRepository.save(comment).switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
+					})
+					.flatMap(e -> this.commentCountPlus(type, parentId)))
+				.map(e -> new BbangResponse());
 	}
 
-	public void commentCountPlus(String type, String parentId) {
+	public Mono<Object> commentCountPlus(String type, String parentId) {
 		if (parentId != null && parentId.equals("")) {
 			if (CommentType.RE_COMMENT.equalsType(type)) {
-				commentRepository.findById(parentId).subscribe(entity -> {
+				return commentRepository.findById(parentId).flatMap(entity -> {
 					entity.setReCommentCount(entity.getReCommentCount() + 1);
-					commentRepository.save(entity).subscribe();
+					return commentRepository.save(entity);
 				});
 			} else if (CommentType.PILGRIMAGE.equalsType(type)) {
-				pilgrimageBoardRepository.findById(parentId).subscribe(entity -> {
+				return pilgrimageBoardRepository.findById(parentId).flatMap(entity -> {
 					entity.setCommentCount(entity.getCommentCount() + 1);
-					pilgrimageBoardRepository.save(entity).subscribe();
+					return pilgrimageBoardRepository.save(entity);
 				});
 			} else if (CommentType.BREADSTAGRAM.equalsType(type)) {
-				breadstagramRepository.findById(parentId).subscribe(entity -> {
+				return breadstagramRepository.findById(parentId).flatMap(entity -> {
 					entity.setCommentCount(entity.getCommentCount() + 1);
-					breadstagramRepository.save(entity).subscribe();
+					return breadstagramRepository.save(entity);
 				});
 			}
 		}
+		return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
 	}
 
-	public void delete(String id) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
-			commentRepository.findById(id).subscribe(entity -> {
-				String type = entity.getType();
-				String parentId = entity.getParentId();
+	public Mono<BbangResponse> delete(String id) {
+		return jwtUtil.getMonoUserId().flatMap(userId ->
+			commentRepository.findById(id)
+				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+				.flatMap(entity -> {
+					String type = entity.getType();
+					String parentId = entity.getParentId();
 
-				if (CommentType.RE_COMMENT.equalsType(type)) {
-					commentRepository.findById(parentId).subscribe(e -> {
-						e.setReCommentCount(e.getReCommentCount() - 1);
-						commentRepository.save(e).subscribe();
-					});
-				} else if (CommentType.PILGRIMAGE.equalsType(type)) {
-					pilgrimageBoardRepository.findById(parentId).subscribe(e -> {
-						e.setCommentCount(e.getCommentCount() - 1);
-						pilgrimageBoardRepository.save(e).subscribe();
-					});
-				} else if (CommentType.BREADSTAGRAM.equalsType(type)) {
-					breadstagramRepository.findById(parentId).subscribe(e -> {
-						e.setCommentCount(e.getCommentCount() - 1);
-						breadstagramRepository.save(e).subscribe();
-					});
-				}
-				commentRepository.delete(entity).subscribe();
-			});
-		});
+					if (CommentType.RE_COMMENT.equalsType(type)) {
+						return commentRepository.findById(parentId).flatMap(e -> {
+							e.setReCommentCount(e.getReCommentCount() - 1);
+							return commentRepository.save(e).map(e1 -> entity);
+						});
+					} else if (CommentType.PILGRIMAGE.equalsType(type)) {
+						return pilgrimageBoardRepository.findById(parentId).flatMap(e -> {
+							e.setCommentCount(e.getCommentCount() - 1);
+							return pilgrimageBoardRepository.save(e).map(e1 -> entity);
+						});
+					} else if (CommentType.BREADSTAGRAM.equalsType(type)) {
+						return breadstagramRepository.findById(parentId).flatMap(e -> {
+							e.setCommentCount(e.getCommentCount() - 1);
+							return breadstagramRepository.save(e).map(e1 -> entity);
+						});
+					}
+					return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+				})
+				.flatMap(commentRepository::delete).map(e -> new BbangResponse()))
+			;
 
 	}
 

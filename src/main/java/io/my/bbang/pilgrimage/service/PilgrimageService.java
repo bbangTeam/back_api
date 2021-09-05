@@ -8,6 +8,7 @@ import io.my.bbang.breadstore.repository.StoreRepository;
 import io.my.bbang.code.repository.CodeRepository;
 import io.my.bbang.commons.exception.BbangException;
 import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.domain.PilgrimageBoard;
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardListResponse;
@@ -136,32 +137,40 @@ public class PilgrimageService {
 		;
 	}
 
-	 public void write(PilgrimageWriteRequest requestBody) {
+	 public Mono<BbangResponse> write(PilgrimageWriteRequest requestBody) {
 		PilgrimageBoard entity = new PilgrimageBoard();
 
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			String storeId = requestBody.getStoreId();
 			entity.setUserId(userId);
 			entity.setTitle(requestBody.getTitle());
 			entity.setContent(requestBody.getContent());
 			entity.setStoreId(storeId);
 			entity.setCommentCount(0);
-
-			pilgrimageBoardRepository.save(entity).subscribe();
-			pilgrimageRepository.findByStoreId(storeId).subscribe(pilgrimage -> {
-				pilgrimage.setReviewCount(pilgrimage.getReviewCount() + 1);
-				pilgrimageRepository.save(pilgrimage).subscribe();
-			});
-		});
+			return pilgrimageBoardRepository.save(entity)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
+		})
+		.flatMap(e ->
+				pilgrimageRepository.findByStoreId(requestBody.getStoreId())
+						.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+						.flatMap(pilgrimage -> {
+							pilgrimage.setReviewCount(pilgrimage.getReviewCount() + 1);
+							return pilgrimageRepository.save(pilgrimage)
+									.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
+						})
+		)
+		.map(e -> new BbangResponse());
 	 }
 
-	 public void visit(String id) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+	 public Mono<BbangResponse> visit(String id) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			UserPilgrimage entity = new UserPilgrimage();
 			entity.setPilgrimageId(id);
 			entity.setUserId(userId);
-			userPilgrimageRepository.save(entity).subscribe();
-		});
+			return userPilgrimageRepository.save(entity)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
+		})
+		.map(e -> new BbangResponse());
 	 }
 
 	 public Mono<PilgrimageBoardListResponse> boardList(String id, int pageNum, int pageSize) {

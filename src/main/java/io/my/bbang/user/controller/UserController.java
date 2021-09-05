@@ -31,17 +31,18 @@ public class UserController {
     @PatchMapping("/nickname")
     public Mono<BbangResponse> modifyNickname(
         @RequestParam String nickname) {
-        userService.modifyNickname(nickname);
-        return Mono.just(new BbangResponse());
+        return userService.modifyNickname(nickname);
     }
 
     @PostMapping("/click")
     public Mono<BbangResponse> userClick(
             @RequestParam("type") String type,
             @RequestParam("id") String id) {
-        if (UserClickType.isExistType(type)) userService.click(id, type);
-        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
-        return Mono.just(new BbangResponse());
+
+        if (UserClickType.isExistType(type))
+            return userService.click(id, type);
+
+        throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
     }
 
     @PostMapping("/like")
@@ -50,18 +51,19 @@ public class UserController {
             @RequestParam("id") String id) {
         log.info("POST /api/breadstagram/userLike");
 
-        if (UserHeartType.isExistType(type)) userService.postLike(id, type);
-        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
-        return Mono.just(new BbangResponse());
+        if (UserHeartType.isExistType(type))
+            return userService.postLike(id, type);
+        throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
     }
 
     @DeleteMapping("/like")
     public Mono<BbangResponse> deleteUserLike(
             @RequestParam("type") String type,
             @RequestParam("id") String id) {
-        if (UserHeartType.isExistType(type)) userService.deleteLike(id, type);
-        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
-        return Mono.just(new BbangResponse());
+        if (UserHeartType.isExistType(type))
+            return userService.deleteLike(id, type);
+
+        throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
     }
 
     @PostMapping("/star")
@@ -70,10 +72,10 @@ public class UserController {
             @RequestParam("type") String type,
             @RequestParam("star") int star) {
 
-        if (UserStarType.isExistType(type)) userService.postStar(id, type, star);
-        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+        if (UserStarType.isExistType(type))
+            return userService.postStar(id, type, star);
 
-        return Mono.just(new BbangResponse());
+        throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
     }
 
     @DeleteMapping("/star")
@@ -81,10 +83,10 @@ public class UserController {
             @RequestParam("id") String id,
             @RequestParam("type") String type) {
 
-        if (UserStarType.isExistType(type)) userService.deleteStar(id, type);
-        else throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
+        if (UserStarType.isExistType(type))
+            return userService.deleteStar(id, type);
 
-        return Mono.just(new BbangResponse());
+        throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
     }
 
     @GetMapping("/my/page")

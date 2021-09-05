@@ -5,6 +5,7 @@ import io.my.bbang.breadstore.payload.request.StoreMenuPostRequest;
 import io.my.bbang.breadstore.payload.resposne.StoreBreadListResponse;
 import io.my.bbang.breadstore.payload.resposne.StoreListResponse;
 import io.my.bbang.commons.base.RestDocAttributes;
+import io.my.bbang.commons.payloads.BbangResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -231,6 +232,8 @@ class BreadstoreTest extends RestDocsBaseWithSpringBoot {
         requestBody.setBakeTimeList(list);
         requestBody.setStoreId("storeId001adfawe");
 
+        Mockito.when(storeService.postStoreBread(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
         RequestFieldsSnippet requestSnippet =
                 requestFields(
                         fieldWithPath("storeId").description("빵집 id")
@@ -280,6 +283,8 @@ class BreadstoreTest extends RestDocsBaseWithSpringBoot {
         list.add("2021-09-01 11:10");
         requestBody.setBakeTimeList(list);
         requestBody.setStoreId("storeId001adfawe");
+
+        Mockito.when(storeService.patchStoreBread(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
 
         RequestFieldsSnippet requestSnippet =
                 requestFields(

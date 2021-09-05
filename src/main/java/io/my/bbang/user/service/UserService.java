@@ -119,175 +119,194 @@ public class UserService {
 		});
 	}
 
-	public void click(String id, String type) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+	public Mono<BbangResponse> click(String id, String type) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			UserClick entity = new UserClick();
 			entity.setUserId(userId);
 			entity.setType(type);
 			entity.setParentId(id);
-			userClickRepository.save(entity).subscribe();
+			return userClickRepository.save(entity)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
 		})
+		.flatMap(e -> {
+			if (UserClickType.BREADSTAGRAM.isEqualsType(type)) {
+				return breadstagramRepository.findById(id).flatMap(entity -> {
+					entity.setClickCount(entity.getClickCount() + 1);
+					return breadstagramRepository.save(entity);
+				});
+			} else if (UserClickType.STORE.isEqualsType(type)) {
+				return storeRepository.findById(id).flatMap(entity -> {
+					entity.setClickCount(entity.getClickCount() + 1);
+					return storeRepository.save(entity);
+				});
+			} else if (UserClickType.PILGRIMAGE_BOARD.isEqualsType(type)) {
+				return pilgrimageBoardRepository.findById(id).flatMap(entity -> {
+					entity.setClickCount(entity.getClickCount() + 1);
+					return pilgrimageBoardRepository.save(entity);
+				});
+			}
+			return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+		})
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+		.map(e -> new BbangResponse())
 		;
 
-		if (UserClickType.BREADSTAGRAM.isEqualsType(type)) {
-			breadstagramRepository.findById(id).subscribe(entity -> {
-				entity.setClickCount(entity.getClickCount() + 1);
-				breadstagramRepository.save(entity).subscribe();
-			});
-		} else if (UserClickType.STORE.isEqualsType(type)) {
-			storeRepository.findById(id).subscribe(entity -> {
-				entity.setClickCount(entity.getClickCount() + 1);
-				storeRepository.save(entity).subscribe();
-			});
-		} else if (UserClickType.PILGRIMAGE_BOARD.isEqualsType(type)) {
-			pilgrimageBoardRepository.findById(id).subscribe(entity -> {
-				entity.setClickCount(entity.getClickCount() + 1);
-				pilgrimageBoardRepository.save(entity).subscribe();
-			});
-		}
 	}
 
-	public void postLike(String id, String type) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+	public Mono<BbangResponse> postLike(String id, String type) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			UserHeart entity = new UserHeart();
 			entity.setUserId(userId);
 			entity.setType(type);
 			entity.setParentId(id);
-			userHeartRepository.save(entity).subscribe();
+			return userHeartRepository.save(entity)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
 		})
-		;
-
-		if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
-			breadstagramRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() + 1);
-				breadstagramRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
-			pilgrimageRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() + 1);
-				pilgrimageRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.STORE.isEqualsType(type)) {
-			storeRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() + 1);
-				storeRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.COMMENT.isEqualsType(type)) {
-			commentRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() + 1);
-				commentRepository.save(entity).subscribe();
-			});
-		}
-	}
-
-	public void deleteLike(String id, String type) {
-		jwtUtil.getMonoUserId()
-				.subscribe(userId ->
-					userHeartRepository
-							.deleteByUserIdAndParentIdAndType(userId, id, type).subscribe())
-		;
-
-		if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
-			breadstagramRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() - 1);
-				breadstagramRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
-			pilgrimageRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() - 1);
-				pilgrimageRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.STORE.isEqualsType(type)) {
-			storeRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() - 1);
-				storeRepository.save(entity).subscribe();
-			});
-		} else if (UserHeartType.COMMENT.isEqualsType(type)) {
-			commentRepository.findById(id).subscribe(entity -> {
-				entity.setLikeCount(entity.getLikeCount() - 1);
-				commentRepository.save(entity).subscribe();
-			});
-		}
-	}
-
-	public void postStar(String parentId, String type, int star) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
-			if (UserStarType.STORE.isEqualsType(type)) {
-				storeStar(userId, parentId, star);
-			} else if (UserStarType.PILGRIMAGE.isEqualsType(type)) {
-				pilgrimageStar(userId, parentId, star);
+		.flatMap(e -> {
+			if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
+				return breadstagramRepository.findById(id).flatMap(entity -> {
+					entity.setLikeCount(entity.getLikeCount() + 1);
+					return breadstagramRepository.save(entity);
+				});
+			} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
+				return pilgrimageRepository.findById(id).flatMap(entity -> {
+					entity.setLikeCount(entity.getLikeCount() + 1);
+					return pilgrimageRepository.save(entity);
+				});
+			} else if (UserHeartType.STORE.isEqualsType(type)) {
+				return storeRepository.findById(id).flatMap(entity -> {
+					entity.setLikeCount(entity.getLikeCount() + 1);
+					return storeRepository.save(entity);
+				});
+			} else if (UserHeartType.COMMENT.isEqualsType(type)) {
+				return commentRepository.findById(id).flatMap(entity -> {
+					entity.setLikeCount(entity.getLikeCount() + 1);
+					return commentRepository.save(entity);
+				});
 			}
+			return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+		})
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+		.map(e -> new BbangResponse())
+		;
+	}
+
+	public Mono<BbangResponse> deleteLike(String id, String type) {
+		return jwtUtil.getMonoUserId()
+				.flatMap(userId ->
+						userHeartRepository.deleteByUserIdAndParentIdAndType(userId, id, type))
+				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+				.flatMap(e -> {
+					if (UserHeartType.BREADSTAGRAM.isEqualsType(type)) {
+						return breadstagramRepository.findById(id).flatMap(entity -> {
+							entity.setLikeCount(entity.getLikeCount() - 1);
+							return breadstagramRepository.save(entity);
+						});
+					} else if (UserHeartType.PILGRIMAGE.isEqualsType(type)) {
+						return pilgrimageRepository.findById(id).flatMap(entity -> {
+							entity.setLikeCount(entity.getLikeCount() - 1);
+							return pilgrimageRepository.save(entity);
+						});
+					} else if (UserHeartType.STORE.isEqualsType(type)) {
+						return storeRepository.findById(id).flatMap(entity -> {
+							entity.setLikeCount(entity.getLikeCount() - 1);
+							return storeRepository.save(entity);
+						});
+					} else if (UserHeartType.COMMENT.isEqualsType(type)) {
+						return commentRepository.findById(id).flatMap(entity -> {
+							entity.setLikeCount(entity.getLikeCount() - 1);
+							return commentRepository.save(entity);
+						});
+					}
+					return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+				})
+				.map(e -> new BbangResponse())
+				;
+	}
+
+	public Mono<BbangResponse> postStar(String parentId, String type, int star) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
+			if (UserStarType.STORE.isEqualsType(type)) {
+				return storeStar(userId, parentId, star);
+			} else if (UserStarType.PILGRIMAGE.isEqualsType(type)) {
+				return pilgrimageStar(userId, parentId, star);
+			}
+			return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+		})
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+		.map(e -> new BbangResponse());
+	}
+
+	private Mono<Object> storeStar(String userId, String storeId, int star) {
+		return userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).flatMap(entity -> {
+			if (entity == null) return saveStoreStar(userId, storeId, star);
+			else return updateStoreStar(entity, star);
 		});
 	}
 
-	private void storeStar(String userId, String storeId, int star) {
-		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).subscribe(entity -> {
-			if (entity == null) saveStoreStar(userId, storeId, star);
-			else updateStoreStar(entity, star);
-		});
-	}
-
-	private void saveStoreStar(String userId, String storeId, int star) {
+	private Mono<Object> saveStoreStar(String userId, String storeId, int star) {
 		UserStar userStar = new UserStar();
 		userStar.setUserId(userId);
 		userStar.setStar(star);
 		userStar.setParentId(storeId);
 		userStar.setType(UserStarType.STORE.getValue());
 
-		userStarRepository.save(userStar).subscribe();
-		storeRepository.findById(storeId).subscribe(store -> {
-			store.setStarCount(store.getStarCount() + 1);
-			store.setStarSum(store.getStarSum() + star);
-			store.setStar(
-					setStar(store.getStarSum(), store.getStarCount())
-			);
-			storeRepository.save(store).subscribe();
-		});
+		return userStarRepository.save(userStar)
+				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+		.flatMap(e ->
+			storeRepository.findById(storeId).flatMap(store -> {
+				store.setStarCount(store.getStarCount() + 1);
+				store.setStarSum(store.getStarSum() + star);
+				store.setStar(
+						setStar(store.getStarSum(), store.getStarCount())
+				);
+				return storeRepository.save(store);
+			})
+		);
 	}
 
-	private void updateStoreStar(UserStar userStar, int star) {
-		storeRepository.findById(userStar.getParentId()).subscribe(store -> {
+	private Mono<Object> updateStoreStar(UserStar userStar, int star) {
+		return storeRepository.findById(userStar.getParentId()).flatMap(store -> {
 			store.setStarSum(store.getStarSum() - userStar.getStar() + star);
 			store.setStar(setStar(store.getStarSum(), store.getStarCount()));
-
 			userStar.setStar(star);
-			userStarRepository.save(userStar).subscribe();
-			storeRepository.save(store).subscribe();
+			return userStarRepository.save(userStar).flatMap(e -> storeRepository.save(store));
 		});
 	}
 
-	private void pilgrimageStar(String userId, String pilgrimageId, int star) {
-		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId).subscribe(entity -> {
-			if (entity == null) savePilgrimageStar(userId, pilgrimageId, star);
-			else updatePilgrimageStar(entity, star);
-		});
+	private Mono<Object> pilgrimageStar(String userId, String pilgrimageId, int star) {
+		return userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId).flatMap(entity -> {
+			if (entity == null) return savePilgrimageStar(userId, pilgrimageId, star);
+			else return updatePilgrimageStar(entity, star);
+		})
+		.switchIfEmpty(savePilgrimageStar(userId, pilgrimageId, star));
 	}
 
-	private void savePilgrimageStar(String userId, String pilgrimageId, int star) {
+	private Mono<Object> savePilgrimageStar(String userId, String pilgrimageId, int star) {
 		UserStar userStar = new UserStar();
 		userStar.setUserId(userId);
 		userStar.setParentId(pilgrimageId);
 		userStar.setStar(star);
 
-		userStarRepository.save(userStar).subscribe();
-		pilgrimageRepository.findById(pilgrimageId).subscribe(entity -> {
-			entity.setStarCount(entity.getStarCount() + 1);
-			entity.setStarSum(entity.getStarSum() + star);
-			entity.setStar(
-					setStar(entity.getStarSum(), entity.getStarCount())
-			);
-			pilgrimageRepository.save(entity);
-		});
+		return userStarRepository.save(userStar).flatMap(e ->
+			pilgrimageRepository.findById(pilgrimageId).flatMap(entity -> {
+				entity.setStarCount(entity.getStarCount() + 1);
+				entity.setStarSum(entity.getStarSum() + star);
+				entity.setStar(
+						setStar(entity.getStarSum(), entity.getStarCount())
+				);
+				return pilgrimageRepository.save(entity);
+			})
+		);
 	}
 
-	private void updatePilgrimageStar(UserStar userStar, int star) {
-		pilgrimageRepository.findById(userStar.getParentId()).subscribe(pilgrimage -> {
+	private Mono<Object> updatePilgrimageStar(UserStar userStar, int star) {
+		return pilgrimageRepository.findById(userStar.getParentId()).flatMap(pilgrimage -> {
 			pilgrimage.setStarSum(pilgrimage.getStarSum() - userStar.getStar() + star);
 			pilgrimage.setStar(setStar(pilgrimage.getStarSum(), pilgrimage.getStarCount()));
 
 			userStar.setStar(star);
-			pilgrimageRepository.save(pilgrimage).subscribe();
-			userStarRepository.save(userStar).subscribe();
+			return pilgrimageRepository.save(pilgrimage).flatMap(e -> userStarRepository.save(userStar));
 		});
 	}
 
@@ -295,40 +314,47 @@ public class UserService {
 		return ((double) starSum / starCount) / 2;
 	}
 
-	public void deleteStar(String parentId, String type) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+	public Mono<BbangResponse> deleteStar(String parentId, String type) {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			if (UserStarType.STORE.isEqualsType(type)) {
-				deleteStoreStar(userId, parentId);
+				return deleteStoreStar(userId, parentId);
 			} else if (UserStarType.PILGRIMAGE.isEqualsType(type)) {
-				deletePilgrimageStar(userId, parentId);
+				return deletePilgrimageStar(userId, parentId);
 			}
+			return Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION));
+		})
+		.map(e -> new BbangResponse());
+	}
+
+	private Mono<Object> deleteStoreStar(String userId, String storeId) {
+		return userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).flatMap(userStar -> {
+			int star = userStar.getStar();
+			return userStarRepository.deleteById(userStar.getId()).flatMap(e ->
+				storeRepository.findById(storeId).flatMap(store -> {
+					store.setStarSum(store.getStarSum() - star);
+					store.setStarCount(store.getStarCount() - 1);
+					store.setStar(setStar(store.getStarSum(), store.getStarCount()));
+					return storeRepository.save(store);
+				})
+			);
 		});
 	}
 
-	private void deleteStoreStar(String userId, String storeId) {
-		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.STORE.getValue(), userId, storeId).subscribe(userStar -> {
-			int star = userStar.getStar();
-			userStarRepository.deleteById(userStar.getId()).subscribe();
-			storeRepository.findById(storeId).subscribe(store -> {
-				store.setStarSum(store.getStarSum() - star);
-				store.setStarCount(store.getStarCount() - 1);
-				store.setStar(setStar(store.getStarSum(), store.getStarCount()));
-				storeRepository.save(store).subscribe();
-			});
-		});
-	}
-
-	private void deletePilgrimageStar(String userId, String pilgrimageId) {
-		userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId).subscribe(userStar -> {
-			int star = userStar.getStar();
-			userStarRepository.deleteById(userStar.getId()).subscribe();
-			pilgrimageRepository.findById(pilgrimageId).subscribe(pilgrimage -> {
-				pilgrimage.setStarSum(pilgrimage.getStarSum() - star);
-				pilgrimage.setStarCount(pilgrimage.getStarCount() - 1);
-				pilgrimage.setStar(setStar(pilgrimage.getStarSum(), pilgrimage.getStarCount()));
-				pilgrimageRepository.save(pilgrimage).subscribe();
-			});
-		});
+	private Mono<Object> deletePilgrimageStar(String userId, String pilgrimageId) {
+		return userStarRepository.findByTypeAndUserIdAndParentId(UserStarType.PILGRIMAGE.getValue(), userId, pilgrimageId)
+				.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+				.flatMap(userStar -> {
+					int star = userStar.getStar();
+					return userStarRepository.deleteById(userStar.getId()).flatMap(e ->
+						pilgrimageRepository.findById(pilgrimageId).flatMap(pilgrimage -> {
+							pilgrimage.setStarSum(pilgrimage.getStarSum() - star);
+							pilgrimage.setStarCount(pilgrimage.getStarCount() - 1);
+							pilgrimage.setStar(setStar(pilgrimage.getStarSum(), pilgrimage.getStarCount()));
+							return pilgrimageRepository.save(pilgrimage);
+						})
+					);
+				})
+		.map(e -> new BbangResponse());
 	}
 
 	public Mono<MyPageResponse> getMyPage() {

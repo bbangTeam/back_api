@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import io.my.bbang.comment.dto.CommentType;
+import io.my.bbang.commons.payloads.BbangResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -148,6 +149,8 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 		responseBody.setResult("Success");
 		responseBody.setId(UUID.randomUUID().toString());
 
+		Mockito.when(commentService.write(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestFieldsSnippet requestSnippet =
 				requestFields(
 						fieldWithPath("id").description("게시글(혹은 상위 댓글) 고유 번호")
@@ -190,6 +193,9 @@ class CommentTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 댓글 삭제")
 	void delete() {
+
+		Mockito.when(commentService.delete(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("게시글(혹은 상위 댓글) 고유 번호")

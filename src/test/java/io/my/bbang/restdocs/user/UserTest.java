@@ -107,6 +107,8 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 조회수 API 명세서")
 	void userClick() {
+		Mockito.when(userService.click(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("type").description("명세서 상단 타입 참고")
@@ -150,6 +152,8 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 좋아요 API 명세서")
 	void userLike() {
+		Mockito.when(userService.postLike(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("type").description("명세서 상단 타입 참고")
@@ -193,6 +197,9 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 좋아요 삭제 API 명세서")
 	void deleteUserLike() {
+
+		Mockito.when(userService.deleteLike(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("type").description("명세서 상단 타입 참고")
@@ -236,6 +243,7 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 별점 추가 API 명세서")
 	void postUserStar() {
+		Mockito.when(userService.postStar(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt())).thenReturn(Mono.just(new BbangResponse()));
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("type").description("명세서 상단 타입 참고")
@@ -287,6 +295,8 @@ class UserTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 별점 삭제 API 명세서")
 	void deleteUserStar() {
+		Mockito.when(userService.deleteStar(Mockito.any(), Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("type").description("명세서 상단 타입 참고")

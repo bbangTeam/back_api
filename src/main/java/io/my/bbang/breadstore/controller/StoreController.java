@@ -34,14 +34,12 @@ public class StoreController {
 	@PostMapping("/bread")
 	public Mono<BbangResponse> postStoreBread(
 			@RequestBody StoreMenuPostRequest requestBody) {
-		storeService.postStoreBread(requestBody);
-		return Mono.just(new BbangResponse());
+		return storeService.postStoreBread(requestBody);
 	}
 
 	@PatchMapping("/bread")
 	public Mono<BbangResponse> patchStoreBread(
 			@RequestBody StoreMenuPatchRequest requestBody) {
-		storeService.patchStoreBread(requestBody);
-		return Mono.just(new BbangResponse());
+		return storeService.patchStoreBread(requestBody);
 	}
 }

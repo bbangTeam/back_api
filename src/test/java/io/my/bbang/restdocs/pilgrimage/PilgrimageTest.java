@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.pilgrimage.payload.request.PilgrimageWriteRequest;
 import io.my.bbang.pilgrimage.payload.response.PilgrimageBoardListResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -199,6 +200,8 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 		requestBody.setContent("content content content");
 		requestBody.setTitle("title title title");
 
+		Mockito.when(pilgrimageService.write(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestFieldsSnippet requestSnippet =
 				requestFields(
 						fieldWithPath("storeId").description("빵집 고유번호")
@@ -236,6 +239,8 @@ class PilgrimageTest extends RestDocsBaseWithSpringBoot {
 	@Test
 	@DisplayName("REST Docs 빵지순례 방문")
 	void visit() {
+		Mockito.when(pilgrimageService.visit(Mockito.any())).thenReturn(Mono.just(new BbangResponse()));
+
 		RequestParametersSnippet requestSnippet =
 				requestParameters(
 						parameterWithName("id").description("빵지순례 고유 번호")

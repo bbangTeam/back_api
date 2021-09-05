@@ -31,14 +31,12 @@ public class PilgrimageController {
 
 	@PostMapping("/board")
 	public Mono<BbangResponse> writePilgrimage(@RequestBody PilgrimageWriteRequest requestBody) {
-		pilgrimageService.write(requestBody);
-		return Mono.just(new BbangResponse());
+		return pilgrimageService.write(requestBody);
 	}
 
 	@PostMapping("/visit")
 	public Mono<BbangResponse> visit(@RequestParam("id") String id) {
-		pilgrimageService.visit(id);
-		return Mono.just(new BbangResponse());
+		return pilgrimageService.visit(id);
 	}
 
 	@GetMapping("/board/list")

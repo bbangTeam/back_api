@@ -35,13 +35,11 @@ public class CommentController {
 
 		if (!CommentType.isExistType(type)) throw new BbangException(ExceptionTypes.TYPE_EXCEPTION);
 		
-		commentService.write(id, content, type, parentId);
-		return Mono.just(new BbangResponse());
+		return commentService.write(id, content, type, parentId);
 	}
 
 	@DeleteMapping
 	public Mono<BbangResponse> delete(@RequestParam("id") String id) {
-		commentService.delete(id);
-		return Mono.just(new BbangResponse());
+		return commentService.delete(id);
 	}
 }

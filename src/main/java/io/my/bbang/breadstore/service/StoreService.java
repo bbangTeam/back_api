@@ -6,6 +6,9 @@ import io.my.bbang.breadstore.payload.request.StoreMenuPostRequest;
 import io.my.bbang.breadstore.payload.resposne.StoreBreadListResponse;
 import io.my.bbang.breadstore.payload.resposne.StoreListResponse;
 import io.my.bbang.breadstore.repository.StoreBreadRepository;
+import io.my.bbang.commons.exception.BbangException;
+import io.my.bbang.commons.exception.type.ExceptionTypes;
+import io.my.bbang.commons.payloads.BbangResponse;
 import io.my.bbang.commons.utils.DateUtil;
 import io.my.bbang.commons.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -71,8 +74,8 @@ public class StoreService {
 		.switchIfEmpty(Mono.just(new StoreBreadListResponse()));
 	}
 
-	public void postStoreBread(StoreMenuPostRequest requestBody) {
-		jwtUtil.getMonoUserId().subscribe(userId -> {
+	public Mono<BbangResponse> postStoreBread(StoreMenuPostRequest requestBody) {
+		return jwtUtil.getMonoUserId().map(userId -> {
 			StoreBread entity = new StoreBread();
 
 			List<StoreBread.ModifyUserList> userList = new ArrayList<>();
@@ -90,13 +93,16 @@ public class StoreService {
 			entity.setName(requestBody.getName());
 			entity.setPrice(requestBody.getPrice());
 			entity.setStoreId(requestBody.getStoreId());
-			storeBreadRepository.save(entity).subscribe();
-		});
+			return storeBreadRepository.save(entity)
+					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
+			;
+		})
+		.flatMap(e -> Mono.just(new BbangResponse()));
 	}
 
-	public void patchStoreBread(StoreMenuPatchRequest requestBody) {
-		jwtUtil.getMonoUserId().subscribe(userId ->
-			storeBreadRepository.findByStoreId(requestBody.getStoreId()).subscribe(entity -> {
+	public Mono<BbangResponse> patchStoreBread(StoreMenuPatchRequest requestBody) {
+		return jwtUtil.getMonoUserId().map(userId ->
+			storeBreadRepository.findByStoreId(requestBody.getStoreId()).flatMap(entity -> {
 				requestBody.getBakeTimeList().forEach(time ->
 						entity.getBakeTimeList().add(
 								dateUtil.stringToLocalDateTime(time)));
@@ -107,9 +113,12 @@ public class StoreService {
 				entity.getUserList().add(user);
 				entity.setPrice(requestBody.getPrice());
 
-				storeBreadRepository.save(entity).subscribe();
+				return storeBreadRepository.save(entity)
+						.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)));
 			})
-		);
+		)
+		.flatMap(e -> Mono.just(new BbangResponse()))
+		;
 	}
 
 }
