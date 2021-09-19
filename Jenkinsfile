@@ -117,8 +117,8 @@ pipeline {
                             sshTransfer(
                                 sourceFiles: "docker-compose-dev.yml",
                             ),
-                            sshTransfer(execCommand: "docker-compose -f /home/mysend/bbang-comopse/docker-compose.yml -f /home/mysend/bbang-comopse/docker-compose-dev.yml down"),
-                            sshTransfer(execCommand: "docker-compose -f /home/mysend/bbang-comopse/docker-compose.yml -f /home/mysend/bbang-comopse/docker-compose-dev.yml up -d"),
+                            sshTransfer(execCommand: "docker service rm bbang_bbang-api"),
+                            sshTransfer(execCommand: "docker stack deploy --compose-file /home/mysend/bbang-comopse/docker-compose.yml -c /home/mysend/bbang-comopse/docker-compose-dev.yml bbang"),
                             sshTransfer(execCommand: "docker image prune -f")
                         ]
                     )
