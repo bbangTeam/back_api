@@ -64,7 +64,7 @@ pipeline {
           steps {
             echo 'Build Dokcer'
             sh '''
-            docker tag rlabotjd/mysend:backup-bbang-api .
+            docker tag rlabotjd/mysend:backup-bbang-api
             docker build -t rlabotjd/mysend:latest-bbang-api .
             '''
           }
