@@ -75,7 +75,7 @@ public class StoreService {
 	}
 
 	public Mono<BbangResponse> postStoreBread(StoreMenuPostRequest requestBody) {
-		return jwtUtil.getMonoUserId().map(userId -> {
+		return jwtUtil.getMonoUserId().flatMap(userId -> {
 			StoreBread entity = new StoreBread();
 
 			List<StoreBread.ModifyUserList> userList = new ArrayList<>();
@@ -97,7 +97,8 @@ public class StoreService {
 					.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.DATABASE_EXCEPTION)))
 			;
 		})
-		.flatMap(e -> Mono.just(new BbangResponse()));
+		.switchIfEmpty(Mono.error(new BbangException(ExceptionTypes.AUTH_EXCEPTION)))
+		.map(e -> new BbangResponse());
 	}
 
 	public Mono<BbangResponse> patchStoreBread(StoreMenuPatchRequest requestBody) {

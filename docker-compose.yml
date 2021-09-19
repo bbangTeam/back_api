@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  bbang-api:
+    image: rlabotjd/mysend:latest-bbang-api
+    container_name: bbang-api
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=Asia/Seoul
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        delay: 60s
+        window: 120s

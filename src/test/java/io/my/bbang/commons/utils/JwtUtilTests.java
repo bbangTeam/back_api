@@ -19,7 +19,7 @@ class JwtUtilTests extends SpringBootTestBase {
 	@Test
 	@DisplayName("Access토큰 생성 성공 테스트")
 	void createAccessTokenTest() {
-		String accessToken = jwtUtil.createAccessToken("60e833fad9fe745685375ba7");
+		String accessToken = jwtUtil.createAccessToken("60e83462d9fe745685375ba9");
 
 		log.info(accessToken);
 
